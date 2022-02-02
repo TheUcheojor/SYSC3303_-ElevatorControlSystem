@@ -1,7 +1,7 @@
 /**
  *
  */
-package Scheduler;
+package common;
 
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;

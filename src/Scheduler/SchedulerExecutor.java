@@ -3,6 +3,8 @@
  */
 package Scheduler;
 
+import common.SimulationFloorInputData;
+
 /**
  * @author paulokenne
  *

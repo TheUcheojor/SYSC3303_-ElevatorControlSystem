@@ -1,7 +1,7 @@
 /**
  *
  */
-package Scheduler;
+package common;
 
 /**
  * This class provides options of elevator directions
