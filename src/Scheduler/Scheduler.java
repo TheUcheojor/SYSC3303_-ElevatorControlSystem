@@ -6,13 +6,13 @@ package Scheduler;
 import java.util.ArrayList;
 
 import common.requests.JobRequest;
-import common.requests.Request;
-import common.requests.RequestChannel;
+import common.requests.Message;
+import common.requests.MessageChannel;
 
 /**
  * This represents the scheduler which manages the elevator and floor subsystem.
  *
- * @author paulokenne, jacobcharpentier
+ * @author paulokenne, jacobcharpentier, ryanfife
  *
  */
 public class Scheduler implements Runnable {
@@ -25,12 +25,12 @@ public class Scheduler implements Runnable {
 	/**
 	 * The floor subsystem channel.
 	 */
-	private RequestChannel floorSubsystemChannel;
+	private MessageChannel floorSubsystemChannel;
 
 	/**
 	 * The elevator subsystem channel.
 	 */
-	private RequestChannel elevatorSubsystemChannel;
+	private MessageChannel elevatorSubsystemChannel;
 
 	/**
 	 * A flag indicating whether the elevator subsystem is ready to take a job
@@ -44,7 +44,7 @@ public class Scheduler implements Runnable {
 	 * @param floorSubsystemChannel    the floor subsystem channel
 	 * @param elevatorSubsystemChanell the elevator subsystem channel
 	 */
-	public Scheduler(RequestChannel floorSubsystemChannel, RequestChannel elevatorSubsystemChannel) {
+	public Scheduler(MessageChannel floorSubsystemChannel, MessageChannel elevatorSubsystemChannel) {
 		this.floorSubsystemChannel = floorSubsystemChannel;
 		this.elevatorSubsystemChannel = elevatorSubsystemChannel;
 	}
@@ -56,7 +56,7 @@ public class Scheduler implements Runnable {
 			if (!floorSubsystemChannel.isEmpty()) {
 				System.out.println("\n" + Thread.currentThread().getName() + " sees the floor subsystem request.");
 
-				Request floorRequest = floorSubsystemChannel.getRequest();
+				Message floorRequest = floorSubsystemChannel.getMessage();
 				handleFloorRequest(floorRequest);
 
 				System.out.println(Thread.currentThread().getName() + " has addressed the floor subsystem request.");
@@ -67,7 +67,7 @@ public class Scheduler implements Runnable {
 			if (!isElevatorSubsystemJobReady && !elevatorSubsystemChannel.isEmpty()) {
 				System.out.println("\n" + Thread.currentThread().getName() + " sees the elevator subsystem request.");
 
-				Request elevatorRequest = elevatorSubsystemChannel.getRequest();
+				Message elevatorRequest = elevatorSubsystemChannel.getMessage();
 				System.out.print("elevatorRequest " + elevatorRequest);
 				handleElevatorRequest(elevatorRequest);
 
@@ -77,7 +77,7 @@ public class Scheduler implements Runnable {
 			// If the elevator is ready and there are job requests, send a job request to
 			// the elevator system
 			if (isElevatorSubsystemJobReady && !jobRequests.isEmpty()) {
-				elevatorSubsystemChannel.setRequest(jobRequests.get(0));
+				elevatorSubsystemChannel.setMessage(jobRequests.get(0));
 				jobRequests.remove(0);
 				isElevatorSubsystemJobReady = false;
 			}
@@ -88,14 +88,14 @@ public class Scheduler implements Runnable {
 	/**
 	 * Handles floor request accordingly.
 	 *
-	 * @param request the request
+	 * @param message the request
 	 */
-	private void handleFloorRequest(Request request) {
+	private void handleFloorRequest(Message message) {
 
-		switch (request.getRequestType()) {
+		switch (message.getMessageType()) {
 
 		case JOB_REQUEST:
-			jobRequests.add((JobRequest) request);
+			jobRequests.add((JobRequest) message);
 			break;
 
 		case ELEVATOR_SUBSYSTEM_READY, TEST_REQUEST:
@@ -107,14 +107,14 @@ public class Scheduler implements Runnable {
 	/**
 	 * Handles elevator request accordingly.
 	 *
-	 * @param request the request
+	 * @param message the request
 	 */
-	private void handleElevatorRequest(Request request) {
+	private void handleElevatorRequest(Message message) {
 
-		switch (request.getRequestType()) {
+		switch (message.getMessageType()) {
 
 		case JOB_REQUEST:
-			floorSubsystemChannel.setRequest(request);
+			floorSubsystemChannel.setMessage(message);
 			break;
 
 		case ELEVATOR_SUBSYSTEM_READY:
