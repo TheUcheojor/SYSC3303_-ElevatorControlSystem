@@ -14,9 +14,17 @@ public class Request {
 	/**
 	 * The request type.
 	 */
-	public RequestType requestType;
+	private RequestType requestType;
 
 	public Request(RequestType requestType) {
 		this.requestType = requestType;
 	}
+
+	/**
+	 * @return the requestType
+	 */
+	public RequestType getRequestType() {
+		return requestType;
+	}
+
 }
