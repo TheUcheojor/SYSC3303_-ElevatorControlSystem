@@ -61,7 +61,7 @@ public class RequestChannel {
 		Request tempRequest = this.request;
 		this.request = null;
 
-		return request;
+		return tempRequest;
 
 	}
 
