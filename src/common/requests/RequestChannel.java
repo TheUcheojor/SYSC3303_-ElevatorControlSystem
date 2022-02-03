@@ -62,7 +62,6 @@ public class RequestChannel {
 		this.request = null;
 
 		return tempRequest;
-
 	}
 
 	/**

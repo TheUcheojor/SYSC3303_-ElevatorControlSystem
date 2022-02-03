@@ -20,4 +20,9 @@ public enum RequestType {
 	 * A request indicating that the elevator subsystem is ready.
 	 */
 	ELEVATOR_SUBSYSTEM_READY,
+
+	/**
+	 * A request for testing purposes.
+	 */
+	TEST_REQUEST
 }
