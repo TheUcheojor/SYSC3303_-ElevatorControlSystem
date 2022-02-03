@@ -53,6 +53,10 @@ class SchedulerTest {
 		scheduler = new Thread(new Scheduler(floorSubsystemChannel, elevatorSubsystemChannel), "");
 	}
 
+	/**
+	 * This test cases tests that the request received from the floor subsystem is
+	 * accepted.
+	 */
 	@Test
 	void testFloorSubsystemRequestIsAccepted() {
 		SimulationFloorInputData data = new SimulationFloorInputData("14:05:15.0 2 UP 4");
@@ -74,6 +78,10 @@ class SchedulerTest {
 		assertTrue(floorSubsystemChannel.isEmpty());
 	}
 
+	/**
+	 * This test cases tests that the request received from the elevator subsystem
+	 * is accepted.
+	 */
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
 		Request request = new Request(RequestType.ELEVATOR_SUBSYSTEM_READY);

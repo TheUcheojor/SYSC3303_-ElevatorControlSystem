@@ -62,7 +62,8 @@ public class Scheduler implements Runnable {
 				System.out.println(Thread.currentThread().getName() + " has addressed the floor subsystem request.");
 			}
 
-			// Only read the data in the channel if the elevator is not ready for a job.
+			// Only read the data in the channel if the elevator is not ready for a job and
+			// the channel is not empty.
 			if (!isElevatorSubsystemJobReady && !elevatorSubsystemChannel.isEmpty()) {
 				System.out.println("\n" + Thread.currentThread().getName() + " sees the elevator subsystem request.");
 

@@ -73,7 +73,7 @@ public class JobRequest extends Request {
 	}
 
 	/**
-	 * Set the isCobCompleted flag.
+	 * Set the isJobCompleted flag.
 	 *
 	 * @param isJobCompleted the isJobCompleted to set
 	 */
