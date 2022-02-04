@@ -9,7 +9,7 @@ package common.requests;
 
 import common.SimulationFloorInputData;
 
-public class JobRequest extends Request {
+public class JobRequest extends Message {
 
 	/**
 	 * The input data.
@@ -40,7 +40,7 @@ public class JobRequest extends Request {
 	 * A Constructor.
 	 **/
 	public JobRequest(SimulationFloorInputData inputData) {
-		super(RequestType.JOB_REQUEST);
+		super(MessageType.JOB_REQUEST);
 		this.inputData = inputData;
 		this.floorId = inputData.getCurrentFloor();
 	}
