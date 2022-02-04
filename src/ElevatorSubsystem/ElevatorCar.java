@@ -1,6 +1,6 @@
 package ElevatorSubsystem;
 
-import common.messages.ElevatorStatusMessage;
+import common.messages.ElevatorStatusResponse;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.MessageType;
@@ -13,10 +13,10 @@ import common.messages.MessageType;
  */
 public class ElevatorCar implements Runnable {
 	private int id;
-	private MessageChannel messageChannel;
 	private boolean inService;
-	private ElevatorMotor elevatorMotor;
-	private ElevatorDoor elevatorDoor;
+	private MessageChannel messageChannel;
+	private ElevatorMotor motor;
+	private ElevatorDoor door;
 	
 	private final static double DOOR_SPEED = 3000;
 	private final static double ELEVATOR_SPEED = 0.5;
@@ -25,12 +25,20 @@ public class ElevatorCar implements Runnable {
 		this.id = id;
 		this.messageChannel = messageChannel;
 		this.inService = true;
-		elevatorDoor = new ElevatorDoor(DOOR_SPEED);
-		elevatorMotor = new ElevatorMotor(ELEVATOR_SPEED);
+		door = new ElevatorDoor(DOOR_SPEED);
+		motor = new ElevatorMotor(ELEVATOR_SPEED);
 	}
 	
 	public int getId() {
 		return this.id;
+	}
+	
+	public ElevatorMotor getMotor() {
+		return motor;
+	}
+	
+	public ElevatorDoor getDoor() {
+		return door;
 	}
 	
 	public boolean getInService() {
@@ -48,14 +56,20 @@ public class ElevatorCar implements Runnable {
 		}
 	}
 	
+	
+	/**
+	 * Elevator message handler. Exterior entities can send various types of request or commands to the elevator.
+	 * 
+	 * @param message
+	 */
 	//@PublicForTestOnly
 	public void handleMessage(Message message) {
 
 		switch (message.getMessageType()) {
 
 		case ELEVATOR_STATUS_REQUEST:
-			ElevatorStatusMessage status = createStatusMessage();
-			messageChannel.setMessage(message);
+			ElevatorStatusResponse status = createStatusMessage();
+			messageChannel.setMessage(status);
 			break;
 
 		default:
@@ -64,12 +78,18 @@ public class ElevatorCar implements Runnable {
 		}
 	}
 	
+	/**
+	 * Creates a ElevatorStatusResponse message containing all relevant status info
+	 * for this elevator.
+	 * 
+	 * @return status response message
+	 */
 	//@PublicForTestOnly
-	public ElevatorStatusMessage createStatusMessage() {
-		ElevatorStatusMessage status = new ElevatorStatusMessage(this.getInService());
-		status.direction = elevatorMotor.getDirection();
-		status.floorNumber = 1337; // TODO: fix this
-		status.isDoorOpen = elevatorDoor.isOpen();
+	public ElevatorStatusResponse createStatusMessage() {
+		ElevatorStatusResponse status = new ElevatorStatusResponse(this.getInService());
+		status.direction = motor.getDirection();
+		status.isDoorOpen = door.isOpen();
+		// TODO (rfife): Pass current floor
 		
 		return status;
 	}

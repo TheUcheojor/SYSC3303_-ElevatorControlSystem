@@ -1,24 +1,21 @@
 package common.messages;
 
 import java.util.Date;
-import java.text.SimpleDateFormat;
 
 import common.DateFormat;
 import common.Direction;
 
-public class ElevatorStatusMessage extends Message {
-	public boolean isRunning;
+public class ElevatorStatusResponse extends Message {
+	public boolean inService;
 	public boolean isDoorOpen;
+	public int floorNumber;
+	public String timestamp;
 	
 	public Direction direction;
 	
-	public int floorNumber;
-
-	public String timestamp;
-	
-	public ElevatorStatusMessage(boolean isRunning){
+	public ElevatorStatusResponse(boolean inService){
 		super(MessageType.ELEVATOR_STATUS_RESPONSE);
 		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
-		this.isRunning = isRunning;
+		this.inService = inService;
 	}
 }
