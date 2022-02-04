@@ -38,7 +38,7 @@ public class SimulationFloorInputData {
 	 * The elevator direction that the passenger wishes to go to reach his or her
 	 * destination
 	 */
-	Direction floorDirectionButton;
+	private Direction floorDirectionButton;
 
 	/**
 	 * The floor that the passenger wishes to go to.
