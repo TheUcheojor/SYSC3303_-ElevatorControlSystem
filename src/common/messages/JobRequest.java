@@ -5,7 +5,7 @@
  *
  */
 
-package common.requests;
+package common.messages;
 
 import common.SimulationFloorInputData;
 

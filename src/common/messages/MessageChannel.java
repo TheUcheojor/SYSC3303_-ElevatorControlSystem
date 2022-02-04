@@ -1,7 +1,7 @@
 /**
  *
  */
-package common.requests;
+package common.messages;
 
 /**
  * This class represents a channel whereby threads can transfer data.
@@ -39,6 +39,7 @@ public class MessageChannel {
 		}
 
 		this.message = message;
+		notifyAll();
 	}
 
 	/**
@@ -61,6 +62,7 @@ public class MessageChannel {
 		Message tempMessage = this.message;
 		this.message = null;
 
+		notifyAll();
 		return tempMessage;
 	}
 

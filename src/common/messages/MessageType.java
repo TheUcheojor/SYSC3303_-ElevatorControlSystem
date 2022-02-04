@@ -1,7 +1,7 @@
 /**
  *
  */
-package common.requests;
+package common.messages;
 
 /**
  * The different types of request.

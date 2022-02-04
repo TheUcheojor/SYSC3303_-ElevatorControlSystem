@@ -1,7 +1,7 @@
 /**
  *
  */
-package common.requests;
+package common.messages;
 
 /**
  * This class represents a request entity
