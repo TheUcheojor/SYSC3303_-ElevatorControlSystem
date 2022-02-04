@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import common.SimulationFloorInputData;
-import common.requests.JobRequest;
-import common.requests.MessageChannel;
+import common.messages.JobRequest;
+import common.messages.MessageChannel;
 
 
 /**
