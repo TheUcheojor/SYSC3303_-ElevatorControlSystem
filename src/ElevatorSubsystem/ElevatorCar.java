@@ -21,7 +21,7 @@ public class ElevatorCar implements Runnable {
 	private final static double DOOR_SPEED = 3000;
 	private final static double ELEVATOR_SPEED = 0.5;
 	
-	ElevatorCar(int id, MessageChannel messageChannel) {
+	public ElevatorCar(int id, MessageChannel messageChannel) {
 		this.id = id;
 		this.messageChannel = messageChannel;
 		this.inService = true;
@@ -40,15 +40,6 @@ public class ElevatorCar implements Runnable {
 	public void setInService(boolean service) {
 		inService = service;
 	}
-	
-	private ElevatorStatusMessage createStatusMessage() {
-		ElevatorStatusMessage status = new ElevatorStatusMessage(this.getInService());
-		status.direction = elevatorMotor.getDirection();
-		status.floorNumber = 1337; // TODO: fix this
-		status.isDoorOpen = elevatorDoor.isOpen();
-		
-		return status;
-	}
 
 	public void run() {
 		while(true) {
@@ -57,7 +48,8 @@ public class ElevatorCar implements Runnable {
 		}
 	}
 	
-	private void handleMessage(Message message) {
+	//@PublicForTestOnly
+	public void handleMessage(Message message) {
 
 		switch (message.getMessageType()) {
 
@@ -70,5 +62,15 @@ public class ElevatorCar implements Runnable {
 			break;
 
 		}
+	}
+	
+	//@PublicForTestOnly
+	public ElevatorStatusMessage createStatusMessage() {
+		ElevatorStatusMessage status = new ElevatorStatusMessage(this.getInService());
+		status.direction = elevatorMotor.getDirection();
+		status.floorNumber = 1337; // TODO: fix this
+		status.isDoorOpen = elevatorDoor.isOpen();
+		
+		return status;
 	}
 }

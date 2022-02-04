@@ -21,8 +21,16 @@ public class ElevatorMotor {
 		this.acceleration = acceleration;
 	}
 	
-	ElevatorMotor(double topSpeed) {
+	public ElevatorMotor(double topSpeed) {
 		this.topSpeed = topSpeed;
+	}
+	
+	public Direction getDirection() {
+		return direction;
+	}
+	
+	public boolean getIsRunning() {
+		return isRunning;
 	}
 	
 	public void goUp() {
@@ -36,11 +44,7 @@ public class ElevatorMotor {
 	}
 	
 	public void turnOff() {
+		this.direction = null;
 		this.isRunning = false;
 	}
-	
-	public Direction getDirection() {
-		return direction;
-	}
-
 }
