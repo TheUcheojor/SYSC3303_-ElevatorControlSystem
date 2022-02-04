@@ -21,7 +21,7 @@ public class FloorSubsystem implements Runnable{
 	/**
 	 * The name of the input text file
 	 */
-	private String inputFileName;
+	private String inputFileName = "";
 	
 	/**
 	 * Collection of the simulation input objects
@@ -42,12 +42,22 @@ public class FloorSubsystem implements Runnable{
 	 * This is the default constructor of the class
 	 * 
 	 * @param inputFileName - The input text file
+	 * @param floorMessageChannel - The message channel for communicating with the scheduler
 	 */
 	public FloorSubsystem(String inputFileName, MessageChannel floorMessageChannel) {
 		this.inputFileName = inputFileName;
 		this.floorMessageChannel = floorMessageChannel;
 	}
 	
+	/**
+	 * This is a secondary constructor for testing purposes 
+	 * @param inputData - A simulation input data object
+	 * @param floorMessageChannel - The message channel for communicating with the scheduler
+	 */
+	public FloorSubsystem(SimulationFloorInputData inputData, MessageChannel floorMessageChannel) {
+		floorDataCollection.add(inputData);
+		this.floorMessageChannel = floorMessageChannel;
+	}
 	/**
 	 * This method reads in the input text file and converts
 	 * it to SimulationFloorInputData objects as needed
@@ -81,7 +91,9 @@ public class FloorSubsystem implements Runnable{
 	 * This is an overide of the runnable run method
 	 */
 	public void run() {
-		readInputFile();
+		// Only attempt to read file when a file name as been passed
+		if(!inputFileName.equals("")) readInputFile();
+		
 		boolean messageSent = false;
 		for(SimulationFloorInputData floorInputData: floorDataCollection) {
 			// creating a job to be sent to scheduler
@@ -97,8 +109,17 @@ public class FloorSubsystem implements Runnable{
 				floorMessageChannel.setMessage(jobRequest);
 				messageSent = true;
 				floor.printFloorStatus();
+				
 			}
 		
+			
+			// Give the scheduler time to get the request.
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
 			
 			// Checking the scheduler has sent a message back
 			if(!floorMessageChannel.isEmpty() && messageSent) {
