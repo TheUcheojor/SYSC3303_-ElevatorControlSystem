@@ -51,7 +51,7 @@ public class FloorSubsystem implements Runnable{
 	
 	/**
 	 * This is a secondary constructor for testing purposes 
-	 * @param inputFileName - The input text file
+	 * @param inputData - A simulation input data object
 	 * @param floorMessageChannel - The message channel for communicating with the scheduler
 	 */
 	public FloorSubsystem(SimulationFloorInputData inputData, MessageChannel floorMessageChannel) {
