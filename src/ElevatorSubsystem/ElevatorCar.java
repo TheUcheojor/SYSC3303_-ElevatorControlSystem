@@ -51,9 +51,9 @@ public class ElevatorCar implements Runnable {
 	}
 
 	public void run() {
-		ElevatorStatusMessage status = createStatusMessage();
-		messageChannel.setMessage(status);
 		while(true) {
+			ElevatorStatusMessage status = createStatusMessage();
+			messageChannel.setMessage(status);
 			Message message = messageChannel.getMessage();
 			try {
 				handleMessage(message);
