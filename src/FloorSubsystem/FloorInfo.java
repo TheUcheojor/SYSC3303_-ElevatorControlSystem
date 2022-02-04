@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package FloorSubsystem;
 
 /**
@@ -20,12 +23,6 @@ public class FloorInfo {
 		isButtonPressed = false;
 	}
 	
-//	public FloorInfo(String timeStamp, String direction, int floorNumber, int carButton) {
-//		this.timeStamp = timeStamp;
-//		this.direction = direction;
-//		this.floorNumber = floorNumber;
-//		this.carButton = carButton;
-//	}
 
 	public boolean isFloorNotified() {
 		return ElevatorSensor;
