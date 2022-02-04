@@ -115,7 +115,7 @@ public class FloorInfo {
 	 */
 	public void printFloorStatus() {
 		if(isLampActive && isButtonPressed) {
-			System.out.println("The user has pushed the floor button to go " + direction + "at floor: " + floorNumber +" ..");
+			System.out.println("The user has pushed the floor button to go " + direction + " at floor: " + floorNumber +" ..");
 		}else if(ElevatorSensor) {
 			System.out.println("The elevator has arrived at floor: " + floorNumber + " ..");
             ElevatorSensor = false;

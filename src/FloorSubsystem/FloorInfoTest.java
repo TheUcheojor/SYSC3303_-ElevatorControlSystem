@@ -7,9 +7,18 @@ import org.junit.jupiter.api.Test;
 
 import common.Direction;
 
+/**
+ * Tests the FloorInfo class.
+ *
+ * @author Favour
+ *
+ */
 class FloorInfoTest {
 
 
+	/**
+	 * Instance of the FloorInfo class
+	 */
 	FloorInfo floor;
 
 	/**
@@ -34,6 +43,7 @@ class FloorInfoTest {
 	 */
 	@Test
 	void testFloorNumber() {
+		// testing the default state
 		assertTrue(floor.getFloorNumber() == -1);
 		floor.setFloorNumber(2);
 		assertTrue(floor.getFloorNumber() == 2);
