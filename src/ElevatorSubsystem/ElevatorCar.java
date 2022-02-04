@@ -53,7 +53,7 @@ public class ElevatorCar implements Runnable {
 	public void run() {
 		boolean messageSent = false;
 		while(true) {
-			// send status message and wait for a response for scheduler response in loop
+			// send status message and wait for a response from scheduler response in loop
 			if(messageChannel.isEmpty() && !messageSent) {
 				ElevatorStatusMessage status = createStatusMessage();
 				messageChannel.setMessage(status);
