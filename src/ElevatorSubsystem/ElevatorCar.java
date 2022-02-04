@@ -51,14 +51,17 @@ public class ElevatorCar implements Runnable {
 	}
 
 	public void run() {
+		boolean messageSent = false;
 		while(true) {
-			ElevatorStatusMessage status = createStatusMessage();
-			messageChannel.setMessage(status);
-			Message message = messageChannel.getMessage();
-			try {
+			// send status message and wait for a response for scheduler response in loop
+			if(messageChannel.isEmpty() && !messageSent) {
+				ElevatorStatusMessage status = createStatusMessage();
+				messageChannel.setMessage(status);
+				messageSent = true;
+			}else if(!messageChannel.isEmpty() && messageSent) {
+				Message message = messageChannel.getMessage();
 				handleMessage(message);
-			}catch(Exception e) {
-				System.out.println(e);
+				messageSent = false;
 			}
 		}
 	}
