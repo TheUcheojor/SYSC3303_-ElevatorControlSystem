@@ -5,9 +5,9 @@ package Scheduler;
 
 import java.util.ArrayList;
 
-import common.requests.JobRequest;
-import common.requests.Message;
-import common.requests.MessageChannel;
+import common.messages.JobRequest;
+import common.messages.Message;
+import common.messages.MessageChannel;
 
 /**
  * This represents the scheduler which manages the elevator and floor subsystem.
