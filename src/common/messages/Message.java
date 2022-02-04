@@ -4,7 +4,7 @@
 package common.messages;
 
 /**
- * This class represents a request entity
+ * This class represents a message entity
  *
  * @author paulokenne, ryanfife
  *
@@ -12,7 +12,7 @@ package common.messages;
 public class Message {
 
 	/**
-	 * The request type.
+	 * The message type.
 	 */
 	private MessageType messageType;
 

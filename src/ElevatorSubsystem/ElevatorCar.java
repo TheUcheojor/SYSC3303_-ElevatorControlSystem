@@ -1,12 +1,13 @@
 package ElevatorSubsystem;
 
+import common.messages.ElevatorMessage;
 import common.messages.ElevatorStatusResponse;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.MessageType;
 
 /**
- * Entity representing the elevator car
+ * Entity representing an elevator car, contains composite subcomponents for major functionality.
  * 
  * @author Ryan Fife
  *
@@ -52,7 +53,11 @@ public class ElevatorCar implements Runnable {
 	public void run() {
 		while(true) {
 			Message message = messageChannel.getMessage();
-			handleMessage(message);
+			try {
+				handleMessage(message);
+			}catch(Exception e) {
+				System.out.println(e);
+			}
 		}
 	}
 	
@@ -60,21 +65,27 @@ public class ElevatorCar implements Runnable {
 	/**
 	 * Elevator message handler. Exterior entities can send various types of request or commands to the elevator.
 	 * 
-	 * @param message
+	 * @param message to handle
+	 * @throws Exception if the message doesn't belong to this elevator
 	 */
 	//@PublicForTestOnly
-	public void handleMessage(Message message) {
+	public void handleMessage(Message message) throws Exception {
 
-		switch (message.getMessageType()) {
-
-		case ELEVATOR_STATUS_REQUEST:
-			ElevatorStatusResponse status = createStatusMessage();
-			messageChannel.setMessage(status);
-			break;
-
-		default:
-			break;
-
+		ElevatorMessage m = (ElevatorMessage) message;
+		if(m.getId() == id) {
+			switch (message.getMessageType()) {
+	
+			case ELEVATOR_STATUS_REQUEST:
+				ElevatorStatusResponse status = createStatusMessage();
+				messageChannel.setMessage(status);
+				break;
+	
+			default:
+				break;
+	
+			}
+		}else {
+			throw new Exception("Message sent to wrong elevator, disregarding message");
 		}
 	}
 	
@@ -86,7 +97,7 @@ public class ElevatorCar implements Runnable {
 	 */
 	//@PublicForTestOnly
 	public ElevatorStatusResponse createStatusMessage() {
-		ElevatorStatusResponse status = new ElevatorStatusResponse(this.getInService());
+		ElevatorStatusResponse status = new ElevatorStatusResponse(this.getInService(), id);
 		status.direction = motor.getDirection();
 		status.isDoorOpen = door.isOpen();
 		// TODO (rfife): Pass current floor

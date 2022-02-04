@@ -19,6 +19,7 @@ public enum MessageType {
 	/**
 	 * A request indicating that the elevator subsystem is ready.
 	 */
+	ELEVATOR_MESSAGE,
 	ELEVATOR_STATUS_REQUEST,
 	ELEVATOR_STATUS_RESPONSE,
 

@@ -1,6 +1,9 @@
 package tests.ElevatorSubsystem;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,11 +52,23 @@ class TestElevatorCar {
 	
 	@Test
 	void testStatusRequestReceived() {	
-		 elevatorCar.handleMessage(new ElevatorStatusRequest(CAR_ID));
+		try {
+			elevatorCar.handleMessage(new ElevatorStatusRequest(CAR_ID));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		 Message message = messageChannel.getMessage();
 		
 		// elevator should place a status response in the channel
 		assertEquals(message instanceof ElevatorStatusResponse, true);
+	}
+	
+	@Test
+	void testHandleWrongCardId() {
+		// handleMessage should throw an exception if the elevator doesn't recognize the elevatorId
+		assertThrows(Exception.class, () -> {
+			elevatorCar.handleMessage(new ElevatorStatusRequest(CAR_ID+1));
+			});
 	}
 
 }

@@ -6,7 +6,7 @@ package common.messages;
 /**
  * This class represents a channel whereby threads can transfer data.
  *
- * @author paulokenne, ryanfife
+ * @author paulokenne, Ryan Fife
  *
  */
 public class MessageChannel {
