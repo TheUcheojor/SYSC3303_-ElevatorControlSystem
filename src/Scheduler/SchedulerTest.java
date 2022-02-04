@@ -84,7 +84,7 @@ class SchedulerTest {
 	 */
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
-		Message message = new Message(MessageType.ELEVATOR_SUBSYSTEM_READY);
+		Message message = new Message(MessageType.ELEVATOR_STATUS_REQUEST);
 		elevatorSubsystemChannel.setMessage(message);
 
 		scheduler.start();

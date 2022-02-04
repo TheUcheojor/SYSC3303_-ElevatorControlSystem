@@ -116,5 +116,4 @@ public class JobRequest extends Message {
 	public int getFloorId() {
 		return floorId;
 	}
-
 }

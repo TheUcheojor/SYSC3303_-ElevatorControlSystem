@@ -11,17 +11,17 @@ import common.Direction;
 
 public class ElevatorMotor {
 	
-	private float topSpeed;
+	private double topSpeed;
 	private Direction direction = null;
-	private float acceleration = 0;
+	private double acceleration = 0;
 	private boolean isRunning = false;
 	
-	ElevatorMotor(int topSpeed, int acceleration) {
+	public ElevatorMotor(double topSpeed, double acceleration) {
 		this.topSpeed = topSpeed;
 		this.acceleration = acceleration;
 	}
 	
-	ElevatorMotor(int topSpeed) {
+	ElevatorMotor(double topSpeed) {
 		this.topSpeed = topSpeed;
 	}
 	
@@ -37,6 +37,10 @@ public class ElevatorMotor {
 	
 	public void turnOff() {
 		this.isRunning = false;
+	}
+	
+	public Direction getDirection() {
+		return direction;
 	}
 
 }

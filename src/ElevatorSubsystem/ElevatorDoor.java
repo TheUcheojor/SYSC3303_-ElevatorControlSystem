@@ -2,32 +2,36 @@ package ElevatorSubsystem;
 
 public class ElevatorDoor {
 	// door open/close speed in milliseconds
-	private long doorSpeed;
+	private double doorSpeed;
 	private boolean isOpen = false;
 	
-	ElevatorDoor(long doorSpeed) {
+	public ElevatorDoor(double doorSpeed) {
 		this.doorSpeed = doorSpeed;
+	}
+	
+	public boolean isOpen() {
+		return isOpen;
 	}
 	
 	public void openDoor() {
 		if(!this.isOpen) {
 			try {
-				Thread.sleep(this.doorSpeed);
+				Thread.sleep((long) this.doorSpeed);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			this.isOpen = true;
+			isOpen = true;
 		}
 	}
 	
 	public void closeDoor() {
 		if(!this.isOpen) {
 			try {
-				Thread.sleep(this.doorSpeed);
+				Thread.sleep((long) this.doorSpeed);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			this.isOpen = false;
+			isOpen = false;
 		}
 	}
 	

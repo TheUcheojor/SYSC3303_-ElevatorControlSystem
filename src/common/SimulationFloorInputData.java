@@ -21,10 +21,6 @@ public class SimulationFloorInputData {
 	private static final String FLOOR_DATA_INPUT_SEPARATOR = " ";
 
 	/**
-	 * The data formatter for the time field
-	 */
-	private final SimpleDateFormat DATA_FORMAT_FOR_ARRIVAL_TIME = new SimpleDateFormat("hh:mm:ss.mmm");
-	/**
 	 * The time stamp indicating when the passenger arrives.
 	 */
 	private String arrivalTime;
@@ -74,8 +70,8 @@ public class SimulationFloorInputData {
 			String[] data = dataString.split(FLOOR_DATA_INPUT_SEPARATOR);
 
 			System.out.println(data.length);
-			Date parsedDate = DATA_FORMAT_FOR_ARRIVAL_TIME.parse(data[0]);
-			this.arrivalTime = DATA_FORMAT_FOR_ARRIVAL_TIME.format(parsedDate);
+			Date parsedDate = DateFormat.DATE_FORMAT.parse(data[0]);
+			this.arrivalTime = DateFormat.DATE_FORMAT.format(parsedDate);
 
 			this.currentFloor = Integer.parseInt(data[1]);
 			this.floorDirectionButton = Direction.valueOf(data[2]);
