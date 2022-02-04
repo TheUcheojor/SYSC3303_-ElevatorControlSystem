@@ -4,36 +4,48 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.util.ArrayList;
+
+import common.SimulationFloorInputData;
+import common.requests.JobRequest;
+import common.requests.MessageChannel;
 
 
 /**
+ * This class simulates the FloorSubsystem thread
  * 
  * @author Favour
  * @author Delight
  */
 public class FloorSubsystem implements Runnable{
 	
-	//private Scheduler scheduler;
-	private String inputFile;
-	//private ArrayList<SimulationFloorInputData> floorDataCollection;
+	private String inputFileName;
+	private ArrayList<SimulationFloorInputData> floorDataCollection;
 	private FloorInfo floor;
+	private MessageChannel floorMessageChannel;
 
-	
-	public FloorSubsystem(String inputFile) { // add scheduler
-		this.inputFile = inputFile;
-		//floorDataCollection = new ArrayList<>();
+	/**
+	 * This is the default constructor of the class
+	 * 
+	 * @param inputFileName - The input text file
+	 */
+	public FloorSubsystem(String inputFileName) {
+		this.inputFileName = inputFileName;
+		floorDataCollection = new ArrayList<>();
 		floor = new FloorInfo();
-		
+		floorMessageChannel = new MessageChannel();
 	}
 	
+	/**
+	 * This method reads in the input text file and converts
+	 * it to SimulationFloorInputData objects as needed
+	 * 
+	 */
 	private void readInputFile() {
 		BufferedReader bufferedReader = null;
 		
 		try {
-			bufferedReader = new BufferedReader(new FileReader(inputFile));
+			bufferedReader = new BufferedReader(new FileReader(inputFileName));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -43,41 +55,40 @@ public class FloorSubsystem implements Runnable{
 		try {
 			while((input = bufferedReader.readLine()) != null) {
 				
-				//floorDataCollection.add(initializeInput(input.split(" ")));
+				floorDataCollection.add(new SimulationFloorInputData(input));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private FloorInfo initializeInput(String[] inputLine) {
-		
-		int timeStampIndex = 0;
-		int floorNumberIndex = 1;
-		int floorButtonIndex = 2;
-		int carNumberIndex = 3;
-		
-		if(inputLine == null || (inputLine.length < 3)) {
-			System.out.println("Faulty line found...Please check input file.");
-		}else {
-			String timeStamp = inputLine[timeStampIndex];
-			int floorNumber = Integer.parseInt(inputLine[floorNumberIndex]);
-			String direction = inputLine[floorButtonIndex];;
-			int carButton = Integer.parseInt(inputLine[carNumberIndex]);
-			//return new FloorInfo(timeStamp, direction, floorNumber, carButton);
-		}
-		return null;
-	}
 
+	/**
+	 * This is an overide of the runnable run method
+	 */
 	public void run() {
 		readInputFile();
-		//for(FloorInfo f: floorDataCollection) {
-			//System.out.println(f.toString());
-		//}
+		
+		for(SimulationFloorInputData floorInputData: floorDataCollection) {
+			// creating a job to be sent to scheduler
+			JobRequest jobRequest = new JobRequest(floorInputData);
+			
+			//updating the floor properties(User interacting with the floor button)
+			floor.pressFloorButton(floorInputData.getFloorDirectionButton());
+			floor.setFloorNumber(floorInputData.getCurrentFloor());
+			
+			//sending the job to the scheduler
+			floorMessageChannel.setMessage(jobRequest);
+			floor.printFloorStatus();
+			
+			// Checking the scheduler has sent a message back
+			if(!floorMessageChannel.isEmpty()) {
+				jobRequest = (JobRequest) floorMessageChannel.getMessage();
+				floor.messageRecieved(jobRequest.isJobCompleted());
+				floor.setFloorNumber(jobRequest.getFloorId());
+				floor.printFloorStatus();
+			}
+		}
 	}
 
-	public static void main(String[] args) {
-		Thread fss = new Thread(new FloorSubsystem("c:\\Input.txt"));
-		fss.start();
-	}
 }
