@@ -14,7 +14,7 @@ import ElevatorSubsystem.ElevatorDoor;
 import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
 import common.messages.ElevatorStatusRequest;
-import common.messages.ElevatorStatusResponse;
+import common.messages.ElevatorStatusMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
 
@@ -42,7 +42,7 @@ class TestElevatorCar {
 		door.closeDoor();
 		motor.goUp();
 		
-		ElevatorStatusResponse statusMessage = elevatorCar.createStatusMessage();
+		ElevatorStatusMessage statusMessage = elevatorCar.createStatusMessage();
 		
 		// elevator should format status message correctly
 		assertTrue(statusMessage.inService);
@@ -60,15 +60,6 @@ class TestElevatorCar {
 		 Message message = messageChannel.getMessage();
 		
 		// elevator should place a status response in the channel
-		assertEquals(message instanceof ElevatorStatusResponse, true);
+		assertEquals(message instanceof ElevatorStatusMessage, true);
 	}
-	
-	@Test
-	void testHandleWrongCardId() {
-		// handleMessage should throw an exception if the elevator doesn't recognize the elevatorId
-		assertThrows(Exception.class, () -> {
-			elevatorCar.handleMessage(new ElevatorStatusRequest(CAR_ID+1));
-			});
-	}
-
 }

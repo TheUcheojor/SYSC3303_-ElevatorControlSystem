@@ -12,7 +12,7 @@ import common.Direction;
  *
  */
 
-public class ElevatorStatusResponse extends Message implements ElevatorMessage {
+public class ElevatorStatusMessage extends Message implements ElevatorMessage {
 	public int elevatorId;
 	public boolean inService;
 	public boolean isDoorOpen;
@@ -21,8 +21,8 @@ public class ElevatorStatusResponse extends Message implements ElevatorMessage {
 	
 	public Direction direction;
 	
-	public ElevatorStatusResponse(boolean inService, int elevatorId){
-		super(MessageType.ELEVATOR_STATUS_RESPONSE);
+	public ElevatorStatusMessage(boolean inService, int elevatorId){
+		super(MessageType.ELEVATOR_STATUS_MESSAGE);
 		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
 		this.inService = inService;
 		this.elevatorId = elevatorId;

@@ -16,7 +16,7 @@ public enum MessageType {
 	 */
 	JOB_REQUEST,
 	ELEVATOR_STATUS_REQUEST,
-	ELEVATOR_STATUS_RESPONSE,
+	ELEVATOR_STATUS_MESSAGE,
 
 	/**
 	 * A request for testing purposes.

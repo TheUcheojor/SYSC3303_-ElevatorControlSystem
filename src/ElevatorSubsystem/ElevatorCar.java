@@ -1,7 +1,7 @@
 package ElevatorSubsystem;
 
 import common.messages.ElevatorMessage;
-import common.messages.ElevatorStatusResponse;
+import common.messages.ElevatorStatusMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.MessageType;
@@ -51,6 +51,8 @@ public class ElevatorCar implements Runnable {
 	}
 
 	public void run() {
+		ElevatorStatusMessage status = createStatusMessage();
+		messageChannel.setMessage(status);
 		while(true) {
 			Message message = messageChannel.getMessage();
 			try {
@@ -69,35 +71,34 @@ public class ElevatorCar implements Runnable {
 	 * @throws Exception if the message doesn't belong to this elevator
 	 */
 	//@PublicForTestOnly
-	public void handleMessage(Message message) throws Exception {
+	public void handleMessage(Message message) {
 
-		ElevatorMessage m = (ElevatorMessage) message;
-		if(m.getId() == id) {
-			switch (message.getMessageType()) {
-	
-			case ELEVATOR_STATUS_REQUEST:
-				ElevatorStatusResponse status = createStatusMessage();
-				messageChannel.setMessage(status);
-				break;
-	
-			default:
-				break;
-	
-			}
-		}else {
-			throw new Exception("Message sent to wrong elevator, disregarding message");
+		switch (message.getMessageType()) {
+		
+		case JOB_REQUEST:
+			messageChannel.setMessage(message);
+			break;
+
+		case ELEVATOR_STATUS_REQUEST:
+			ElevatorStatusMessage status = createStatusMessage();
+			messageChannel.setMessage(status);
+			break;
+
+		default:
+			break;
+
 		}
 	}
 	
 	/**
-	 * Creates a ElevatorStatusResponse message containing all relevant status info
+	 * Creates a ElevatorStatusMessage message containing all relevant status info
 	 * for this elevator.
 	 * 
 	 * @return status response message
 	 */
 	//@PublicForTestOnly
-	public ElevatorStatusResponse createStatusMessage() {
-		ElevatorStatusResponse status = new ElevatorStatusResponse(this.getInService(), id);
+	public ElevatorStatusMessage createStatusMessage() {
+		ElevatorStatusMessage status = new ElevatorStatusMessage(this.getInService(), id);
 		status.direction = motor.getDirection();
 		status.isDoorOpen = door.isOpen();
 		// TODO (rfife): Pass current floor
