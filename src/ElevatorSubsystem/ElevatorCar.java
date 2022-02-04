@@ -58,7 +58,8 @@ public class ElevatorCar implements Runnable {
 				ElevatorStatusMessage status = createStatusMessage();
 				messageChannel.setMessage(status);
 				messageSent = true;
-			}else if(!messageChannel.isEmpty() && messageSent) {
+			}
+			if(!messageChannel.isEmpty() && messageSent) {
 				Message message = messageChannel.getMessage();
 				handleMessage(message);
 				messageSent = false;
