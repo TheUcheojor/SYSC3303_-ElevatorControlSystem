@@ -9,21 +9,30 @@ import common.Direction;
  */
 public class FloorInfo {
 	
-	private Direction direction;
-	private int floorNumber;
-	private boolean isLampActive;
-	private boolean ElevatorSensor;
-	private boolean isButtonPressed;
-
-
 	/**
-	 * Default Constructor
+	 * Direction selected by user
 	 */
-	public FloorInfo() {
-		isLampActive = false;
-		ElevatorSensor = false;
-		isButtonPressed = false;
-	}
+	private Direction direction = null;
+	
+	/**
+	 * The current floor number
+	 */
+	private int floorNumber = -1;
+	
+	/**
+	 * The status of the floor lamp
+	 */
+	private boolean isLampActive = false;
+	
+	/**
+	 * The status of the floor elevator sensor
+	 */
+	private boolean ElevatorSensor = false;
+	
+	/**
+	 * The status of the floor's button
+	 */
+	private boolean isButtonPressed = false;
 	
 
 	/**
@@ -61,7 +70,7 @@ public class FloorInfo {
 	
 	/**
 	 * This method returns the status of the floor's button
-	 * @return - 
+	 * @return - The status of the button
 	 */
 	public boolean isButtonPressed() {
 		return isButtonPressed;
