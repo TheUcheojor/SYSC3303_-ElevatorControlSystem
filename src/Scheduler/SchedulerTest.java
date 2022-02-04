@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import common.SimulationFloorInputData;
 import common.requests.JobRequest;
-import common.requests.Request;
-import common.requests.RequestChannel;
-import common.requests.RequestType;
+import common.requests.Message;
+import common.requests.MessageChannel;
+import common.requests.MessageType;
 
 /**
  * Tests the scheduler based on iteration 1 requirements.
@@ -30,12 +30,12 @@ class SchedulerTest {
 	/**
 	 * The floor subsystem channel.
 	 */
-	private RequestChannel floorSubsystemChannel;
+	private MessageChannel floorSubsystemChannel;
 
 	/**
 	 * The elevator subsystem channel.
 	 */
-	private RequestChannel elevatorSubsystemChannel;
+	private MessageChannel elevatorSubsystemChannel;
 
 	/**
 	 * The scheduler.
@@ -47,8 +47,8 @@ class SchedulerTest {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		floorSubsystemChannel = new RequestChannel();
-		elevatorSubsystemChannel = new RequestChannel();
+		floorSubsystemChannel = new MessageChannel();
+		elevatorSubsystemChannel = new MessageChannel();
 
 		scheduler = new Thread(new Scheduler(floorSubsystemChannel, elevatorSubsystemChannel), "");
 	}
@@ -61,10 +61,10 @@ class SchedulerTest {
 	void testFloorSubsystemRequestIsAccepted() {
 		SimulationFloorInputData data = new SimulationFloorInputData("14:05:15.0 2 UP 4");
 		JobRequest jobRequest = new JobRequest(data);
-		floorSubsystemChannel.setRequest(jobRequest);
+		floorSubsystemChannel.setMessage(jobRequest);
 
-		Request request = new Request(RequestType.TEST_REQUEST);
-		elevatorSubsystemChannel.setRequest(request);
+		Message message = new Message(MessageType.TEST_REQUEST);
+		elevatorSubsystemChannel.setMessage(message);
 
 		scheduler.start();
 
@@ -84,8 +84,8 @@ class SchedulerTest {
 	 */
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
-		Request request = new Request(RequestType.ELEVATOR_SUBSYSTEM_READY);
-		elevatorSubsystemChannel.setRequest(request);
+		Message message = new Message(MessageType.ELEVATOR_SUBSYSTEM_READY);
+		elevatorSubsystemChannel.setMessage(message);
 
 		scheduler.start();
 

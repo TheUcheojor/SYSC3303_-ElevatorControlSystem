@@ -9,7 +9,7 @@ package common.requests;
  * @author paulokenne
  *
  */
-public enum RequestType {
+public enum MessageType {
 
 	/**
 	 * A job request which indicates a passenger wishes to go from floor A to B.
