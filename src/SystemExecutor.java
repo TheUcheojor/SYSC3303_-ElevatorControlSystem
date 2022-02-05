@@ -27,7 +27,6 @@ public class SystemExecutor {
 		MessageChannel elevatorSubsystemReceiverChannel = new MessageChannel("Elevator Subsystem Receiver");
 
 		String filePath = "resources/FloorInputFile.txt";
-		SimulationFloorInputData floorInputData = new SimulationFloorInputData("14:05:15.0 2 UP 4");
 
 		Thread floorSubsystem = new Thread(
 				new FloorSubsystem(filePath, floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel),
