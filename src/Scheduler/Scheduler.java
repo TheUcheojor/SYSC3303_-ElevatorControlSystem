@@ -76,7 +76,7 @@ public class Scheduler implements Runnable {
 
 			// Only read the data in the channel if the elevator is not ready for a job and
 			// the channel is not empty.
-			if (!isElevatorSubsystemJobReady && !elevatorSubsystemTransmissonChannel.isEmpty()) {
+			if (!elevatorSubsystemTransmissonChannel.isEmpty()) {
 				Message elevatorRequest = elevatorSubsystemTransmissonChannel.getMessage();
 				handleElevatorRequest(elevatorRequest);
 			}
