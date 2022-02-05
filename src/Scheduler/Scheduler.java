@@ -23,14 +23,24 @@ public class Scheduler implements Runnable {
 	private ArrayList<JobRequest> jobRequests = new ArrayList<>();
 
 	/**
-	 * The floor subsystem channel.
+	 * The floor subsystem transmission channel.
 	 */
-	private MessageChannel floorSubsystemChannel;
+	private MessageChannel floorSubsystemTransmissonChannel;
 
 	/**
-	 * The elevator subsystem channel.
+	 * The floor subsystem receiver channel.
 	 */
-	private MessageChannel elevatorSubsystemChannel;
+	private MessageChannel floorSubsystemReceiverChannel;
+
+	/**
+	 * The elevator subsystem transmission channel.
+	 */
+	private MessageChannel elevatorSubsystemTransmissonChannel;
+
+	/**
+	 * The elevator subsystem receiver channel.
+	 */
+	private MessageChannel elevatorSubsystemReceiverChannel;
 
 	/**
 	 * A flag indicating whether the elevator subsystem is ready to take a job
@@ -44,40 +54,39 @@ public class Scheduler implements Runnable {
 	 * @param floorSubsystemChannel    the floor subsystem channel
 	 * @param elevatorSubsystemChanell the elevator subsystem channel
 	 */
-	public Scheduler(MessageChannel floorSubsystemChannel, MessageChannel elevatorSubsystemChannel) {
-		this.floorSubsystemChannel = floorSubsystemChannel;
-		this.elevatorSubsystemChannel = elevatorSubsystemChannel;
+	public Scheduler(MessageChannel floorSubsystemTransmissonChannel, MessageChannel floorSubsystemReceiverChannel,
+			MessageChannel elevatorSubsystemTransmissonChannel, MessageChannel elevatorSubsystemReceiverChannel) {
+
+		this.floorSubsystemTransmissonChannel = floorSubsystemTransmissonChannel;
+		this.floorSubsystemReceiverChannel = floorSubsystemReceiverChannel;
+
+		this.elevatorSubsystemTransmissonChannel = elevatorSubsystemTransmissonChannel;
+		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
 	}
 
 	@Override
 	public void run() {
 
 		while (true) {
-			if (!floorSubsystemChannel.isEmpty()) {
-				System.out.println("\n" + Thread.currentThread().getName() + " sees the floor subsystem request.");
-
-				Message floorRequest = floorSubsystemChannel.getMessage();
+			if (!floorSubsystemTransmissonChannel.isEmpty()) {
+//				System.out.println("\n" + Thread.currentThread().getName() + " sees the floor subsystem message.");
+				Message floorRequest = floorSubsystemTransmissonChannel.getMessage();
 				handleFloorRequest(floorRequest);
-
-				System.out.println(Thread.currentThread().getName() + " has addressed the floor subsystem request.");
 			}
 
 			// Only read the data in the channel if the elevator is not ready for a job and
 			// the channel is not empty.
-			if (!isElevatorSubsystemJobReady && !elevatorSubsystemChannel.isEmpty()) {
-				System.out.println("\n" + Thread.currentThread().getName() + " sees the elevator subsystem request.");
+			if (!isElevatorSubsystemJobReady && !elevatorSubsystemTransmissonChannel.isEmpty()) {
+//				System.out.println("\n" + Thread.currentThread().getName() + " sees the elevator subsystem message.");
 
-				Message elevatorRequest = elevatorSubsystemChannel.getMessage();
-				System.out.print("elevatorRequest " + elevatorRequest);
+				Message elevatorRequest = elevatorSubsystemTransmissonChannel.getMessage();
 				handleElevatorRequest(elevatorRequest);
-
-				System.out.println(Thread.currentThread().getName() + " has addressed the elevator subsystem request.");
 			}
 
 			// If the elevator is ready and there are job requests, send a job request to
 			// the elevator system
 			if (isElevatorSubsystemJobReady && !jobRequests.isEmpty()) {
-				elevatorSubsystemChannel.setMessage(jobRequests.get(0));
+				elevatorSubsystemReceiverChannel.setMessage(jobRequests.get(0));
 				jobRequests.remove(0);
 				isElevatorSubsystemJobReady = false;
 			}
@@ -98,7 +107,7 @@ public class Scheduler implements Runnable {
 			jobRequests.add((JobRequest) message);
 			break;
 
-		case ELEVATOR_STATUS_MESSAGE, TEST_REQUEST:
+		default:
 			break;
 		}
 
@@ -114,14 +123,14 @@ public class Scheduler implements Runnable {
 		switch (message.getMessageType()) {
 
 		case JOB_REQUEST:
-			floorSubsystemChannel.setMessage(message);
+			floorSubsystemReceiverChannel.setMessage(message);
 			break;
 
 		case ELEVATOR_STATUS_MESSAGE:
 			isElevatorSubsystemJobReady = true;
 			break;
 
-		case TEST_REQUEST:
+		default:
 			break;
 
 		}

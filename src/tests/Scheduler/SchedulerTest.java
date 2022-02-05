@@ -1,7 +1,7 @@
 /**
  *
  */
-package tests.ElevatorSubsystem.Scheduler;
+package tests.Scheduler;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,15 +34,24 @@ class SchedulerTest {
 	private final String SAMPLE_FLOOR_INPUT_DATA = "14:05:15.0 2 UP 4";
 
 	/**
-	 * The floor subsystem channel.
+	 * The floor subsystem transmission channel.
 	 */
-	private MessageChannel floorSubsystemChannel;
+	private MessageChannel floorSubsystemTransmissonChannel;
 
 	/**
-	 * The elevator subsystem channel.
+	 * The floor subsystem receiver channel.
 	 */
-	private MessageChannel elevatorSubsystemChannel;
+	private MessageChannel floorSubsystemReceiverChannel;
 
+	/**
+	 * The elevator subsystem transmission channel.
+	 */
+	private MessageChannel elevatorSubsystemTransmissonChannel;
+
+	/**
+	 * The elevator subsystem receiver channel.
+	 */
+	private MessageChannel elevatorSubsystemReceiverChannel;
 	/**
 	 * The scheduler.
 	 */
@@ -53,10 +62,14 @@ class SchedulerTest {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		floorSubsystemChannel = new MessageChannel();
-		elevatorSubsystemChannel = new MessageChannel();
+		this.floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson");
+		this.floorSubsystemReceiverChannel = new MessageChannel(" Floor Subsystem Receiever");
 
-		scheduler = new Thread(new Scheduler(floorSubsystemChannel, elevatorSubsystemChannel), SCHEDULER_NAME);
+		this.elevatorSubsystemTransmissonChannel = new MessageChannel(" Elevator Subsystem Transmisson");
+		this.elevatorSubsystemReceiverChannel = new MessageChannel(" Elevator Subsystem Receiever");
+
+		scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel,
+				elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel), SCHEDULER_NAME);
 	}
 
 	/**
@@ -67,10 +80,10 @@ class SchedulerTest {
 	void testFloorSubsystemRequestIsAccepted() {
 		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
 		JobRequest jobRequest = new JobRequest(data);
-		floorSubsystemChannel.setMessage(jobRequest);
+		floorSubsystemTransmissonChannel.setMessage(jobRequest);
 
 		Message message = new Message(MessageType.TEST_REQUEST);
-		elevatorSubsystemChannel.setMessage(message);
+		elevatorSubsystemTransmissonChannel.setMessage(message);
 
 		scheduler.start();
 
@@ -81,7 +94,7 @@ class SchedulerTest {
 			e.printStackTrace();
 		}
 
-		assertTrue(floorSubsystemChannel.isEmpty());
+		assertTrue(floorSubsystemTransmissonChannel.isEmpty());
 	}
 
 	/**
@@ -91,7 +104,7 @@ class SchedulerTest {
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
 		Message message = new Message(MessageType.ELEVATOR_STATUS_REQUEST);
-		elevatorSubsystemChannel.setMessage(message);
+		elevatorSubsystemTransmissonChannel.setMessage(message);
 
 		scheduler.start();
 
@@ -102,6 +115,6 @@ class SchedulerTest {
 			e.printStackTrace();
 		}
 
-		assertTrue(elevatorSubsystemChannel.isEmpty());
+		assertTrue(elevatorSubsystemTransmissonChannel.isEmpty());
 	}
 }

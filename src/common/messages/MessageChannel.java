@@ -17,9 +17,15 @@ public class MessageChannel {
 	private Message message;
 
 	/**
+	 * The channel name
+	 */
+	private String channelName;
+
+	/**
 	 * A constructor.
 	 */
-	public MessageChannel() {
+	public MessageChannel(String channelName) {
+		this.channelName = channelName;
 	}
 
 	/**
@@ -39,6 +45,9 @@ public class MessageChannel {
 		}
 
 		this.message = message;
+		System.out.println(Thread.currentThread().getName() + " has sent a " + message.getMessageType()
+				+ " message in the " + channelName + " channel.\n");
+
 		notifyAll();
 	}
 
@@ -61,6 +70,9 @@ public class MessageChannel {
 
 		Message tempMessage = this.message;
 		this.message = null;
+
+		System.out.println(
+				Thread.currentThread().getName() + " has recieved message from the " + channelName + " channel.\n");
 
 		notifyAll();
 		return tempMessage;
