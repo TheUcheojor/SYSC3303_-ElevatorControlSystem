@@ -1,13 +1,14 @@
 /**
  *
  */
-package Scheduler;
+package tests.ElevatorSubsystem.Scheduler;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import Scheduler.Scheduler;
 import common.SimulationFloorInputData;
 import common.messages.JobRequest;
 import common.messages.Message;
@@ -84,7 +85,7 @@ class SchedulerTest {
 	 */
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
-		Message message = new Message(MessageType.ELEVATOR_SUBSYSTEM_READY);
+		Message message = new Message(MessageType.ELEVATOR_STATUS_REQUEST);
 		elevatorSubsystemChannel.setMessage(message);
 
 		scheduler.start();

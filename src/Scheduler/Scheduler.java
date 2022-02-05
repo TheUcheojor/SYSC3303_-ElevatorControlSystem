@@ -98,7 +98,7 @@ public class Scheduler implements Runnable {
 			jobRequests.add((JobRequest) message);
 			break;
 
-		case ELEVATOR_SUBSYSTEM_READY, TEST_REQUEST:
+		case ELEVATOR_STATUS_MESSAGE, TEST_REQUEST:
 			break;
 		}
 
@@ -117,7 +117,7 @@ public class Scheduler implements Runnable {
 			floorSubsystemChannel.setMessage(message);
 			break;
 
-		case ELEVATOR_SUBSYSTEM_READY:
+		case ELEVATOR_STATUS_MESSAGE:
 			isElevatorSubsystemJobReady = true;
 			break;
 
