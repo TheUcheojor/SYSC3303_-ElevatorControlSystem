@@ -5,7 +5,7 @@ import common.SimulationFloorInputData;
 import common.messages.MessageChannel;
 
 /**
- *
+ * This class sets up and starts the elevator, floor, and scheduler systems.
  */
 
 /**
@@ -15,11 +15,11 @@ import common.messages.MessageChannel;
 public class SystemExecutor {
 
 	/**
+	 * Set up and start the application
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 		MessageChannel floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson");
 		MessageChannel floorSubsystemReceiverChannel = new MessageChannel("Floor Subsystem Receiver");
 

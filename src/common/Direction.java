@@ -4,7 +4,7 @@
 package common;
 
 /**
- * This class provides options of elevator directions
+ * This class provides possible elevator directions.
  *
  * @author paulokenne
  *
