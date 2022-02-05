@@ -39,6 +39,8 @@ public class MessageChannel {
 		 */
 		while (this.message != null) {
 			try {
+				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
+
 				wait();
 			} catch (InterruptedException exception) {
 			}
@@ -63,6 +65,8 @@ public class MessageChannel {
 		 */
 		while (this.message == null) {
 			try {
+				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
+
 				wait();
 			} catch (InterruptedException exception) {
 			}

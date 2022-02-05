@@ -68,6 +68,7 @@ public class Scheduler implements Runnable {
 	public void run() {
 
 		while (true) {
+
 			if (!floorSubsystemTransmissonChannel.isEmpty()) {
 //				System.out.println("\n" + Thread.currentThread().getName() + " sees the floor subsystem message.");
 				Message floorRequest = floorSubsystemTransmissonChannel.getMessage();
@@ -78,7 +79,6 @@ public class Scheduler implements Runnable {
 			// the channel is not empty.
 			if (!isElevatorSubsystemJobReady && !elevatorSubsystemTransmissonChannel.isEmpty()) {
 //				System.out.println("\n" + Thread.currentThread().getName() + " sees the elevator subsystem message.");
-
 				Message elevatorRequest = elevatorSubsystemTransmissonChannel.getMessage();
 				handleElevatorRequest(elevatorRequest);
 			}
