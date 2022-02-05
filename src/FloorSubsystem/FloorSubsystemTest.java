@@ -1,6 +1,6 @@
 package FloorSubsystem;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,11 +17,15 @@ import common.messages.MessageChannel;
  */
 class FloorSubsystemTest {
 
+	/**
+	 * The floor subsystem transmission message channel.
+	 */
+	private MessageChannel floorSubsystemTransmissonChannel;
 
 	/**
-	 * The floor subsystem channel.
+	 * The floor subsystem transmission message channel.
 	 */
-	private MessageChannel floorSubsystemChannel;
+	private MessageChannel floorSubsystemReceiverChannel;
 
 	/**
 	 * The scheduler and floor subsystem threads.
@@ -33,10 +37,14 @@ class FloorSubsystemTest {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		floorSubsystemChannel = new MessageChannel();
-		
-		floorSubsystem = new Thread(new FloorSubsystem(new SimulationFloorInputData("14:05:15.0 2 UP 4"), floorSubsystemChannel), "");
-		scheduler = new Thread(new Scheduler(floorSubsystemChannel, new MessageChannel()), "Scheduler");
+		floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson");
+		floorSubsystemReceiverChannel = new MessageChannel("Floor Subsystem Receiver");
+
+		floorSubsystem = new Thread(new FloorSubsystem(new SimulationFloorInputData("14:05:15.0 2 UP 4"),
+				floorSubsystemTransmissonChannel, floorSubsystemTransmissonChannel), "");
+
+		scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemTransmissonChannel,
+				new MessageChannel(""), new MessageChannel("")), "Scheduler");
 	}
 
 	/**
@@ -44,12 +52,10 @@ class FloorSubsystemTest {
 	 */
 	@Test
 	void testFloorSubsystemCommunication() {
-		
+
 		floorSubsystem.start();
 		scheduler.start();
-		assertTrue(floorSubsystemChannel.isEmpty());
+		assertTrue(floorSubsystemTransmissonChannel.isEmpty());
 	}
-
-
 
 }
