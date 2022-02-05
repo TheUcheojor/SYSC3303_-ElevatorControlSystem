@@ -4,7 +4,6 @@
 package common;
 
 import java.security.InvalidParameterException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -66,10 +65,12 @@ public class SimulationFloorInputData {
 	public SimulationFloorInputData(String dataString) throws InvalidParameterException {
 
 		try {
+			// Remove leading and trailing spaces
+			dataString = dataString.strip();
+
 			// Format of data String: Time Floor FloorButton CarButton
 			String[] data = dataString.split(FLOOR_DATA_INPUT_SEPARATOR);
 
-			System.out.println(data.length);
 			Date parsedDate = DateFormat.DATE_FORMAT.parse(data[0]);
 			this.arrivalTime = DateFormat.DATE_FORMAT.format(parsedDate);
 

@@ -29,6 +29,11 @@ class SchedulerTest {
 	private final String SCHEDULER_NAME = "Test Scheduler";
 
 	/**
+	 * A sample floor input data.
+	 */
+	private final String SAMPLE_FLOOR_INPUT_DATA = "14:05:15.0 2 UP 4";
+
+	/**
 	 * The floor subsystem channel.
 	 */
 	private MessageChannel floorSubsystemChannel;
@@ -51,7 +56,7 @@ class SchedulerTest {
 		floorSubsystemChannel = new MessageChannel();
 		elevatorSubsystemChannel = new MessageChannel();
 
-		scheduler = new Thread(new Scheduler(floorSubsystemChannel, elevatorSubsystemChannel), "");
+		scheduler = new Thread(new Scheduler(floorSubsystemChannel, elevatorSubsystemChannel), SCHEDULER_NAME);
 	}
 
 	/**
@@ -60,7 +65,7 @@ class SchedulerTest {
 	 */
 	@Test
 	void testFloorSubsystemRequestIsAccepted() {
-		SimulationFloorInputData data = new SimulationFloorInputData("14:05:15.0 2 UP 4");
+		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
 		JobRequest jobRequest = new JobRequest(data);
 		floorSubsystemChannel.setMessage(jobRequest);
 
