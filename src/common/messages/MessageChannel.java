@@ -40,7 +40,6 @@ public class MessageChannel {
 		while (this.message != null) {
 			try {
 				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
-
 				wait();
 			} catch (InterruptedException exception) {
 			}
@@ -60,9 +59,6 @@ public class MessageChannel {
 	 */
 	public synchronized Message getMessage() {
 
-		/**
-		 * Wait until the message channel is full
-		 */
 		while (this.message == null) {
 			try {
 				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
@@ -76,7 +72,7 @@ public class MessageChannel {
 		this.message = null;
 
 		System.out.println(
-				Thread.currentThread().getName() + " has recieved message from the " + channelName + " channel.\n");
+				Thread.currentThread().getName() + " has received message from the " + channelName + " channel.\n");
 
 		notifyAll();
 		return tempMessage;
@@ -85,7 +81,7 @@ public class MessageChannel {
 	/**
 	 * @return true if there is no message and false otherwise.
 	 */
-	public boolean isEmpty() {
-		return message == null;
+	public synchronized boolean isEmpty() {
+		return this.message == null;
 	}
 }
