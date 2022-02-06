@@ -1,7 +1,6 @@
 import ElevatorSubsystem.ElevatorCar;
 import FloorSubsystem.FloorSubsystem;
 import Scheduler.Scheduler;
-import common.SimulationFloorInputData;
 import common.messages.MessageChannel;
 
 /**
