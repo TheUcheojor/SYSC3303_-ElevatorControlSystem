@@ -3,6 +3,7 @@
  */
 package tests.Scheduler;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -73,8 +74,7 @@ class SchedulerTest {
 	}
 
 	/**
-	 * This test cases tests that the request received from the floor subsystem is
-	 * accepted.
+	 * Test that the request received from the floor subsystem is accepted.
 	 */
 	@Test
 	void testFloorSubsystemRequestIsAccepted() {
@@ -98,8 +98,7 @@ class SchedulerTest {
 	}
 
 	/**
-	 * This test cases tests that the request received from the elevator subsystem
-	 * is accepted.
+	 * Test that the request received from the elevator subsystem is accepted.
 	 */
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
@@ -115,6 +114,65 @@ class SchedulerTest {
 			e.printStackTrace();
 		}
 
+		// The elevator ELEVATOR_STATUS_REQUEST should have been taken by the
+		// scheduler
 		assertTrue(elevatorSubsystemTransmissonChannel.isEmpty());
 	}
+
+	/**
+	 * Test that job-request sent by the floor subsystem is passed to the elevator
+	 * subsystem is accepted.
+	 */
+	@Test
+	void testFloorSubsystemJobRequestIsTransferredToElevatorSubsystem() {
+		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
+		JobRequest jobRequest = new JobRequest(data);
+		floorSubsystemTransmissonChannel.setMessage(jobRequest);
+
+		Message message = new Message(MessageType.ELEVATOR_STATUS_MESSAGE);
+		elevatorSubsystemTransmissonChannel.setMessage(message);
+
+		scheduler.start();
+
+		// Give the scheduler time to work.
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// The elevator ELEVATOR_STATUS_REQUEST should have been taken by the
+		// scheduler
+		assertTrue(elevatorSubsystemTransmissonChannel.isEmpty());
+
+		// The scheduler should know that the elevator is ready. Hence, the job request
+		// from the floor channel should be in elevator's receiver channel
+		assertFalse(elevatorSubsystemReceiverChannel.isEmpty());
+	}
+
+	/**
+	 * Test that job-request sent by the elevator subsystem is passed to the floor
+	 * subsystem is accepted.
+	 */
+	@Test
+	void testElevatorSubsystemJobRequestIsTransferredToFloorSubsystem() {
+		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
+		JobRequest jobRequest = new JobRequest(data);
+
+		elevatorSubsystemTransmissonChannel.setMessage(jobRequest);
+
+		scheduler.start();
+
+		// Give the scheduler time to work.
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// The scheduler should send the job request from the elevator channel to the
+		// floor's receiver channel
+		assertFalse(floorSubsystemReceiverChannel.isEmpty());
+	}
+
 }

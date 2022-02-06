@@ -93,7 +93,7 @@ public class FloorSubsystem implements Runnable {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			// stop runnig the program if input data is unavailable
+			// stop running the program if input data is unavailable
 			System.exit(1);
 		}
 	}
