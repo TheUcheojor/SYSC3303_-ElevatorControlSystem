@@ -27,6 +27,22 @@ public enum MessageType {
 	ELEVATOR_STATUS_MESSAGE,
 
 	/**
+	 * A message indicating that the elevator has arrived to the floor
+	 */
+	FLOOR_ARRIVAL_MESSAGE,
+
+	/**
+	 * A message indicating that the elevator is coming in the direction of the
+	 * floor
+	 */
+	EVELATOR_FLOOR_SIGNAL_REQUEST,
+
+	/**
+	 * A message indicating that the elevator is leaving the floor
+	 */
+	EVELATOR_LEAVING_FLOOR_MESSAGE,
+
+	/**
 	 * A request for testing purposes.
 	 */
 	TEST_REQUEST
