@@ -1,10 +1,11 @@
-package FloorSubsystem;
+package tests.FloorSubsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import FloorSubsystem.FloorInfo;
 import common.Direction;
 
 /**
