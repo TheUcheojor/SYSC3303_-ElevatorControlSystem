@@ -27,9 +27,8 @@ public class SystemExecutor {
 
 		String filePath = "resources/FloorInputFile.txt";
 
-		Thread floorSubsystem = new Thread(
-				new FloorSubsystem(filePath, floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel),
-				"Floor Subsystem");
+		Thread floorSubsystem = new Thread(new FloorSubsystem(filePath, floorSubsystemTransmissonChannel,
+				floorSubsystemReceiverChannel, elevatorSubsystemReceiverChannel), "Floor Subsystem");
 
 		Thread elevatorSubsystem = new Thread(
 				new ElevatorCar(1, elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel),

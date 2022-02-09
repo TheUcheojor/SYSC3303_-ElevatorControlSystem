@@ -7,14 +7,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import common.SimulationFloorInputData;
+import common.messages.ElevatorFloorSignalRequestMessage;
 import common.messages.JobRequest;
+import common.messages.Message;
 import common.messages.MessageChannel;
 
 /**
  * This class simulates the FloorSubsystem thread
  *
- * @author Favour
- * @author Delight
+ * @author Favour, Delight, paulokenne
  */
 public class FloorSubsystem implements Runnable {
 	/**
@@ -43,6 +44,11 @@ public class FloorSubsystem implements Runnable {
 	private MessageChannel floorSubsystemReceiverChannel;
 
 	/**
+	 * The elevator subsystem transmission message channel.
+	 */
+	private MessageChannel elevatorSubsystemReceiverChannel;
+
+	/**
 	 * This is the default constructor of the class
 	 *
 	 * @param inputFileName       - The input text file
@@ -50,11 +56,11 @@ public class FloorSubsystem implements Runnable {
 	 *                            scheduler
 	 */
 	public FloorSubsystem(String inputFileName, MessageChannel floorSubsystemTransmissonChannel,
-			MessageChannel floorSubsystemReceiverChannel) {
+			MessageChannel floorSubsystemReceiverChannel, MessageChannel elevatorSubsystemReceiverChannel) {
 		this.inputFileName = inputFileName;
 		this.floorSubsystemTransmissonChannel = floorSubsystemTransmissonChannel;
 		this.floorSubsystemReceiverChannel = floorSubsystemReceiverChannel;
-
+		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
 	}
 
 	/**
@@ -65,10 +71,11 @@ public class FloorSubsystem implements Runnable {
 	 *                            scheduler
 	 */
 	public FloorSubsystem(SimulationFloorInputData inputData, MessageChannel floorSubsystemTransmissonChannel,
-			MessageChannel floorSubsystemReceiverChannel) {
+			MessageChannel floorSubsystemReceiverChannel, MessageChannel elevatorSubsystemReceiverChannel) {
 		floorDataCollection.add(inputData);
 		this.floorSubsystemTransmissonChannel = floorSubsystemTransmissonChannel;
 		this.floorSubsystemReceiverChannel = floorSubsystemReceiverChannel;
+		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
 	}
 
 	/**
@@ -83,6 +90,7 @@ public class FloorSubsystem implements Runnable {
 			bufferedReader = new BufferedReader(new FileReader(inputFileName));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		String input = "";
@@ -131,14 +139,41 @@ public class FloorSubsystem implements Runnable {
 
 			// Checking the scheduler has sent a message back
 			if (!floorSubsystemReceiverChannel.isEmpty()) {
-				JobRequest jobRequest = (JobRequest) floorSubsystemReceiverChannel.getMessage();
-
-				floor.messageRecieved(jobRequest.isJobCompleted());
-				floor.setFloorNumber(jobRequest.getFloorId());
+				handleRequest(floorSubsystemReceiverChannel.getMessage());
 			}
 
 		}
 
+	}
+
+	/**
+	 * Handle message accordingly
+	 *
+	 * @param message the message
+	 */
+	public void handleRequest(Message message) {
+
+		switch (message.getMessageType()) {
+
+		case EVELATOR_FLOOR_SIGNAL_REQUEST:
+			ElevatorFloorSignalRequestMessage floorSignalRequestMessage = (ElevatorFloorSignalRequestMessage) message;
+			floor.notifyElevatorAtFloorArrival(floorSignalRequestMessage.getElevatorMotor(),
+					elevatorSubsystemReceiverChannel, floorSignalRequestMessage.isFloorFinalDestination());
+			break;
+
+		case EVELATOR_LEAVING_FLOOR_MESSAGE:
+			floor.elevatorLeavingFloorNotification();
+			break;
+
+		case JOB_REQUEST:
+			JobRequest jobRequest = (JobRequest) message;
+			floor.messageRecieved(jobRequest.isJobCompleted());
+			floor.setFloorNumber(jobRequest.getFloorId());
+			break;
+
+		default:
+			break;
+		}
 	}
 
 }
