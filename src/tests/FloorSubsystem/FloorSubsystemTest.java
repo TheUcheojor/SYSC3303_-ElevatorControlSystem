@@ -52,8 +52,7 @@ class FloorSubsystemTest {
 		elevatorSubsystemReceiverChannel = new MessageChannel("Elevator Subsystem Receiver");
 
 		floorSubsystem = new Thread(new FloorSubsystem(new SimulationFloorInputData("14:05:15.0 2 UP 4"),
-				floorSubsystemTransmissonChannel, floorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel),
-				"");
+				floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel, elevatorSubsystemReceiverChannel), "");
 
 		scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemTransmissonChannel,
 				new MessageChannel(""), new MessageChannel("")), "Scheduler");
@@ -81,7 +80,7 @@ class FloorSubsystemTest {
 		ElevatorFloorSignalRequestMessage floorSignalRequest = new ElevatorFloorSignalRequestMessage(true,
 				elevatorMotor);
 
-		floorSubsystemTransmissonChannel.setMessage(floorSignalRequest);
+		floorSubsystemReceiverChannel.setMessage(floorSignalRequest);
 		floorSubsystem.start();
 
 		// Let the floor work. The notification may take well because of default
