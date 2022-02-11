@@ -137,7 +137,7 @@ public class FloorSubsystem implements Runnable {
 				floorSubsystemTransmissonChannel.setMessage(jobRequest);
 			}
 
-			// Checking the scheduler has sent a message back
+			// Checking if we have a request message
 			if (!floorSubsystemReceiverChannel.isEmpty()) {
 				handleRequest(floorSubsystemReceiverChannel.getMessage());
 			}
