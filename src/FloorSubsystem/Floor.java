@@ -28,7 +28,8 @@ public class Floor {
 	private LampButton downLampButton = null;
 
 	/**
-	 * The elevator sensors, one per elevator shaft
+	 * The elevator components (arrival sensor and direction lamp), one per elevator
+	 * shaft
 	 *
 	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS. Hence, they
 	 * can be mapped with an array.
