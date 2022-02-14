@@ -5,9 +5,11 @@
  *
  */
 
-package common.messages;
+package common.messages.floor;
 
 import common.SimulationFloorInputData;
+import common.messages.Message;
+import common.messages.MessageType;
 
 public class JobRequest extends Message {
 

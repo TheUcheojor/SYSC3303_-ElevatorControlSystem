@@ -1,9 +1,11 @@
-package common.messages;
+package common.messages.elevator;
 
 import java.util.Date;
 
 import common.DateFormat;
 import common.Direction;
+import common.messages.Message;
+import common.messages.MessageType;
 
 /**
  * A DS representing an elevator status response
