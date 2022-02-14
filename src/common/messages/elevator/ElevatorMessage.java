@@ -1,4 +1,4 @@
-package common.messages;
+package common.messages.elevator;
 
 /**
  * This class provides a base function that elevator messages must implement.

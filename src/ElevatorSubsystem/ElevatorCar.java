@@ -2,9 +2,9 @@ package ElevatorSubsystem;
 
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
-import common.messages.ElevatorStatusMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
+import common.messages.elevator.ElevatorStatusMessage;
 
 /**
  * Entity representing an elevator car, contains composite subcomponents for
@@ -22,6 +22,12 @@ public class ElevatorCar implements Runnable {
 	private ElevatorDoor door;
 
 	/**
+	 * The number of elevators in the system
+	 *
+	 * TODO to be relocated to a elevator subsystem level
+	 */
+	public final static int NUMBER_OF_ELEVATORS = 1;
+	/**
 	 * The door opening and closing time in seconds
 	 */
 	private final static double DOOR_SPEED = 3000;
@@ -37,7 +43,6 @@ public class ElevatorCar implements Runnable {
 
 	public ElevatorCar(int id, MessageChannel elevatorSubsystemTransmissonChannel,
 			MessageChannel elevatorSubsystemReceiverChannel) {
-
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);

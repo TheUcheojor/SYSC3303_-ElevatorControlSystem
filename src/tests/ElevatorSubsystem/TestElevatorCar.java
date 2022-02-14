@@ -12,10 +12,10 @@ import ElevatorSubsystem.ElevatorCar;
 import ElevatorSubsystem.ElevatorDoor;
 import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
-import common.messages.ElevatorStatusMessage;
-import common.messages.ElevatorStatusRequest;
 import common.messages.Message;
 import common.messages.MessageChannel;
+import common.messages.elevator.ElevatorStatusMessage;
+import common.messages.elevator.ElevatorStatusRequest;
 
 class TestElevatorCar {
 	private ElevatorCar elevatorCar;

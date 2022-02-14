@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 
 import Scheduler.Scheduler;
 import common.SimulationFloorInputData;
-import common.messages.JobRequest;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.MessageType;
+import common.messages.floor.JobRequest;
 
 /**
  * Tests the scheduler based on iteration 1 requirements.

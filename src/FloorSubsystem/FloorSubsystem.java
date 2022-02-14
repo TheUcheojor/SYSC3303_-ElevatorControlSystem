@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import common.SimulationFloorInputData;
-import common.messages.ElevatorFloorSignalRequestMessage;
-import common.messages.JobRequest;
+import common.SystemValidationUtil;
+import common.exceptions.InvalidSystemConfigurationInputException;
+import common.messages.IdentifierDrivenMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
+import common.messages.elevator.ElevatorFloorSignalRequestMessage;
+import common.messages.floor.JobRequest;
 
 /**
  * This class simulates the FloorSubsystem thread
@@ -18,6 +21,22 @@ import common.messages.MessageChannel;
  * @author Favour, Delight, paulokenne
  */
 public class FloorSubsystem implements Runnable {
+
+	/**
+	 * The number of floors
+	 */
+	public static final int NUMBER_OF_FLOORS = 3;
+
+	/**
+	 * The floor to floor distance in meters
+	 */
+	public static final double FLOOR_TO_FLOOR_DISTANCE = 4.5;
+
+	/**
+	 * The floors.
+	 */
+	private Floor[] floors = new Floor[NUMBER_OF_FLOORS];;
+
 	/**
 	 * The name of the input text file
 	 */
@@ -31,7 +50,7 @@ public class FloorSubsystem implements Runnable {
 	/**
 	 * The object that stores the properties of the floor
 	 */
-	private FloorInfo floor = new FloorInfo();
+	private Floor floor = new Floor(1);
 
 	/**
 	 * The floor subsystem transmission message channel.
@@ -57,25 +76,24 @@ public class FloorSubsystem implements Runnable {
 	 */
 	public FloorSubsystem(String inputFileName, MessageChannel floorSubsystemTransmissonChannel,
 			MessageChannel floorSubsystemReceiverChannel, MessageChannel elevatorSubsystemReceiverChannel) {
+		// Validate that the floor subsystem values are valid
+		try {
+			SystemValidationUtil.validateFloorToFloorDistance(FLOOR_TO_FLOOR_DISTANCE);
+		} catch (InvalidSystemConfigurationInputException e) {
+			System.out.println("InvalidSystemConfigurationInputException: " + e);
+			// Terminate if the elevation configuration are invalid.
+			System.exit(1);
+		}
+
 		this.inputFileName = inputFileName;
 		this.floorSubsystemTransmissonChannel = floorSubsystemTransmissonChannel;
 		this.floorSubsystemReceiverChannel = floorSubsystemReceiverChannel;
 		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
-	}
 
-	/**
-	 * This is a secondary constructor for testing purposes
-	 *
-	 * @param inputData           - A simulation input data object
-	 * @param floorMessageChannel - The message channel for communicating with the
-	 *                            scheduler
-	 */
-	public FloorSubsystem(SimulationFloorInputData inputData, MessageChannel floorSubsystemTransmissonChannel,
-			MessageChannel floorSubsystemReceiverChannel, MessageChannel elevatorSubsystemReceiverChannel) {
-		floorDataCollection.add(inputData);
-		this.floorSubsystemTransmissonChannel = floorSubsystemTransmissonChannel;
-		this.floorSubsystemReceiverChannel = floorSubsystemReceiverChannel;
-		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
+		// Add floors to the floor subsystem
+		for (int i = 0; i < floors.length; i++) {
+			floors[i] = new Floor(i);
+		}
 	}
 
 	/**
@@ -90,7 +108,7 @@ public class FloorSubsystem implements Runnable {
 			bufferedReader = new BufferedReader(new FileReader(inputFileName));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			System.exit(1);
+			return;
 		}
 
 		String input = "";
@@ -101,13 +119,11 @@ public class FloorSubsystem implements Runnable {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			// stop running the program if input data is unavailable
-			System.exit(1);
 		}
 	}
 
 	/**
-	 * This is an overide of the runnable run method
+	 * This is an override of the runnable run method
 	 */
 	@Override
 	public void run() {
@@ -128,10 +144,9 @@ public class FloorSubsystem implements Runnable {
 				JobRequest jobRequest = new JobRequest(floorInputData);
 
 				// updating the floor properties(User interacting with the floor button)
-				floor.pressFloorButton(floorInputData.getFloorDirectionButton());
-				floor.setFloorNumber(floorInputData.getCurrentFloor());
-
-				floor.printFloorStatus();
+				int floorId = floorInputData.getCurrentFloor();
+				floors[floorId].pressFloorButton(floorInputData.getFloorDirectionButton());
+				floors[floorId].printFloorStatus();
 
 				// sending the job to the scheduler
 				floorSubsystemTransmissonChannel.setMessage(jobRequest);
@@ -153,22 +168,31 @@ public class FloorSubsystem implements Runnable {
 	 */
 	public void handleRequest(Message message) {
 
+		int sourceEntityId = -1;
+		int floorId = -1;
+
+		// Verifying the validity of the request
+		if (message instanceof IdentifierDrivenMessage) {
+			sourceEntityId = ((IdentifierDrivenMessage) message).getSourceEntityId();
+			floorId = ((IdentifierDrivenMessage) message).getTargetEntityId();
+
+			// Ignore request messages with an invalid floor id
+			if (!SystemValidationUtil.isFloorNumberInRange(floorId)) {
+				return;
+			}
+		}
+
 		switch (message.getMessageType()) {
 
 		case EVELATOR_FLOOR_SIGNAL_REQUEST:
 			ElevatorFloorSignalRequestMessage floorSignalRequestMessage = (ElevatorFloorSignalRequestMessage) message;
-			floor.notifyElevatorAtFloorArrival(floorSignalRequestMessage.getElevatorMotor(),
+
+			floors[floorId].notifyElevatorAtFloorArrival(sourceEntityId, floorSignalRequestMessage.getElevatorMotor(),
 					elevatorSubsystemReceiverChannel, floorSignalRequestMessage.isFloorFinalDestination());
 			break;
 
 		case EVELATOR_LEAVING_FLOOR_MESSAGE:
-			floor.elevatorLeavingFloorNotification();
-			break;
-
-		case JOB_REQUEST:
-			JobRequest jobRequest = (JobRequest) message;
-			floor.messageRecieved(jobRequest.isJobCompleted());
-			floor.setFloorNumber(jobRequest.getFloorId());
+			floors[floorId].elevatorLeavingFloor(sourceEntityId);
 			break;
 
 		default:

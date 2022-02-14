@@ -31,7 +31,7 @@ public class SystemExecutor {
 				floorSubsystemReceiverChannel, elevatorSubsystemReceiverChannel), "Floor Subsystem");
 
 		Thread elevatorSubsystem = new Thread(
-				new ElevatorCar(1, elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel),
+				new ElevatorCar(0, elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel),
 				"Elevator Car");
 
 		Thread scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel,

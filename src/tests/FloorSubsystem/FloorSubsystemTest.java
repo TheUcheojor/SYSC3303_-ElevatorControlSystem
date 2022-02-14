@@ -8,19 +8,20 @@ import org.junit.jupiter.api.Test;
 import ElevatorSubsystem.ElevatorMotor;
 import FloorSubsystem.FloorSubsystem;
 import Scheduler.Scheduler;
-import common.SimulationFloorInputData;
-import common.messages.ElevatorFloorArrivalMessage;
-import common.messages.ElevatorFloorSignalRequestMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
+import common.messages.elevator.ElevatorFloorArrivalMessage;
+import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 
 /**
  * Tests the floorSubsystem based on iteration 1 requirements.
  *
- * @author Favour
+ * @author Favour, paulokenne
  *
  */
 class FloorSubsystemTest {
+
+	String TEST_FILE = "resources/TestInputFile.txt";
 
 	/**
 	 * The floor subsystem transmission message channel.
@@ -51,8 +52,8 @@ class FloorSubsystemTest {
 		floorSubsystemReceiverChannel = new MessageChannel("Floor Subsystem Receiver");
 		elevatorSubsystemReceiverChannel = new MessageChannel("Elevator Subsystem Receiver");
 
-		floorSubsystem = new Thread(new FloorSubsystem(new SimulationFloorInputData("14:05:15.0 2 UP 4"),
-				floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel, elevatorSubsystemReceiverChannel), "");
+		floorSubsystem = new Thread(new FloorSubsystem(TEST_FILE, floorSubsystemTransmissonChannel,
+				floorSubsystemReceiverChannel, elevatorSubsystemReceiverChannel), "");
 
 		scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemTransmissonChannel,
 				new MessageChannel(""), new MessageChannel("")), "Scheduler");
@@ -63,7 +64,6 @@ class FloorSubsystemTest {
 	 */
 	@Test
 	void testFloorSubsystemCommunication() {
-
 		floorSubsystem.start();
 		scheduler.start();
 		assertTrue(floorSubsystemTransmissonChannel.isEmpty());
@@ -77,8 +77,8 @@ class FloorSubsystemTest {
 
 		ElevatorMotor elevatorMotor = new ElevatorMotor(3, 1.5);
 
-		ElevatorFloorSignalRequestMessage floorSignalRequest = new ElevatorFloorSignalRequestMessage(true,
-				elevatorMotor);
+		ElevatorFloorSignalRequestMessage floorSignalRequest = new ElevatorFloorSignalRequestMessage(0, 1,
+				elevatorMotor, true);
 
 		floorSubsystemReceiverChannel.setMessage(floorSignalRequest);
 		floorSubsystem.start();
@@ -92,6 +92,12 @@ class FloorSubsystemTest {
 
 		ElevatorFloorArrivalMessage floorResponse = (ElevatorFloorArrivalMessage) floorSentResponseMessage;
 		assertTrue(floorResponse.getNewCurrentElevatorSpeed() == 0);
+
+		// Verify that the correct floor sends the response
+		assertTrue(floorResponse.getSourceEntityId() == 1);
+
+		// Verify that the floor sends the response to the correct elevator
+		assertTrue(floorResponse.getTargetEntityId() == 0);
 
 	}
 

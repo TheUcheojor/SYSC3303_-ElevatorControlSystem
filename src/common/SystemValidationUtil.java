@@ -4,7 +4,7 @@
 package common;
 
 import ElevatorSubsystem.ElevatorCar;
-import FloorSubsystem.FloorInfo;
+import FloorSubsystem.FloorSubsystem;
 import common.exceptions.InvalidSystemConfigurationInputException;
 
 /**
@@ -38,7 +38,8 @@ public final class SystemValidationUtil {
 
 		// Verify that within floor-to-floor distance, we can slow down from the top
 		// speed in time.
-		if (evelatorMaxSpeed > Math.sqrt(FloorInfo.FLOOR_TO_FLOOR_DISTANCE * 2 * ElevatorCar.ELEVATOR_ACCELERATION)) {
+		if (evelatorMaxSpeed > Math
+				.sqrt(FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE * 2 * ElevatorCar.ELEVATOR_ACCELERATION)) {
 			throw new InvalidSystemConfigurationInputException("The elevator max speed cannot be negative.");
 		}
 
@@ -46,7 +47,7 @@ public final class SystemValidationUtil {
 		// floors.
 		double maxDistanceTraveledWhenAcceleratingToTopSpeed = (Math.pow(evelatorMaxSpeed, 2))
 				/ (2 * ElevatorCar.ELEVATOR_ACCELERATION);
-		if (maxDistanceTraveledWhenAcceleratingToTopSpeed > FloorInfo.FLOOR_TO_FLOOR_DISTANCE) {
+		if (maxDistanceTraveledWhenAcceleratingToTopSpeed > FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE) {
 			throw new InvalidSystemConfigurationInputException(
 					"The elevator max speed cannot be reached between adjacent floors");
 		}
@@ -68,7 +69,7 @@ public final class SystemValidationUtil {
 
 		// Verify that we can slow down from the top speed in time.
 		if (evelatorAcceleration < Math.pow(ElevatorCar.MAX_ELEVATOR_SPEED, 2)
-				/ (2 * FloorInfo.FLOOR_TO_FLOOR_DISTANCE)) {
+				/ (2 * FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE)) {
 			throw new InvalidSystemConfigurationInputException("The elevator acceleration is invalid.");
 		}
 
@@ -97,4 +98,25 @@ public final class SystemValidationUtil {
 
 	}
 
+	/**
+	 * Return a flag indicating whether the given floor id is in the acceptable
+	 * range of the system
+	 *
+	 * @param floorId
+	 * @return
+	 */
+	public static boolean isFloorNumberInRange(int floorId) {
+		return floorId >= 0 && floorId < FloorSubsystem.NUMBER_OF_FLOORS;
+	}
+
+	/**
+	 * Return a flag indicating whether the given elevator id is in the acceptable
+	 * range of the system
+	 *
+	 * @param elevatorId the elevator id
+	 * @return
+	 */
+	public static boolean isElevatorNumberInRange(int elevatorId) {
+		return elevatorId >= 0 && elevatorId < ElevatorCar.NUMBER_OF_ELEVATORS;
+	}
 }

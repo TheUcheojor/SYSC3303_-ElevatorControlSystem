@@ -78,9 +78,15 @@ public class SimulationFloorInputData {
 			this.floorDirectionButton = Direction.valueOf(data[2]);
 			this.destinationFloorCarButton = Integer.parseInt(data[3]);
 
+			// Validate the current floor and destination floor inputs are valid.
+			if (!SystemValidationUtil.isFloorNumberInRange(currentFloor)
+					|| !SystemValidationUtil.isFloorNumberInRange(destinationFloorCarButton)) {
+				throw new InvalidParameterException();
+			}
+
 		} catch (Exception e) {
 			System.out.println(e);
-			throw new InvalidParameterException(dataString);
+			throw new InvalidParameterException(dataString + " is an invalid floor input simulation data");
 		}
 
 	}
