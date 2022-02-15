@@ -3,10 +3,12 @@
  */
 package Scheduler;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 import common.messages.Message;
 import common.messages.MessageChannel;
+import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.floor.JobRequest;
 
 /**
@@ -16,44 +18,15 @@ import common.messages.floor.JobRequest;
  *
  */
 public class Scheduler implements Runnable {
-
-	/**
-	 * The job requests.
-	 */
-	private ArrayList<JobRequest> jobRequests = new ArrayList<>();
-
-	/**
-	 * The floor subsystem transmission channel.
-	 */
+	private ArrayList<JobRequest> unassignedJobRequests = new ArrayList<>();
 	private MessageChannel floorSubsystemTransmissonChannel;
-
-	/**
-	 * The floor subsystem receiver channel.
-	 */
 	private MessageChannel floorSubsystemReceiverChannel;
-
-	/**
-	 * The elevator subsystem transmission channel.
-	 */
 	private MessageChannel elevatorSubsystemTransmissonChannel;
-
-	/**
-	 * The elevator subsystem receiver channel.
-	 */
 	private MessageChannel elevatorSubsystemReceiverChannel;
+	private boolean isElevatorRunning = false;
+	private int elevatorFloor;
+	private ArrayDeque<JobRequest> elevatorJobQueue;
 
-	/**
-	 * A flag indicating whether the elevator subsystem is ready to take a job
-	 * request.
-	 */
-	private boolean isElevatorSubsystemJobReady = false;
-
-	/**
-	 * A constructor.
-	 *
-	 * @param floorSubsystemChannel    the floor subsystem channel
-	 * @param elevatorSubsystemChanell the elevator subsystem channel
-	 */
 	public Scheduler(MessageChannel floorSubsystemTransmissonChannel, MessageChannel floorSubsystemReceiverChannel,
 			MessageChannel elevatorSubsystemTransmissonChannel, MessageChannel elevatorSubsystemReceiverChannel) {
 
@@ -62,6 +35,9 @@ public class Scheduler implements Runnable {
 
 		this.elevatorSubsystemTransmissonChannel = elevatorSubsystemTransmissonChannel;
 		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
+		
+		// TODO (rfife) for iter 3: scale this to multiple elevators
+		this.elevatorJobQueue = new ArrayDeque<>();
 	}
 
 	@Override
@@ -73,22 +49,21 @@ public class Scheduler implements Runnable {
 				Message floorRequest = floorSubsystemTransmissonChannel.getMessage();
 				handleFloorRequest(floorRequest);
 			}
+			
+			// Move unassigned jobs to the elevator
+			if(isElevatorRunning && unassignedJobRequests.size() != 0) {
+				unassignedJobRequests.forEach((JobRequest job) -> {
+					elevatorJobQueue.add(job);
+					unassignedJobRequests.remove(job);
+				});
+			}
 
 			// Only read the data in the channel if the elevator is not ready for a job and
 			// the channel is not empty.
 			if (!elevatorSubsystemTransmissonChannel.isEmpty()) {
 				Message elevatorRequest = elevatorSubsystemTransmissonChannel.getMessage();
-				handleElevatorRequest(elevatorRequest);
+				handleElevatorMessage(elevatorRequest);
 			}
-
-			// If the elevator is ready and there are job requests, send a job request to
-			// the elevator system
-			if (isElevatorSubsystemJobReady && !jobRequests.isEmpty()) {
-				elevatorSubsystemReceiverChannel.setMessage(jobRequests.get(0));
-				jobRequests.remove(0);
-				isElevatorSubsystemJobReady = false;
-			}
-
 		}
 	}
 
@@ -102,7 +77,7 @@ public class Scheduler implements Runnable {
 		switch (message.getMessageType()) {
 
 		case JOB_REQUEST:
-			jobRequests.add((JobRequest) message);
+			unassignedJobRequests.add((JobRequest) message);
 			break;
 
 		default:
@@ -112,20 +87,17 @@ public class Scheduler implements Runnable {
 	}
 
 	/**
-	 * Handles elevator request accordingly.
+	 * Handles elevator messages accordingly.
 	 *
 	 * @param message the request
 	 */
-	private void handleElevatorRequest(Message message) {
+	private void handleElevatorMessage(Message message) {
 
 		switch (message.getMessageType()) {
 
-		case JOB_REQUEST:
-			floorSubsystemReceiverChannel.setMessage(message);
-			break;
-
 		case ELEVATOR_STATUS_MESSAGE:
-			isElevatorSubsystemJobReady = true;
+			isElevatorRunning = ((ElevatorStatusMessage) message).inService;
+			elevatorFloor = ((ElevatorStatusMessage) message).floorNumber;
 			break;
 
 		default:
@@ -134,4 +106,26 @@ public class Scheduler implements Runnable {
 		}
 
 	}
+	
+	private void stopElevator() {
+		
+	}
+	
+	private void closeElevatorDoors() {
+		
+	}
+	
+	private void openElevatorDoors () {
+		
+	}
+	
+	private void moveElevatorUp() {
+		
+	}
+	
+	private void moveElevatorDown() {
+		
+	}
+	
+	
 }
