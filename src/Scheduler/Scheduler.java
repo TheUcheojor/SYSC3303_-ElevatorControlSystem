@@ -7,6 +7,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import common.Direction;
 import common.SchedulerCommand;
 import common.messages.Message;
 import common.messages.MessageChannel;
@@ -17,7 +18,7 @@ import common.messages.scheduler.SchedulerElevatorCommand;
 /**
  * This represents the scheduler which manages the elevator and floor subsystem.
  *
- * @author paulokenne, jacobcharpentier, ryanfife
+ * @author paulokenne, jacobcharpentier, ryanfife, Favour
  *
  */
 public class Scheduler implements Runnable {
@@ -30,6 +31,9 @@ public class Scheduler implements Runnable {
 	private int elevatorFloorNumber;
 	private ArrayDeque<JobRequest> elevatorJobQueue;
 	private Thread elevatorManagerThread;
+
+	public Direction diretion;
+	public boolean isDoorOpen;
 
 	public Scheduler(MessageChannel floorSubsystemTransmissonChannel, MessageChannel floorSubsystemReceiverChannel,
 			MessageChannel elevatorSubsystemTransmissonChannel, MessageChannel elevatorSubsystemReceiverChannel) {
@@ -147,6 +151,8 @@ public class Scheduler implements Runnable {
 		case ELEVATOR_STATUS_MESSAGE:
 			isElevatorRunning = ((ElevatorStatusMessage) message).inService;
 			elevatorFloorNumber = ((ElevatorStatusMessage) message).floorNumber;
+			diretion = ((ElevatorStatusMessage) message).direction;
+			isDoorOpen = ((ElevatorStatusMessage) message).isDoorOpen;
 			break;
 
 		default:
@@ -156,30 +162,48 @@ public class Scheduler implements Runnable {
 
 	}
 	
+	/**
+	 * This method sends a comand to the elevator to stop moving 
+	 * Then recieves a status message back
+	 */
 	private void stopElevator() {
-		// We want manager thread to wait for a response from the elevator telling us its stopped!
-		// If timeout, throw Exception
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
+	/**
+	 * This method sends a comand to the elevator to close elevator doors 
+	 * Then recieves a status message back
+	 */
 	private void closeElevatorDoors() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.CLOSE_DOORS));
-
+		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
+	/**
+	 * This method sends a comand to the elevator to open elevator doors
+	 * Then recieves a status message back
+	 */
 	private void openElevatorDoors () {
-		// We wait for a response telling us doors are open
-		// If timeout, throw Exception
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.OPEN_DOORS));
-
+		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
+	/**
+	 * This method sends a comand to the elevator to start moving up 
+	 * Then recieves a status message back
+	 */
 	private void moveElevatorUp() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_UP));
-
+		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
+	/**
+	 * This method sends a comand to the elevator to start moving down
+	 * Then recieves a status message back
+	 */
 	private void moveElevatorDown() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_DOWN));
+		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}	
 }
