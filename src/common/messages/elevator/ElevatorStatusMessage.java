@@ -20,7 +20,6 @@ public class ElevatorStatusMessage extends Message implements ElevatorMessage {
 	public boolean isDoorOpen;
 	public int floorNumber;
 	public String timestamp;
-
 	public Direction direction;
 
 	public ElevatorStatusMessage(boolean inService, int elevatorId) {
