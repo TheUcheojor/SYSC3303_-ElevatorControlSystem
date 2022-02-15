@@ -12,6 +12,7 @@ import common.messages.MessageChannel;
  *
  */
 public class SystemExecutor {
+	public static final int DEFAULT_MESSAGE_QUEUE_SIZE = 10;
 
 	/**
 	 * Set up and start the application
@@ -19,11 +20,11 @@ public class SystemExecutor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MessageChannel floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson");
-		MessageChannel floorSubsystemReceiverChannel = new MessageChannel("Floor Subsystem Receiver");
+		MessageChannel floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson", DEFAULT_MESSAGE_QUEUE_SIZE);
+		MessageChannel floorSubsystemReceiverChannel = new MessageChannel("Floor Subsystem Receiver", DEFAULT_MESSAGE_QUEUE_SIZE);
 
-		MessageChannel elevatorSubsystemTransmissonChannel = new MessageChannel("Elevator Subsystem Transmisson");
-		MessageChannel elevatorSubsystemReceiverChannel = new MessageChannel("Elevator Subsystem Receiver");
+		MessageChannel elevatorSubsystemTransmissonChannel = new MessageChannel("Elevator Subsystem Transmisson", DEFAULT_MESSAGE_QUEUE_SIZE);
+		MessageChannel elevatorSubsystemReceiverChannel = new MessageChannel("Elevator Subsystem Receiver", DEFAULT_MESSAGE_QUEUE_SIZE);
 
 		String filePath = "resources/FloorInputFile.txt";
 

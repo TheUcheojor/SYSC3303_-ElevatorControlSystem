@@ -61,7 +61,7 @@ class TestElevatorCar {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Message message = elevatorSubsystemTransmissonChannel.getMessage();
+		Message message = elevatorSubsystemTransmissonChannel.popMessage();
 
 		// elevator should place a status response in the channel
 		assertEquals(message instanceof ElevatorStatusMessage, true);

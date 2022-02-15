@@ -48,7 +48,7 @@ public class Scheduler implements Runnable {
 		while (true) {
 
 			if (!floorSubsystemTransmissonChannel.isEmpty()) {
-				Message floorRequest = floorSubsystemTransmissonChannel.getMessage();
+				Message floorRequest = floorSubsystemTransmissonChannel.popMessage();
 				handleFloorRequest(floorRequest);
 			}
 			
@@ -63,7 +63,7 @@ public class Scheduler implements Runnable {
 			// Only read the data in the channel if the elevator is not ready for a job and
 			// the channel is not empty.
 			if (!elevatorSubsystemTransmissonChannel.isEmpty()) {
-				Message elevatorRequest = elevatorSubsystemTransmissonChannel.getMessage();
+				Message elevatorRequest = elevatorSubsystemTransmissonChannel.popMessage();
 				handleElevatorMessage(elevatorRequest);
 			}
 			

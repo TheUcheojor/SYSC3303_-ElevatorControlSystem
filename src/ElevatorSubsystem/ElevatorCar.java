@@ -86,11 +86,11 @@ public class ElevatorCar implements Runnable {
 
 		// The elevator is ready
 		ElevatorStatusMessage status = createStatusMessage();
-		elevatorSubsystemTransmissonChannel.setMessage(status);
+		elevatorSubsystemTransmissonChannel.appendMessage(status);
 
 		while (true) {
 			// send status message and wait for a response from scheduler response in loop
-			Message message = elevatorSubsystemReceiverChannel.getMessage();
+			Message message = elevatorSubsystemReceiverChannel.popMessage();
 			handleMessage(message);
 		}
 	}
@@ -108,12 +108,12 @@ public class ElevatorCar implements Runnable {
 		switch (message.getMessageType()) {
 
 		case JOB_REQUEST:
-			elevatorSubsystemTransmissonChannel.setMessage(message);
+			elevatorSubsystemTransmissonChannel.appendMessage(message);
 			break;
 
 		case ELEVATOR_STATUS_REQUEST:
 			ElevatorStatusMessage status = createStatusMessage();
-			elevatorSubsystemTransmissonChannel.setMessage(status);
+			elevatorSubsystemTransmissonChannel.appendMessage(status);
 			break;
 
 		default:

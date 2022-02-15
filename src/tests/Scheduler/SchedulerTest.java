@@ -80,10 +80,10 @@ class SchedulerTest {
 	void testFloorSubsystemRequestIsAccepted() {
 		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
 		JobRequest jobRequest = new JobRequest(data);
-		floorSubsystemTransmissonChannel.setMessage(jobRequest);
+		floorSubsystemTransmissonChannel.appendMessage(jobRequest);
 
 		Message message = new Message(MessageType.TEST_REQUEST);
-		elevatorSubsystemTransmissonChannel.setMessage(message);
+		elevatorSubsystemTransmissonChannel.appendMessage(message);
 
 		scheduler.start();
 
@@ -103,7 +103,7 @@ class SchedulerTest {
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
 		Message message = new Message(MessageType.ELEVATOR_STATUS_REQUEST);
-		elevatorSubsystemTransmissonChannel.setMessage(message);
+		elevatorSubsystemTransmissonChannel.appendMessage(message);
 
 		scheduler.start();
 
@@ -127,10 +127,10 @@ class SchedulerTest {
 	void testFloorSubsystemJobRequestIsTransferredToElevatorSubsystem() {
 		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
 		JobRequest jobRequest = new JobRequest(data);
-		floorSubsystemTransmissonChannel.setMessage(jobRequest);
+		floorSubsystemTransmissonChannel.appendMessage(jobRequest);
 
 		Message message = new Message(MessageType.ELEVATOR_STATUS_MESSAGE);
-		elevatorSubsystemTransmissonChannel.setMessage(message);
+		elevatorSubsystemTransmissonChannel.appendMessage(message);
 
 		scheduler.start();
 
@@ -159,7 +159,7 @@ class SchedulerTest {
 		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
 		JobRequest jobRequest = new JobRequest(data);
 
-		elevatorSubsystemTransmissonChannel.setMessage(jobRequest);
+		elevatorSubsystemTransmissonChannel.appendMessage(jobRequest);
 
 		scheduler.start();
 

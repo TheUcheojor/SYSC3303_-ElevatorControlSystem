@@ -149,12 +149,12 @@ public class FloorSubsystem implements Runnable {
 				floors[floorId].printFloorStatus();
 
 				// sending the job to the scheduler
-				floorSubsystemTransmissonChannel.setMessage(jobRequest);
+				floorSubsystemTransmissonChannel.appendMessage(jobRequest);
 			}
 
 			// Checking if we have a request message
 			if (!floorSubsystemReceiverChannel.isEmpty()) {
-				handleRequest(floorSubsystemReceiverChannel.getMessage());
+				handleRequest(floorSubsystemReceiverChannel.popMessage());
 			}
 
 		}

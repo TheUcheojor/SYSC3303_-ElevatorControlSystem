@@ -173,7 +173,7 @@ public class FloorElevatorComponents {
 				elevatorArrivedAtFloor(elevatorMotor.getDirection());
 
 				elevatorSubsystemReceiverChannel
-						.setMessage(new ElevatorFloorArrivalMessage(floorNumber, elevatorId, newCurrentElevatorSpeed));
+						.appendMessage(new ElevatorFloorArrivalMessage(floorNumber, elevatorId, newCurrentElevatorSpeed));
 			}
 
 		};
