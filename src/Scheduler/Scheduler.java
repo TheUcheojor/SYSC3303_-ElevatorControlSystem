@@ -5,6 +5,7 @@ package Scheduler;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import common.messages.Message;
 import common.messages.MessageChannel;
@@ -24,7 +25,7 @@ public class Scheduler implements Runnable {
 	private MessageChannel elevatorSubsystemTransmissonChannel;
 	private MessageChannel elevatorSubsystemReceiverChannel;
 	private boolean isElevatorRunning = false;
-	private int elevatorFloor;
+	private int elevatorFloorNumber;
 	private ArrayDeque<JobRequest> elevatorJobQueue;
 
 	public Scheduler(MessageChannel floorSubsystemTransmissonChannel, MessageChannel floorSubsystemReceiverChannel,
@@ -64,6 +65,15 @@ public class Scheduler implements Runnable {
 				Message elevatorRequest = elevatorSubsystemTransmissonChannel.getMessage();
 				handleElevatorMessage(elevatorRequest);
 			}
+			
+			// iterate over job requests to figure out if elevator should stop at this floor
+			Iterator<JobRequest> iterator = elevatorJobQueue.iterator();
+			while(iterator.hasNext()) {
+				JobRequest currRequest = iterator.next();
+				if(currRequest.getFloorId() == elevatorFloorNumber) {
+					
+				}
+			}
 		}
 	}
 
@@ -97,7 +107,7 @@ public class Scheduler implements Runnable {
 
 		case ELEVATOR_STATUS_MESSAGE:
 			isElevatorRunning = ((ElevatorStatusMessage) message).inService;
-			elevatorFloor = ((ElevatorStatusMessage) message).floorNumber;
+			elevatorFloorNumber = ((ElevatorStatusMessage) message).floorNumber;
 			break;
 
 		default:
@@ -108,23 +118,23 @@ public class Scheduler implements Runnable {
 	}
 	
 	private void stopElevator() {
-		
+//		elevatorSubsystemReceiverChannel.setMessage();
 	}
 	
 	private void closeElevatorDoors() {
-		
+//		elevatorSubsystemReceiverChannel.setMessage();
 	}
 	
 	private void openElevatorDoors () {
-		
+//		elevatorSubsystemReceiverChannel.setMessage();
 	}
 	
 	private void moveElevatorUp() {
-		
+//		elevatorSubsystemReceiverChannel.setMessage();
 	}
 	
 	private void moveElevatorDown() {
-		
+//		elevatorSubsystemReceiverChannel.setMessage();
 	}
 	
 	
