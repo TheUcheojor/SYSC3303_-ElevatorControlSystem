@@ -52,7 +52,7 @@ public class Scheduler implements Runnable {
 			}
 			
 			// Move unassigned jobs to the elevator
-			if(isElevatorRunning && unassignedJobRequests.size() != 0) {
+			if(unassignedJobRequests.size() != 0) {
 				unassignedJobRequests.forEach((JobRequest job) -> {
 					elevatorJobQueue.add(job);
 					unassignedJobRequests.remove(job);
@@ -67,11 +67,28 @@ public class Scheduler implements Runnable {
 			}
 			
 			// iterate over job requests to figure out if elevator should stop at this floor
-			Iterator<JobRequest> iterator = elevatorJobQueue.iterator();
-			while(iterator.hasNext()) {
-				JobRequest currRequest = iterator.next();
-				if(currRequest.getFloorId() == elevatorFloorNumber) {
-					
+			if(isElevatorRunning && elevatorJobQueue.size() > 0) {
+				Iterator<JobRequest> iterator = elevatorJobQueue.iterator();
+				boolean jobServed = false;
+				while(iterator.hasNext()) {
+					JobRequest currRequest = iterator.next();
+					if(currRequest.getFloorId() == elevatorFloorNumber) {
+						elevatorJobQueue.remove(currRequest);
+						jobServed = true;
+					}
+				}
+				if(jobServed) { 
+					stopElevator();
+					openElevatorDoors();	
+				}
+			} else if(!isElevatorRunning && elevatorJobQueue.size() > 0) {
+				JobRequest firstJob = elevatorJobQueue.peekFirst();
+				if(firstJob.getFloorId() > elevatorFloorNumber) {
+					closeElevatorDoors();
+					moveElevatorUp();
+				} else if(firstJob.getFloorId() < elevatorFloorNumber) {
+					closeElevatorDoors();
+					moveElevatorDown();
 				}
 			}
 		}
@@ -118,6 +135,7 @@ public class Scheduler implements Runnable {
 	}
 	
 	private void stopElevator() {
+		// We want to get a response from the elevator telling us its stopped
 //		elevatorSubsystemReceiverChannel.setMessage();
 	}
 	
@@ -135,7 +153,5 @@ public class Scheduler implements Runnable {
 	
 	private void moveElevatorDown() {
 //		elevatorSubsystemReceiverChannel.setMessage();
-	}
-	
-	
+	}	
 }
