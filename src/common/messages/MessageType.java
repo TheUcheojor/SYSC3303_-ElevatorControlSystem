@@ -41,6 +41,11 @@ public enum MessageType {
 	 * A message indicating that the elevator is leaving the floor
 	 */
 	EVELATOR_LEAVING_FLOOR_MESSAGE,
+	
+	/**
+	 * A message indicating that the elevator is leaving the floor
+	 */
+	SCHEDULER_ELEVATOR_COMMAND,
 
 	/**
 	 * A request for testing purposes.

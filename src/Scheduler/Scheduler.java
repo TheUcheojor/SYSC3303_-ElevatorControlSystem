@@ -7,10 +7,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import common.SchedulerCommand;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.floor.JobRequest;
+import common.messages.scheduler.SchedulerElevatorCommand;
 
 /**
  * This represents the scheduler which manages the elevator and floor subsystem.
@@ -155,9 +157,13 @@ public class Scheduler implements Runnable {
 	}
 	
 	private void stopElevator() {
+<<<<<<< Updated upstream
 //		elevatorSubsystemReceiverChannel.setMessage();
 		// We want manager thread to wait for a response from the elevator telling us its stopped!
 		// If timeout, throw Exception
+=======
+		elevatorSubsystemReceiverChannel.setMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+>>>>>>> Stashed changes
 	}
 	
 	private void closeElevatorDoors() {
