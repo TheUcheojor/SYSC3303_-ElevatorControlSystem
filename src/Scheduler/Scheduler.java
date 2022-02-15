@@ -27,6 +27,7 @@ public class Scheduler implements Runnable {
 	private boolean isElevatorRunning = false;
 	private int elevatorFloorNumber;
 	private ArrayDeque<JobRequest> elevatorJobQueue;
+	private Thread elevatorManagerThread;
 
 	public Scheduler(MessageChannel floorSubsystemTransmissonChannel, MessageChannel floorSubsystemReceiverChannel,
 			MessageChannel elevatorSubsystemTransmissonChannel, MessageChannel elevatorSubsystemReceiverChannel) {
@@ -67,7 +68,8 @@ public class Scheduler implements Runnable {
 			}
 			
 			// iterate over job requests to figure out if elevator should stop at this floor
-			if(isElevatorRunning && elevatorJobQueue.size() > 0) {
+			
+			if(!elevatorManagerThread.isAlive() && isElevatorRunning && elevatorJobQueue.size() > 0) {
 				Iterator<JobRequest> iterator = elevatorJobQueue.iterator();
 				boolean jobServed = false;
 				while(iterator.hasNext()) {
@@ -77,18 +79,36 @@ public class Scheduler implements Runnable {
 						jobServed = true;
 					}
 				}
-				if(jobServed) { 
-					stopElevator();
-					openElevatorDoors();	
+				if(jobServed) {
+					elevatorManagerThread = new Thread() {	
+						@Override
+						public void run() {
+							stopElevator();
+							openElevatorDoors();	
+						}
+					};
+					elevatorManagerThread.start();
 				}
-			} else if(!isElevatorRunning && elevatorJobQueue.size() > 0) {
+			} else if(!elevatorManagerThread.isAlive() && !isElevatorRunning && elevatorJobQueue.size() > 0) {
 				JobRequest firstJob = elevatorJobQueue.peekFirst();
 				if(firstJob.getFloorId() > elevatorFloorNumber) {
-					closeElevatorDoors();
-					moveElevatorUp();
+					elevatorManagerThread = new Thread() {	
+						@Override
+						public void run() {
+							closeElevatorDoors();
+							moveElevatorUp();
+						}
+					};
+					elevatorManagerThread.start();
 				} else if(firstJob.getFloorId() < elevatorFloorNumber) {
-					closeElevatorDoors();
-					moveElevatorDown();
+					elevatorManagerThread = new Thread() {	
+						@Override
+						public void run() {
+							closeElevatorDoors();
+							moveElevatorDown();
+						}
+					};
+					elevatorManagerThread.start();
 				}
 			}
 		}
@@ -135,8 +155,9 @@ public class Scheduler implements Runnable {
 	}
 	
 	private void stopElevator() {
-		// We want to get a response from the elevator telling us its stopped
 //		elevatorSubsystemReceiverChannel.setMessage();
+		// We want manager thread to wait for a response from the elevator telling us its stopped!
+		// If timeout, throw Exception
 	}
 	
 	private void closeElevatorDoors() {
@@ -145,6 +166,8 @@ public class Scheduler implements Runnable {
 	
 	private void openElevatorDoors () {
 //		elevatorSubsystemReceiverChannel.setMessage();
+		// We wait for a response telling us doors are open
+		// If timeout, throw Exception
 	}
 	
 	private void moveElevatorUp() {
