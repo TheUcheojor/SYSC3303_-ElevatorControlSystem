@@ -168,7 +168,7 @@ public class Scheduler implements Runnable {
 	
 	private void closeElevatorDoors() {
 //		elevatorSubsystemReceiverChannel.setMessage();
-		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.CLOSE_DOORS));
 
 	}
 	
@@ -176,18 +176,18 @@ public class Scheduler implements Runnable {
 //		elevatorSubsystemReceiverChannel.setMessage();
 		// We wait for a response telling us doors are open
 		// If timeout, throw Exception
-		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.OPEN_DOORS));
 
 	}
 	
 	private void moveElevatorUp() {
 //		elevatorSubsystemReceiverChannel.setMessage();
-		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_UP));
 
 	}
 	
 	private void moveElevatorDown() {
 //		elevatorSubsystemReceiverChannel.setMessage();
-		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_DOWN));
 	}	
 }
