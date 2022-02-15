@@ -157,30 +157,37 @@ public class Scheduler implements Runnable {
 	}
 	
 	private void stopElevator() {
-<<<<<<< Updated upstream
+//<<<<<<< Updated upstream
 //		elevatorSubsystemReceiverChannel.setMessage();
 		// We want manager thread to wait for a response from the elevator telling us its stopped!
 		// If timeout, throw Exception
-=======
-		elevatorSubsystemReceiverChannel.setMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
->>>>>>> Stashed changes
+//=======
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+//>>>>>>> Stashed changes
 	}
 	
 	private void closeElevatorDoors() {
 //		elevatorSubsystemReceiverChannel.setMessage();
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+
 	}
 	
 	private void openElevatorDoors () {
 //		elevatorSubsystemReceiverChannel.setMessage();
 		// We wait for a response telling us doors are open
 		// If timeout, throw Exception
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+
 	}
 	
 	private void moveElevatorUp() {
 //		elevatorSubsystemReceiverChannel.setMessage();
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
+
 	}
 	
 	private void moveElevatorDown() {
 //		elevatorSubsystemReceiverChannel.setMessage();
+		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
 	}	
 }
