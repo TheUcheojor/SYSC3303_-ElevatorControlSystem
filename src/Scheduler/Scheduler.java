@@ -73,50 +73,62 @@ public class Scheduler implements Runnable {
 				handleElevatorMessage(elevatorRequest);
 			}
 			
-			// iterate over job requests to figure out if elevator should stop at this floor
-			
-			if(!elevatorManagerThread.isAlive() && isElevatorRunning && elevatorJobQueue.size() > 0) {
-				Iterator<JobRequest> iterator = elevatorJobQueue.iterator();
-				boolean jobServed = false;
-				while(iterator.hasNext()) {
-					JobRequest currRequest = iterator.next();
-					if(currRequest.getFloorId() == elevatorFloorNumber) {
-						elevatorJobQueue.remove(currRequest);
-						jobServed = true;
-					}
-				}
-				if(jobServed) {
-					elevatorManagerThread = new Thread() {	
-						@Override
-						public void run() {
-							stopElevator();
-							openElevatorDoors();	
-						}
-					};
-					elevatorManagerThread.start();
-				}
-			} else if(!elevatorManagerThread.isAlive() && !isElevatorRunning && elevatorJobQueue.size() > 0) {
-				JobRequest firstJob = elevatorJobQueue.peekFirst();
-				if(firstJob.getFloorId() > elevatorFloorNumber) {
-					elevatorManagerThread = new Thread() {	
-						@Override
-						public void run() {
-							closeElevatorDoors();
-							moveElevatorUp();
-						}
-					};
-					elevatorManagerThread.start();
-				} else if(firstJob.getFloorId() < elevatorFloorNumber) {
-					elevatorManagerThread = new Thread() {	
-						@Override
-						public void run() {
-							closeElevatorDoors();
-							moveElevatorDown();
-						}
-					};
-					elevatorManagerThread.start();
-				}
+			if(!elevatorManagerThread.isAlive() && elevatorJobQueue.size() > 0) {
+				if(isElevatorRunning) serveJob();
+				else startJob();
 			}
+		}
+	}
+	
+	/**
+	 * Serves all elevator job requests for the current floor
+	 */
+	private void serveJob() {
+		Iterator<JobRequest> iterator = elevatorJobQueue.iterator();
+		boolean jobServed = false;
+		
+		while(iterator.hasNext()) {
+			JobRequest currRequest = iterator.next();
+			if(currRequest.getFloorId() == elevatorFloorNumber) {
+				elevatorJobQueue.remove(currRequest);
+				jobServed = true;
+			}
+		}
+		if(jobServed) {
+			elevatorManagerThread = new Thread() {	
+				@Override
+				public void run() {
+					stopElevator();
+					openElevatorDoors();	
+				}
+			};
+			elevatorManagerThread.start();
+		}
+	}
+	
+	/**
+	 * Issues the necessary commands to the elevator for starting the first job in the queue.
+	 */
+	private void startJob() {
+		JobRequest firstJob = elevatorJobQueue.peekFirst();
+		if(firstJob.getFloorId() > elevatorFloorNumber) {
+			elevatorManagerThread = new Thread() {	
+				@Override
+				public void run() {
+					closeElevatorDoors();
+					moveElevatorUp();
+				}
+			};
+			elevatorManagerThread.start();
+		} else if(firstJob.getFloorId() < elevatorFloorNumber) {
+			elevatorManagerThread = new Thread() {	
+				@Override
+				public void run() {
+					closeElevatorDoors();
+					moveElevatorDown();
+				}
+			};
+			elevatorManagerThread.start();
 		}
 	}
 
@@ -163,8 +175,8 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * This method sends a comand to the elevator to stop moving 
-	 * Then recieves a status message back
+	 * This method sends a command to the elevator to stop moving 
+	 * Then receives a status message back
 	 */
 	private void stopElevator() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
@@ -172,8 +184,8 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * This method sends a comand to the elevator to close elevator doors 
-	 * Then recieves a status message back
+	 * This method sends a command to the elevator to close elevator doors 
+	 * Then receives a status message back
 	 */
 	private void closeElevatorDoors() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.CLOSE_DOORS));
@@ -181,8 +193,8 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * This method sends a comand to the elevator to open elevator doors
-	 * Then recieves a status message back
+	 * This method sends a command to the elevator to open elevator doors
+	 * Then receives a status message back
 	 */
 	private void openElevatorDoors () {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.OPEN_DOORS));
@@ -190,8 +202,8 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * This method sends a comand to the elevator to start moving up 
-	 * Then recieves a status message back
+	 * This method sends a command to the elevator to start moving up 
+	 * Then receives a status message back
 	 */
 	private void moveElevatorUp() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_UP));
@@ -199,8 +211,8 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * This method sends a comand to the elevator to start moving down
-	 * Then recieves a status message back
+	 * This method sends a command to the elevator to start moving down
+	 * Then receives a status message back
 	 */
 	private void moveElevatorDown() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_DOWN));
