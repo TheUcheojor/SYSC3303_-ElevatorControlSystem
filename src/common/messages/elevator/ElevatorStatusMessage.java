@@ -16,17 +16,18 @@ import common.messages.MessageType;
 
 public class ElevatorStatusMessage extends Message implements ElevatorMessage {
 	public int elevatorId;
-	public boolean inService;
-	public boolean isDoorOpen;
 	public int floorNumber;
-	public String timestamp;
 	public Direction direction;
+	
+	public String timestamp;
 
-	public ElevatorStatusMessage(boolean inService, int elevatorId) {
+	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber) {
 		super(MessageType.ELEVATOR_STATUS_MESSAGE);
 		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
-		this.inService = inService;
+
 		this.elevatorId = elevatorId;
+		this.direction = direction;
+		this.floorNumber = floorNumber;
 	}
 
 	@Override

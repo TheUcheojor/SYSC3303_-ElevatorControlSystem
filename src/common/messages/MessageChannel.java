@@ -90,6 +90,6 @@ public class MessageChannel {
 	 * @return true if message queue is empty, false otherwise
 	 */
 	public synchronized boolean isEmpty() {
-		return this.messages.size() == 0;
+		return messages.size() == 0;
 	}
 }

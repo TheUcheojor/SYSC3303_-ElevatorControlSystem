@@ -19,5 +19,7 @@ public enum Direction {
 	 * The down elevatorDirection.
 	 */
 	DOWN,
+	
+	IDLE
 
 }
