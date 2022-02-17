@@ -23,25 +23,68 @@ import common.messages.scheduler.SchedulerElevatorCommand;
  */
 public class Scheduler implements Runnable {
 	private ArrayList<JobRequest> unassignedJobRequests = new ArrayList<>();
-	private MessageChannel floorSubsystemTransmissonChannel;
+	
+	/**
+	 *  channel that receives messages from floor subsystem
+	 */
+	private MessageChannel receiveFloorChannel;
+	
+	/**
+	 * floor channel that gets messages from the scheduler 
+	 */
 	private MessageChannel floorSubsystemReceiverChannel;
-	private MessageChannel elevatorSubsystemTransmissonChannel;
+	
+	/**
+	 * channel that receives messages from the elevator subsystem
+	 */
+	private MessageChannel receiveElevatorChannel;
+	
+	/**
+	 * elevator channel that gets messages from the scheduler
+	 */
 	private MessageChannel elevatorSubsystemReceiverChannel;
-	private boolean isElevatorRunning = false;
-	private int elevatorFloorNumber;
+	
+
+	/**
+	 * elevator job queue
+	 */
 	private ArrayDeque<JobRequest> elevatorJobQueue;
+	
+	/**
+	 * elevator manager thread
+	 */
 	private Thread elevatorManagerThread;
+	
+	/**
+	 * elevator floor number 
+	 */
+	private int elevatorFloorNumber;
+	
+	/**
+	 * elevator floor number 
+	 */
+	public Direction elevatorDirection;
+	
+	/**
+	 * elevator door status 
+	 */
+	public boolean elevatorIsDoorOpen;
+	
+	/**
+	 * elevator idle status
+	 */
+	private boolean elevatorIsIdle = false;
 
-	public Direction diretion;
-	public boolean isDoorOpen;
+	/**
+	 * a constructor
+	 */
+	public Scheduler(MessageChannel receiveFloorChannel, MessageChannel floorSubsystemReceiverChannel,
+			MessageChannel receiveElevatorChannel, MessageChannel elevatorSubsystemReceiverChannel) {
 
-	public Scheduler(MessageChannel floorSubsystemTransmissonChannel, MessageChannel floorSubsystemReceiverChannel,
-			MessageChannel elevatorSubsystemTransmissonChannel, MessageChannel elevatorSubsystemReceiverChannel) {
-
-		this.floorSubsystemTransmissonChannel = floorSubsystemTransmissonChannel;
+		this.receiveElevatorChannel = receiveElevatorChannel;
+		this.receiveFloorChannel = receiveFloorChannel;
+		
 		this.floorSubsystemReceiverChannel = floorSubsystemReceiverChannel;
-
-		this.elevatorSubsystemTransmissonChannel = elevatorSubsystemTransmissonChannel;
 		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
 		
 		// TODO (rfife) for iter 3: scale this to multiple elevators
@@ -53,8 +96,8 @@ public class Scheduler implements Runnable {
 
 		while (true) {
 
-			if (!floorSubsystemTransmissonChannel.isEmpty()) {
-				Message floorRequest = floorSubsystemTransmissonChannel.popMessage();
+			if (!receiveFloorChannel.isEmpty()) {
+				Message floorRequest = receiveFloorChannel.popMessage();
 				handleFloorRequest(floorRequest);
 			}
 			
@@ -68,13 +111,13 @@ public class Scheduler implements Runnable {
 
 			// Only read the data in the channel if the elevator is not ready for a job and
 			// the channel is not empty.
-			if (!elevatorSubsystemTransmissonChannel.isEmpty()) {
-				Message elevatorRequest = elevatorSubsystemTransmissonChannel.popMessage();
+			if (!receiveElevatorChannel.isEmpty()) {
+				Message elevatorRequest = receiveElevatorChannel.popMessage();
 				handleElevatorMessage(elevatorRequest);
 			}
 			
 			if(!elevatorManagerThread.isAlive() && elevatorJobQueue.size() > 0) {
-				if(isElevatorRunning) serveJob();
+				if(elevatorIsIdle) serveJob();
 				else startJob();
 			}
 		}
@@ -87,6 +130,7 @@ public class Scheduler implements Runnable {
 		Iterator<JobRequest> iterator = elevatorJobQueue.iterator();
 		boolean jobServed = false;
 		
+		// iterate over job requests, remove jobs that are completed by arriving at this floor
 		while(iterator.hasNext()) {
 			JobRequest currRequest = iterator.next();
 			if(currRequest.getFloorId() == elevatorFloorNumber) {
@@ -99,7 +143,8 @@ public class Scheduler implements Runnable {
 				@Override
 				public void run() {
 					stopElevator();
-					openElevatorDoors();	
+					openElevatorDoors();
+					// TODO (rfife): send turn off lamp to floor
 				}
 			};
 			elevatorManagerThread.start();
@@ -161,10 +206,10 @@ public class Scheduler implements Runnable {
 		switch (message.getMessageType()) {
 
 		case ELEVATOR_STATUS_MESSAGE:
-			isElevatorRunning = ((ElevatorStatusMessage) message).inService;
+			elevatorIsIdle = ((ElevatorStatusMessage) message).inService;
 			elevatorFloorNumber = ((ElevatorStatusMessage) message).floorNumber;
-			diretion = ((ElevatorStatusMessage) message).direction;
-			isDoorOpen = ((ElevatorStatusMessage) message).isDoorOpen;
+			elevatorDirection = ((ElevatorStatusMessage) message).direction;
+			elevatorIsDoorOpen = ((ElevatorStatusMessage) message).isDoorOpen;
 			break;
 
 		default:
@@ -176,46 +221,36 @@ public class Scheduler implements Runnable {
 	
 	/**
 	 * This method sends a command to the elevator to stop moving 
-	 * Then receives a status message back
 	 */
 	private void stopElevator() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.STOP));
-		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
 	/**
 	 * This method sends a command to the elevator to close elevator doors 
-	 * Then receives a status message back
 	 */
 	private void closeElevatorDoors() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.CLOSE_DOORS));
-		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
 	/**
 	 * This method sends a command to the elevator to open elevator doors
-	 * Then receives a status message back
 	 */
 	private void openElevatorDoors () {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.OPEN_DOORS));
-		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
 	/**
 	 * This method sends a command to the elevator to start moving up 
-	 * Then receives a status message back
 	 */
 	private void moveElevatorUp() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_UP));
-		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}
 	
 	/**
 	 * This method sends a command to the elevator to start moving down
-	 * Then receives a status message back
 	 */
 	private void moveElevatorDown() {
 		elevatorSubsystemReceiverChannel.appendMessage(new SchedulerElevatorCommand(SchedulerCommand.MOVE_DOWN));
-		handleElevatorMessage(elevatorSubsystemTransmissonChannel.popMessage());
 	}	
 }

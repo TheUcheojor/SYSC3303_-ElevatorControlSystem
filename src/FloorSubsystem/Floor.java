@@ -28,7 +28,7 @@ public class Floor {
 	private LampButton downLampButton = null;
 
 	/**
-	 * The elevator components (arrival sensor and direction lamp), one per elevator
+	 * The elevator components (arrival sensor and elevatorDirection lamp), one per elevator
 	 * shaft
 	 *
 	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS. Hence, they
@@ -78,7 +78,7 @@ public class Floor {
 	/**
 	 * This method simulates a button press to a floor system
 	 *
-	 * @param direction - the direction selected by the user
+	 * @param elevatorDirection - the elevatorDirection selected by the user
 	 */
 	public void pressFloorButton(Direction direction) {
 		switch (direction) {

@@ -10,7 +10,7 @@ import common.messages.elevator.ElevatorFloorArrivalMessage;
 
 /**
  * This class represents the floor elevator components which include the arrival
- * sensor and direction lamp
+ * sensor and elevatorDirection lamp
  *
  * @author paulokenne
  *
@@ -34,8 +34,8 @@ public class FloorElevatorComponents {
 	private boolean arrivalSensorState = false;
 
 	/**
-	 * The direction lamp for the elevator shaft which denotes the arrival and
-	 * direction of an elevator at the floor.
+	 * The elevatorDirection lamp for the elevator shaft which denotes the arrival and
+	 * elevatorDirection of an elevator at the floor.
 	 *
 	 */
 	private Direction directionLamp = null;
@@ -49,9 +49,9 @@ public class FloorElevatorComponents {
 	}
 
 	/**
-	 * The elevator is arriving at floor with a given direction
+	 * The elevator is arriving at floor with a given elevatorDirection
 	 *
-	 * @param direction the direction
+	 * @param elevatorDirection the elevatorDirection
 	 */
 	public void elevatorArrivedAtFloor(Direction direction) {
 		arrivalSensorState = false;
@@ -167,7 +167,7 @@ public class FloorElevatorComponents {
 
 				System.out.println("\nThe evelator has reached the floor " + floorNumber);
 
-				// For now, we will assume that the motor's direction is where the elevator
+				// For now, we will assume that the motor's elevatorDirection is where the elevator
 				// plans to go
 				// TODO Reevaluate the assumption.
 				elevatorArrivedAtFloor(elevatorMotor.getDirection());

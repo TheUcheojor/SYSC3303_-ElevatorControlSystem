@@ -30,7 +30,7 @@ public class SimulationFloorInputData {
 	private Integer currentFloor;
 
 	/**
-	 * The elevator direction that the passenger wishes to go to reach his or her
+	 * The elevator elevatorDirection that the passenger wishes to go to reach his or her
 	 * destination
 	 */
 	private Direction floorDirectionButton;
@@ -45,7 +45,7 @@ public class SimulationFloorInputData {
 	 *
 	 * @param arrivalTime               the arrival time
 	 * @param currentFloor              the current floor
-	 * @param floorDirectionButton      the floor direction
+	 * @param floorDirectionButton      the floor elevatorDirection
 	 * @param destinationFloorCarButton the target floor
 	 */
 	public SimulationFloorInputData(String arrivalTime, Integer currentFloor, Direction floorDirectionButton,
@@ -110,7 +110,7 @@ public class SimulationFloorInputData {
 	}
 
 	/**
-	 * Gets the floor direction
+	 * Gets the floor elevatorDirection
 	 *
 	 * @return the floorDirectionButton
 	 */

@@ -19,12 +19,12 @@ public class LampButton {
 	private boolean isButtonPressed = false;
 
 	/**
-	 * The status of the direction lamp
+	 * The status of the elevatorDirection lamp
 	 */
 	private boolean isDirectionLampActive = false;
 
 	/**
-	 * The button direction
+	 * The button elevatorDirection
 	 */
 	private Direction direction;
 
@@ -61,7 +61,7 @@ public class LampButton {
 	}
 
 	/**
-	 * @return the direction
+	 * @return the elevatorDirection
 	 */
 	public Direction getDirection() {
 		return direction;

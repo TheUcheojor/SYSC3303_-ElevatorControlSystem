@@ -9,7 +9,7 @@ import common.messages.MessageType;
 
 /**
  * This class represents a request that sent to the floor that indicates the
- * elevator is coming in its direction
+ * elevator is coming in its elevatorDirection
  *
  * @author paulokenne
  *

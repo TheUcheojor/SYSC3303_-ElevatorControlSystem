@@ -12,9 +12,21 @@ import java.util.ArrayDeque;
  *
  */
 public class MessageChannel {
+	/**
+	 * default queue size
+	 */
 	private final static int DEFAULT_QUEUE_SIZE = 1;
+	/**
+	 * message queue
+	 */
 	private ArrayDeque<Message> messages;
+	/**
+	 * max size for queue
+	 */
 	private int maxSize;
+	/**
+	 * channel name
+	 */
 	private String channelName;
 
 	public MessageChannel(String channelName, int maxSize) {
@@ -28,7 +40,10 @@ public class MessageChannel {
 		this.maxSize = DEFAULT_QUEUE_SIZE;
 		this.messages = new ArrayDeque<Message>();
 	}
-
+	
+	/**
+	 * Appends message to channel queue
+	 */
 	public synchronized void appendMessage(Message message) {
 		// Wait if channel full 
 		while (messages.size() >= maxSize) {
@@ -46,6 +61,11 @@ public class MessageChannel {
 		notifyAll();
 	}
 
+	/**
+	 * Pops first message from channel queue
+	 * 
+	 * @return popped message
+	 */
 	public synchronized Message popMessage() {
 		// Wait if channel empty
 		while (messages.size() == 0) {
@@ -66,6 +86,9 @@ public class MessageChannel {
 		return tempMessage;
 	}
 
+	/**
+	 * @return true if message queue is empty, false otherwise
+	 */
 	public synchronized boolean isEmpty() {
 		return this.messages.size() == 0;
 	}
