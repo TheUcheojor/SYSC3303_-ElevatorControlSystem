@@ -20,6 +20,7 @@ public class ElevatorCar implements Runnable {
 	private MessageChannel elevatorSubsystemReceiverChannel;
 	private ElevatorMotor motor;
 	private ElevatorDoor door;
+	private int floorNumber;
 
 	/**
 	 * The number of elevators in the system
@@ -130,9 +131,8 @@ public class ElevatorCar implements Runnable {
 	 */
 	// @PublicForTestOnly
 	public ElevatorStatusMessage createStatusMessage() {
-		ElevatorStatusMessage status = new ElevatorStatusMessage(this.getInService(), id);
+		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber);
 		status.direction = motor.getDirection();
-		status.isDoorOpen = door.isOpen();
 		// TODO (rfife): Pass current floor
 
 		return status;

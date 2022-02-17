@@ -49,8 +49,6 @@ class TestElevatorCar {
 		ElevatorStatusMessage statusMessage = elevatorCar.createStatusMessage();
 
 		// elevator should format status message correctly
-		assertTrue(statusMessage.inService);
-		assertFalse(statusMessage.isDoorOpen);
 		assertEquals(statusMessage.direction, Direction.UP);
 	}
 
