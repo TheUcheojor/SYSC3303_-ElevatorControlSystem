@@ -80,13 +80,13 @@ class FloorSubsystemTest {
 		ElevatorFloorSignalRequestMessage floorSignalRequest = new ElevatorFloorSignalRequestMessage(0, 1,
 				elevatorMotor, true);
 
-		floorSubsystemReceiverChannel.setMessage(floorSignalRequest);
+		floorSubsystemReceiverChannel.appendMessage(floorSignalRequest);
 		floorSubsystem.start();
 
 		// Let the floor work. The notification may take well because of default
 		// configurations such speed, acceleration. Wait until the elevator receives the
 		// message
-		Message floorSentResponseMessage = elevatorSubsystemReceiverChannel.getMessage();
+		Message floorSentResponseMessage = elevatorSubsystemReceiverChannel.popMessage();
 
 		assertTrue(floorSentResponseMessage instanceof ElevatorFloorArrivalMessage);
 

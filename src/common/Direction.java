@@ -11,13 +11,15 @@ package common;
  */
 public enum Direction {
 	/**
-	 * The up direction.
+	 * The up elevatorDirection.
 	 */
 	UP,
 
 	/**
-	 * The down direction.
+	 * The down elevatorDirection.
 	 */
 	DOWN,
+	
+	IDLE
 
 }

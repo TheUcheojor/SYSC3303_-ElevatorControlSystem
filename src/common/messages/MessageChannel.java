@@ -3,6 +3,8 @@
  */
 package common.messages;
 
+import java.util.ArrayDeque;
+
 /**
  * This class represents a channel whereby threads can transfer data.
  *
@@ -10,34 +12,41 @@ package common.messages;
  *
  */
 public class MessageChannel {
-
 	/**
-	 * The message.
+	 * default queue size
 	 */
-	private Message message;
-
+	private final static int DEFAULT_QUEUE_SIZE = 1;
 	/**
-	 * The channel name
+	 * message queue
+	 */
+	private ArrayDeque<Message> messages;
+	/**
+	 * max size for queue
+	 */
+	private int maxSize;
+	/**
+	 * channel name
 	 */
 	private String channelName;
 
-	/**
-	 * A constructor.
-	 */
+	public MessageChannel(String channelName, int maxSize) {
+		this.channelName = channelName;
+		this.maxSize = maxSize;
+		this.messages = new ArrayDeque<Message>();
+	}
+	
 	public MessageChannel(String channelName) {
 		this.channelName = channelName;
+		this.maxSize = DEFAULT_QUEUE_SIZE;
+		this.messages = new ArrayDeque<Message>();
 	}
-
+	
 	/**
-	 * Sets the message
-	 *
-	 * @param message the message
+	 * Appends message to channel queue
 	 */
-	public synchronized void setMessage(Message message) {
-		/**
-		 * Wait until the message channel is empty
-		 */
-		while (this.message != null) {
+	public synchronized void appendMessage(Message message) {
+		// Wait if channel full 
+		while (messages.size() >= maxSize) {
 			try {
 				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
 				wait();
@@ -45,7 +54,7 @@ public class MessageChannel {
 			}
 		}
 
-		this.message = message;
+		this.messages.add(message);
 		System.out.println(Thread.currentThread().getName() + " has sent a " + message.getMessageType()
 				+ " message in the " + channelName + " channel.\n");
 
@@ -53,13 +62,13 @@ public class MessageChannel {
 	}
 
 	/**
-	 * Sets the message
-	 *
-	 * @param message the message
+	 * Pops first message from channel queue
+	 * 
+	 * @return popped message
 	 */
-	public synchronized Message getMessage() {
-
-		while (this.message == null) {
+	public synchronized Message popMessage() {
+		// Wait if channel empty
+		while (messages.size() == 0) {
 			try {
 				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
 
@@ -68,8 +77,7 @@ public class MessageChannel {
 			}
 		}
 
-		Message tempMessage = this.message;
-		this.message = null;
+		Message tempMessage = this.messages.pop();
 
 		System.out.println(
 				Thread.currentThread().getName() + " has received message from the " + channelName + " channel.\n");
@@ -79,9 +87,9 @@ public class MessageChannel {
 	}
 
 	/**
-	 * @return true if there is no message and false otherwise.
+	 * @return true if message queue is empty, false otherwise
 	 */
 	public synchronized boolean isEmpty() {
-		return this.message == null;
+		return messages.size() == 0;
 	}
 }

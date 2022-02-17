@@ -20,6 +20,7 @@ public class ElevatorCar implements Runnable {
 	private MessageChannel elevatorSubsystemReceiverChannel;
 	private ElevatorMotor motor;
 	private ElevatorDoor door;
+	private int floorNumber;
 
 	/**
 	 * The number of elevators in the system
@@ -86,11 +87,11 @@ public class ElevatorCar implements Runnable {
 
 		// The elevator is ready
 		ElevatorStatusMessage status = createStatusMessage();
-		elevatorSubsystemTransmissonChannel.setMessage(status);
+		elevatorSubsystemTransmissonChannel.appendMessage(status);
 
 		while (true) {
 			// send status message and wait for a response from scheduler response in loop
-			Message message = elevatorSubsystemReceiverChannel.getMessage();
+			Message message = elevatorSubsystemReceiverChannel.popMessage();
 			handleMessage(message);
 		}
 	}
@@ -108,12 +109,12 @@ public class ElevatorCar implements Runnable {
 		switch (message.getMessageType()) {
 
 		case JOB_REQUEST:
-			elevatorSubsystemTransmissonChannel.setMessage(message);
+			elevatorSubsystemTransmissonChannel.appendMessage(message);
 			break;
 
 		case ELEVATOR_STATUS_REQUEST:
 			ElevatorStatusMessage status = createStatusMessage();
-			elevatorSubsystemTransmissonChannel.setMessage(status);
+			elevatorSubsystemTransmissonChannel.appendMessage(status);
 			break;
 
 		default:
@@ -130,9 +131,8 @@ public class ElevatorCar implements Runnable {
 	 */
 	// @PublicForTestOnly
 	public ElevatorStatusMessage createStatusMessage() {
-		ElevatorStatusMessage status = new ElevatorStatusMessage(this.getInService(), id);
+		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber);
 		status.direction = motor.getDirection();
-		status.isDoorOpen = door.isOpen();
 		// TODO (rfife): Pass current floor
 
 		return status;

@@ -49,8 +49,6 @@ class TestElevatorCar {
 		ElevatorStatusMessage statusMessage = elevatorCar.createStatusMessage();
 
 		// elevator should format status message correctly
-		assertTrue(statusMessage.inService);
-		assertFalse(statusMessage.isDoorOpen);
 		assertEquals(statusMessage.direction, Direction.UP);
 	}
 
@@ -61,7 +59,7 @@ class TestElevatorCar {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Message message = elevatorSubsystemTransmissonChannel.getMessage();
+		Message message = elevatorSubsystemTransmissonChannel.popMessage();
 
 		// elevator should place a status response in the channel
 		assertEquals(message instanceof ElevatorStatusMessage, true);

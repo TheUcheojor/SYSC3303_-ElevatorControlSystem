@@ -17,7 +17,7 @@ public class ElevatorMotor {
 	private double topSpeed;
 
 	/**
-	 * The direction of the motor is moving the elevator
+	 * The elevatorDirection of the motor is moving the elevator
 	 */
 	private Direction direction = null;
 

@@ -6,15 +6,21 @@ package tests.Scheduler;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import Scheduler.Scheduler;
+import common.Direction;
+import common.SchedulerCommand;
 import common.SimulationFloorInputData;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.MessageType;
+import common.messages.elevator.ElevatorStatusMessage;
+import common.messages.floor.ElevatorFloorRequest;
 import common.messages.floor.JobRequest;
+import common.messages.scheduler.SchedulerElevatorCommand;
 
 /**
  * Tests the scheduler based on iteration 1 requirements.
@@ -63,33 +69,37 @@ class SchedulerTest {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		this.floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson");
-		this.floorSubsystemReceiverChannel = new MessageChannel(" Floor Subsystem Receiever");
+		this.floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson", 2);
+		this.floorSubsystemReceiverChannel = new MessageChannel(" Floor Subsystem Receiever", 2);
 
-		this.elevatorSubsystemTransmissonChannel = new MessageChannel(" Elevator Subsystem Transmisson");
-		this.elevatorSubsystemReceiverChannel = new MessageChannel(" Elevator Subsystem Receiever");
+		this.elevatorSubsystemTransmissonChannel = new MessageChannel(" Elevator Subsystem Transmisson", 2);
+		this.elevatorSubsystemReceiverChannel = new MessageChannel(" Elevator Subsystem Receiever", 2);
 
 		scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel,
 				elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel), SCHEDULER_NAME);
 	}
+	
+	@AfterEach
+	void tearDown() {
+		floorSubsystemTransmissonChannel = null;
+		floorSubsystemReceiverChannel = null;
+		elevatorSubsystemTransmissonChannel = null;
+		elevatorSubsystemReceiverChannel = null;
+	}
 
 	/**
-	 * Test that the request received from the floor subsystem is accepted.
+	 * Test that requests received from both channels are received.
 	 */
 	@Test
 	void testFloorSubsystemRequestIsAccepted() {
-		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
-		JobRequest jobRequest = new JobRequest(data);
-		floorSubsystemTransmissonChannel.setMessage(jobRequest);
-
-		Message message = new Message(MessageType.TEST_REQUEST);
-		elevatorSubsystemTransmissonChannel.setMessage(message);
+		ElevatorFloorRequest request = new ElevatorFloorRequest(2, Direction.UP);
+		floorSubsystemTransmissonChannel.appendMessage(request);
 
 		scheduler.start();
 
 		// Give the scheduler time to get the request.
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -103,13 +113,13 @@ class SchedulerTest {
 	@Test
 	void testElevatorSubsystemRequestIsAccepted() {
 		Message message = new Message(MessageType.ELEVATOR_STATUS_REQUEST);
-		elevatorSubsystemTransmissonChannel.setMessage(message);
+		elevatorSubsystemTransmissonChannel.appendMessage(message);
 
 		scheduler.start();
 
 		// Give the scheduler time to get the request.
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -118,61 +128,66 @@ class SchedulerTest {
 		// scheduler
 		assertTrue(elevatorSubsystemTransmissonChannel.isEmpty());
 	}
-
-	/**
-	 * Test that job-request sent by the floor subsystem is passed to the elevator
-	 * subsystem is accepted.
-	 */
+	
 	@Test
-	void testFloorSubsystemJobRequestIsTransferredToElevatorSubsystem() {
-		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
-		JobRequest jobRequest = new JobRequest(data);
-		floorSubsystemTransmissonChannel.setMessage(jobRequest);
-
-		Message message = new Message(MessageType.ELEVATOR_STATUS_MESSAGE);
-		elevatorSubsystemTransmissonChannel.setMessage(message);
-
+	void testSchedulerIssuesMoveUpToFloorCommandsToElevator() {
+		int floorDest = 3;
+		Direction directionRequested = Direction.UP;
+		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floorDest, directionRequested);
+		
+		int elevatorId = 1;
+		int currFloor = 1;
+		Direction currDirection = Direction.IDLE;
+		
+		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
+		
+		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
+		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
+		
 		scheduler.start();
-
-		// Give the scheduler time to work.
+		
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-		// The elevator ELEVATOR_STATUS_REQUEST should have been taken by the
-		// scheduler
-		assertTrue(elevatorSubsystemTransmissonChannel.isEmpty());
-
-		// The scheduler should know that the elevator is ready. Hence, the job request
-		// from the floor channel should be in elevator's receiver channel
-		assertFalse(elevatorSubsystemReceiverChannel.isEmpty());
+		
+		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
+		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
+		
+		
+		assertTrue(message1.getCommand() == SchedulerCommand.CLOSE_DOORS);
+		assertTrue(message2.getCommand() == SchedulerCommand.MOVE_UP);
 	}
-
-	/**
-	 * Test that job-request sent by the elevator subsystem is passed to the floor
-	 * subsystem is accepted.
-	 */
+	
 	@Test
-	void testElevatorSubsystemJobRequestIsTransferredToFloorSubsystem() {
-		SimulationFloorInputData data = new SimulationFloorInputData(SAMPLE_FLOOR_INPUT_DATA);
-		JobRequest jobRequest = new JobRequest(data);
-
-		elevatorSubsystemTransmissonChannel.setMessage(jobRequest);
-
+	void testSchedulerIssuesStopAtFloorCommandsToElevator() {
+		int floorDest = 1;
+		Direction directionRequested = Direction.UP;
+		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floorDest, directionRequested);
+		
+		int elevatorId = 1;
+		int currFloor = 1;
+		Direction currDirection = Direction.UP;
+		
+		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
+		
+		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
+		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
+		
 		scheduler.start();
-
-		// Give the scheduler time to work.
+		
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-		// The scheduler should send the job request from the elevator channel to the
-		// floor's receiver channel
-		assertFalse(floorSubsystemReceiverChannel.isEmpty());
+		
+		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
+		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
+		
+		
+		assertTrue(message1.getCommand() == SchedulerCommand.STOP);
+		assertTrue(message2.getCommand() == SchedulerCommand.OPEN_DOORS);
 	}
-
 }
