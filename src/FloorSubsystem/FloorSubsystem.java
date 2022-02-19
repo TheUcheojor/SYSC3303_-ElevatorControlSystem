@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import common.SimulationFloorInputData;
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
-import common.messages.IdentifierDrivenMessage;
+import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
@@ -36,7 +36,7 @@ public class FloorSubsystem implements Runnable {
 	/**
 	 * The floors.
 	 */
-	private Floor[] floors = new Floor[NUMBER_OF_FLOORS - 1];
+	private Floor[] floors = new Floor[NUMBER_OF_FLOORS];
 
 	/**
 	 * The name of the input text file
@@ -160,37 +160,23 @@ public class FloorSubsystem implements Runnable {
 	}
 
 	/**
+	 * Get the floors
+	 */
+	public Floor[] getFloors() {
+		return floors;
+	}
+
+	/**
 	 * Handle message accordingly
 	 *
 	 * @param message the message
 	 */
 	public void handleRequest(Message message) {
 
-		int sourceEntityId = -1;
-		int floorId = -1;
-
-		// Verifying the validity of the request
-		if (message instanceof IdentifierDrivenMessage) {
-			sourceEntityId = ((IdentifierDrivenMessage) message).getSourceEntityId();
-			floorId = ((IdentifierDrivenMessage) message).getTargetEntityId();
-
-			// Ignore request messages with an invalid floor id
-			if (!SystemValidationUtil.isFloorNumberInRange(floorId)) {
-				return;
-			}
-		}
-
 		switch (message.getMessageType()) {
 
-		case EVELATOR_FLOOR_SIGNAL_REQUEST:
-			ElevatorFloorSignalRequestMessage floorSignalRequestMessage = (ElevatorFloorSignalRequestMessage) message;
-
-			floors[floorId].notifyElevatorAtFloorArrival(sourceEntityId, floorSignalRequestMessage.getElevatorMotor(),
-					elevatorSubsystemReceiverChannel, floorSignalRequestMessage.isFloorFinalDestination());
-			break;
-
-		case EVELATOR_LEAVING_FLOOR_MESSAGE:
-			floors[floorId].elevatorLeavingFloor(sourceEntityId);
+		case ELEVATOR_FLOOR_MESSAGE:
+			handleElevatorRequest((FloorElevatorTargetedMessage) message);
 			break;
 
 		case SCHEDULER_FLOOR_COMMAND:
@@ -203,7 +189,44 @@ public class FloorSubsystem implements Runnable {
 	}
 
 	/**
+	 * Handle the elevator request appropriately
+	 *
+	 * @param request the request
+	 */
+	private void handleElevatorRequest(FloorElevatorTargetedMessage request) {
+
+		int floorId = request.getFloorId();
+		int elevatorId = request.getElevatorId();
+
+		// Validate the floor id
+		if (!SystemValidationUtil.isFloorNumberInRange(floorId)) {
+			return;
+		}
+
+		switch (request.getRequestType()) {
+
+		case ELEVATOR_FLOOR_SIGNAL_REQUEST:
+			ElevatorFloorSignalRequestMessage floorSignalRequestMessage = (ElevatorFloorSignalRequestMessage) request;
+
+			floors[floorId].notifyElevatorAtFloorArrival(floorId, elevatorId,
+					floorSignalRequestMessage.getElevatorMotor(), elevatorSubsystemReceiverChannel,
+					floorSignalRequestMessage.isFloorFinalDestination());
+			break;
+
+		case ELEVATOR_LEAVING_FLOOR_MESSAGE:
+			floors[floorId].elevatorLeavingFloor(elevatorId);
+			break;
+
+		default:
+			break;
+
+		}
+	}
+
+	/**
 	 * Handle scheduler floor command
+	 *
+	 * @param command the command
 	 */
 	private void handleSchedulerFloorCommand(SchedulerFloorCommand command) {
 
@@ -211,10 +234,11 @@ public class FloorSubsystem implements Runnable {
 		if (!SystemValidationUtil.isFloorNumberInRange(command.getFloorId())) {
 			return;
 		}
+
 		switch (command.getCommand()) {
 
 		case TURN_OFF_FLOOR_LAMP:
-
+			floors[command.getFloorId()].turnOffLampButton(command.getLampButtonDirection());
 			break;
 
 		default:
