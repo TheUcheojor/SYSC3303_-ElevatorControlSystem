@@ -13,7 +13,7 @@ import common.messages.IdentifierDrivenMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
-import common.messages.floor.JobRequest;
+import common.messages.floor.ElevatorFloorRequest;
 
 /**
  * This class simulates the FloorSubsystem thread
@@ -40,17 +40,12 @@ public class FloorSubsystem implements Runnable {
 	/**
 	 * The name of the input text file
 	 */
-	private String inputFileName = "";
+	private String inputFileName;
 
 	/**
 	 * Collection of the simulation input objects
 	 */
 	private ArrayList<SimulationFloorInputData> floorDataCollection = new ArrayList<>();
-
-	/**
-	 * The object that stores the properties of the floor
-	 */
-	private Floor floor = new Floor(1);
 
 	/**
 	 * The floor subsystem transmission message channel.
@@ -141,15 +136,17 @@ public class FloorSubsystem implements Runnable {
 
 				SimulationFloorInputData floorInputData = floorDataCollection.get(0);
 				floorDataCollection.remove(0);
-				JobRequest jobRequest = new JobRequest(floorInputData);
 
-				// updating the floor properties(User interacting with the floor button)
+				ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(floorInputData.getCurrentFloor(),
+						floorInputData.getFloorDirectionButton());
+
+				// Updating the floor properties(User interacting with the floor button)
 				int floorId = floorInputData.getCurrentFloor();
 				floors[floorId].pressFloorButton(floorInputData.getFloorDirectionButton());
 				floors[floorId].printFloorStatus();
 
 				// sending the job to the scheduler
-				floorSubsystemTransmissonChannel.appendMessage(jobRequest);
+				floorSubsystemTransmissonChannel.appendMessage(elevatorFloorRequest);
 			}
 
 			// Checking if we have a request message
