@@ -1,10 +1,9 @@
 package common.messages.scheduler;
 
-import common.SchedulerCommand;
 import common.messages.Message;
 import common.messages.MessageType;
 /**
- * This class stores a command to be sent to the elevator from the scheduler
+ * Elevator job requests from elevators
  * 
  * @author Favour
  *
@@ -13,16 +12,16 @@ public class SchedulerElevatorCommand extends Message{
 	/**
 	 * The scheduler command for the elevator 
 	 */
-	private SchedulerCommand schedulerCommand;
+	private ElevatorCommand elevatorCommand;
 	
 	/**
 	 * The primary constructor
 	 * 
 	 * @param schedulerCommands
 	 */
-	public SchedulerElevatorCommand(SchedulerCommand schedulerCommands) {
+	public SchedulerElevatorCommand(ElevatorCommand elevatorCommand) {
 		super(MessageType.SCHEDULER_ELEVATOR_COMMAND);
-		this.schedulerCommand = schedulerCommands;
+		this.elevatorCommand = elevatorCommand;
 	}
 
 	/**
@@ -30,7 +29,7 @@ public class SchedulerElevatorCommand extends Message{
 	 * 
 	 * @return - The scheduler command
 	 */
-	public SchedulerCommand getCommand() {
-		return schedulerCommand;
+	public ElevatorCommand getCommand() {
+		return elevatorCommand;
 	}
 }

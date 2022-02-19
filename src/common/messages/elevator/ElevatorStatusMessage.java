@@ -14,12 +14,11 @@ import common.messages.MessageType;
  *
  */
 
-public class ElevatorStatusMessage extends Message implements ElevatorMessage {
-	public int elevatorId;
-	public int floorNumber;
-	public Direction direction;
-	
-	public String timestamp;
+public class ElevatorStatusMessage extends Message {
+	private int elevatorId;
+	private int floorNumber;
+	private Direction direction;
+	private String timestamp;
 
 	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber) {
 		super(MessageType.ELEVATOR_STATUS_MESSAGE);
@@ -30,8 +29,33 @@ public class ElevatorStatusMessage extends Message implements ElevatorMessage {
 		this.floorNumber = floorNumber;
 	}
 
-	@Override
-	public int getId() {
+	/**
+	 * @return the elevatorId
+	 */
+	public int getElevatorId() {
 		return elevatorId;
 	}
+
+	/**
+	 * @return the floorNumber
+	 */
+	public int getFloorNumber() {
+		return floorNumber;
+	}
+
+	/**
+	 * @return the direction
+	 */
+	public Direction getDirection() {
+		return direction;
+	}
+
+	/**
+	 * @return the timestamp
+	 */
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+
 }

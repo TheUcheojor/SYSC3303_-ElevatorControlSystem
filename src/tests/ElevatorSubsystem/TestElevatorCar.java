@@ -49,7 +49,7 @@ class TestElevatorCar {
 		ElevatorStatusMessage statusMessage = elevatorCar.createStatusMessage();
 
 		// elevator should format status message correctly
-		assertEquals(statusMessage.direction, Direction.UP);
+		assertEquals(statusMessage.getDirection(), Direction.UP);
 	}
 
 	@Test

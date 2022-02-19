@@ -108,10 +108,6 @@ public class ElevatorCar implements Runnable {
 
 		switch (message.getMessageType()) {
 
-		case JOB_REQUEST:
-			elevatorSubsystemTransmissonChannel.appendMessage(message);
-			break;
-
 		case ELEVATOR_STATUS_REQUEST:
 			ElevatorStatusMessage status = createStatusMessage();
 			elevatorSubsystemTransmissonChannel.appendMessage(status);
@@ -131,8 +127,10 @@ public class ElevatorCar implements Runnable {
 	 */
 	// @PublicForTestOnly
 	public ElevatorStatusMessage createStatusMessage() {
-		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber);
-		status.direction = motor.getDirection();
+		ElevatorStatusMessage status = new ElevatorStatusMessage(
+				id,
+				this.getMotor().getDirection(),
+				floorNumber);
 		// TODO (rfife): Pass current floor
 
 		return status;

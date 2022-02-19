@@ -1,4 +1,4 @@
-package common;
+package common.messages.scheduler;
 
 /**
  * This class provides possible elevator commands.
@@ -6,7 +6,7 @@ package common;
  * @author Favour
  *
  */
-public enum SchedulerCommand {
+public enum ElevatorCommand {
 
 	/**
 	 * The stop elevator command.
@@ -29,6 +29,7 @@ public enum SchedulerCommand {
 	/**
 	 * The move down elevator command.
 	 */
-	MOVE_DOWN
+	MOVE_DOWN,
+
 
 }

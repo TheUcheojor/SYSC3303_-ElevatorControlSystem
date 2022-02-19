@@ -2,7 +2,26 @@ package common.messages;
 
 import common.Direction;
 
-public interface ElevatorJobMessage {
-	public int getDestinationFloor();
-	public Direction getDirection();
+/*
+ * Message superclass for elevator jobs
+ * 
+ * @author Ryan Fife
+ */
+public abstract class ElevatorJobMessage extends Message {
+	private int destinationFloor;
+	private Direction direction;
+	
+	public ElevatorJobMessage(MessageType messageType, int destinationFloor, Direction direction) {
+		super(messageType);
+		this.destinationFloor = destinationFloor;
+		this.direction = direction;
+	}
+	
+	public int getDestinationFloor() {
+		return destinationFloor;
+	}
+
+	public Direction getDirection() {
+		return direction;
+	}
 }

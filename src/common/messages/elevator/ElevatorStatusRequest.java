@@ -7,14 +7,14 @@ import common.messages.Message;
 import common.messages.MessageType;
 
 /**
- * A DS representing an elevator status request
+ * An elevator status request
  *
  * @author Ryan Fife
  *
  */
-public class ElevatorStatusRequest extends Message implements ElevatorMessage {
-	public int elevatorId;
-	public String timestamp;
+public class ElevatorStatusRequest extends Message {
+	private int elevatorId;
+	private String timestamp;
 
 	public ElevatorStatusRequest(int elevatorId) {
 		super(MessageType.ELEVATOR_STATUS_REQUEST);
@@ -22,8 +22,11 @@ public class ElevatorStatusRequest extends Message implements ElevatorMessage {
 		this.elevatorId = elevatorId;
 	}
 
-	@Override
 	public int getId() {
 		return elevatorId;
+	}
+	
+	public String getTimeStamp() {
+		return timestamp;
 	}
 }
