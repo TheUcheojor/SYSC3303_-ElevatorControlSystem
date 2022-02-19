@@ -41,7 +41,7 @@ class TestElevatorMotor {
 	void testTurnOff() {
 		elevatorMotor.turnOff();
 		assertFalse(elevatorMotor.getIsRunning());
-		assertEquals(elevatorMotor.getDirection(), null);
+		assertEquals(elevatorMotor.getDirection(), Direction.IDLE);
 	}
 
 }

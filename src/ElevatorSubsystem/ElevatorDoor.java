@@ -25,7 +25,7 @@ public class ElevatorDoor {
 	}
 	
 	public void closeDoor() {
-		if(!this.isOpen) {
+		if(this.isOpen) {
 			try {
 				Thread.sleep((long) this.doorSpeed);
 			} catch (InterruptedException e) {

@@ -20,21 +20,23 @@ import common.messages.elevator.ElevatorStatusRequest;
 class TestElevatorCar {
 	private ElevatorCar elevatorCar;
 	private final static int CAR_ID = 2;
-	private MessageChannel elevatorSubsystemTransmissonChannel;
-	private MessageChannel elevatorSubsystemReceiverChannel;
+	private MessageChannel outgoingSchedulerChannel;
+	private MessageChannel incomingSchedulerChannel;
+	private MessageChannel outgoingFloorChannel;
+	private MessageChannel incomingFloorChannel;
 
 	@BeforeEach
 	void setup() {
-		this.elevatorSubsystemTransmissonChannel = new MessageChannel("Elevator Subsystem Transmisson Channel");
-		this.elevatorSubsystemReceiverChannel = new MessageChannel("Elevator Subsystem Receiver Channel");
+		this.outgoingSchedulerChannel = new MessageChannel("Elevator Subsystem Transmisson Channel");
+		this.incomingSchedulerChannel = new MessageChannel("Elevator Subsystem Receiver Channel");
 
-		elevatorCar = new ElevatorCar(CAR_ID, elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel);
+		elevatorCar = new ElevatorCar(CAR_ID, outgoingSchedulerChannel, incomingSchedulerChannel, outgoingFloorChannel, incomingFloorChannel);
 	}
 
 	@AfterEach
 	void tearDown() {
-		elevatorSubsystemTransmissonChannel = null;
-		elevatorSubsystemReceiverChannel = null;
+		outgoingSchedulerChannel = null;
+		incomingSchedulerChannel = null;
 
 		elevatorCar = null;
 	}
@@ -59,7 +61,7 @@ class TestElevatorCar {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Message message = elevatorSubsystemTransmissonChannel.popMessage();
+		Message message = outgoingSchedulerChannel.popMessage();
 
 		// elevator should place a status response in the channel
 		assertEquals(message instanceof ElevatorStatusMessage, true);

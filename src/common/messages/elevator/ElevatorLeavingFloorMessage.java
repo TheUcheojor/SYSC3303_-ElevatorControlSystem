@@ -18,7 +18,7 @@ public class ElevatorLeavingFloorMessage extends IdentifierDrivenMessage {
 	/**
 	 * A ElevatorLeavingFloorMessage leaving constructor.
 	 */
-	public ElevatorLeavingFloorMessage(int elevatorId, int floorId, MessageType messageType) {
-		super(elevatorId, floorId, messageType);
+	public ElevatorLeavingFloorMessage(int elevatorId, int floorId) {
+		super(elevatorId, floorId, MessageType.EVELATOR_LEAVING_FLOOR_MESSAGE);
 	}
 }

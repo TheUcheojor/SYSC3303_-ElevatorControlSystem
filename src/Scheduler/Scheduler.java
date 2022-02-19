@@ -74,6 +74,11 @@ public class Scheduler implements Runnable {
 	 * elevator id
 	 */
 	public int elevatorId;
+	
+	/**
+	 * elevator error state
+	 */
+	public Exception elevatorErrorState;
 
 	/**
 	 * a constructor
@@ -114,9 +119,13 @@ public class Scheduler implements Runnable {
 				handleElevatorMessage(elevatorRequest);
 			}
 			
-			if(elevatorJobQueue.size() > 0) {
-				if(elevatorDirection != Direction.IDLE) serveJob();
-				else startJob();
+			if(elevatorErrorState == null) {
+				if(elevatorJobQueue.size() > 0) {
+					if(elevatorDirection != Direction.IDLE) serveJob();
+					else startJob();
+				}
+			} else {
+				System.out.println("[ERROR] Elevator in error state: " + elevatorErrorState.getMessage());
 			}
 		}
 	}
@@ -224,6 +233,7 @@ public class Scheduler implements Runnable {
 			elevatorFloorNumber = ((ElevatorStatusMessage) message).getFloorNumber();
 			elevatorDirection = ((ElevatorStatusMessage) message).getDirection();
 			elevatorId = ((ElevatorStatusMessage) message).getElevatorId();
+			elevatorErrorState = ((ElevatorStatusMessage) message).getErrorState();
 			break;
 
 		case ELEVATOR_TRANSPORT_REQUEST:

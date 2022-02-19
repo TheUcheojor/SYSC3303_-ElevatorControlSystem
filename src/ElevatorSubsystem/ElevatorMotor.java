@@ -100,7 +100,7 @@ public class ElevatorMotor {
 	}
 
 	public void turnOff() {
-		this.direction = null;
+		this.direction = Direction.IDLE;
 		this.isRunning = false;
 	}
 }
