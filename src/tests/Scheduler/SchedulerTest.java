@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import Scheduler.Scheduler;
 import common.Direction;
-import common.SchedulerCommand;
 import common.SimulationFloorInputData;
 import common.messages.Message;
 import common.messages.MessageChannel;
@@ -20,6 +19,7 @@ import common.messages.MessageType;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.floor.ElevatorFloorRequest;
 import common.messages.floor.JobRequest;
+import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
 
 /**
@@ -156,8 +156,8 @@ class SchedulerTest {
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		
 		
-		assertTrue(message1.getCommand() == SchedulerCommand.CLOSE_DOORS);
-		assertTrue(message2.getCommand() == SchedulerCommand.MOVE_UP);
+		assertTrue(message1.getCommand() == ElevatorCommand.CLOSE_DOORS);
+		assertTrue(message2.getCommand() == ElevatorCommand.MOVE_UP);
 	}
 	
 	@Test
@@ -187,7 +187,7 @@ class SchedulerTest {
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		
 		
-		assertTrue(message1.getCommand() == SchedulerCommand.STOP);
-		assertTrue(message2.getCommand() == SchedulerCommand.OPEN_DOORS);
+		assertTrue(message1.getCommand() == ElevatorCommand.STOP);
+		assertTrue(message2.getCommand() == ElevatorCommand.OPEN_DOORS);
 	}
 }
