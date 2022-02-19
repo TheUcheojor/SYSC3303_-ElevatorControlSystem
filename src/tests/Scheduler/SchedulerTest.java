@@ -219,7 +219,7 @@ class SchedulerTest {
 		assertTrue(message1.getCommand() == ElevatorCommand.STOP);
 		assertTrue(message2.getCommand() == ElevatorCommand.OPEN_DOORS);
 		assertTrue(message3.getCommand() == FloorCommand.TURN_OFF_FLOOR_LAMP);
-		assertTrue(message3.getDirection() == direction);
+		assertTrue(message3.getLampButtonDirection() == direction);
 		assertTrue(message3.getFloorId() == floor);
 	}
 }
