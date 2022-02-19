@@ -3,6 +3,7 @@
  */
 package tests.Scheduler;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
@@ -11,11 +12,13 @@ import org.junit.jupiter.api.Test;
 
 import Scheduler.Scheduler;
 import common.Direction;
+import common.SimulationFloorInputData;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.MessageType;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.floor.ElevatorFloorRequest;
+import common.messages.floor.JobRequest;
 import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.FloorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
@@ -77,7 +80,7 @@ class SchedulerTest {
 		scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel,
 				elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel), SCHEDULER_NAME);
 	}
-
+	
 	@AfterEach
 	void tearDown() {
 		floorSubsystemTransmissonChannel = null;
@@ -127,99 +130,126 @@ class SchedulerTest {
 		// scheduler
 		assertTrue(elevatorSubsystemTransmissonChannel.isEmpty());
 	}
-
+	
 	@Test
-	void testSchedulerIssuesMoveUpToFloorCommandsToElevator() {
+	void testSchedulerHigherFloorJobReceivedWhenIdle() {
 		int floorDest = 3;
 		Direction directionRequested = Direction.UP;
 		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floorDest, directionRequested);
-
+		
 		int elevatorId = 1;
 		int currFloor = 1;
 		Direction currDirection = Direction.IDLE;
-
+		
 		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
-
+		
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
-
+		
 		scheduler.start();
-
+		
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
+		
 		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
-
-		System.out.println(message1.getCommand() + " " + message2.getCommand());
+		
 		assertTrue(message1.getCommand() == ElevatorCommand.CLOSE_DOORS);
 		assertTrue(message2.getCommand() == ElevatorCommand.MOVE_UP);
 	}
-
+	
 	@Test
-	void testSchedulerIssuesStopAtFloorCommandsToElevator() {
+	void testSchedulerLowerFloorJobReceivedWhenIdle() {
 		int floorDest = 1;
 		Direction directionRequested = Direction.UP;
 		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floorDest, directionRequested);
-
+		
 		int elevatorId = 1;
-		int currFloor = 1;
-		Direction currDirection = Direction.DOWN;
-
+		Direction currDirection = Direction.IDLE;
+		int currFloor = 2;
+		
 		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
-
+		
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
-
+		
 		scheduler.start();
-
+		
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
+		
 		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
-
+		
 		boolean floorChannelIsEmpty = floorSubsystemReceiverChannel.isEmpty();
-
-		assertTrue(message1.getCommand() == ElevatorCommand.STOP);
-		assertTrue(message2.getCommand() == ElevatorCommand.OPEN_DOORS);
+		
+		assertTrue(message1.getCommand() == ElevatorCommand.CLOSE_DOORS);
+		assertTrue(message2.getCommand() == ElevatorCommand.MOVE_DOWN);
 		assertTrue(floorChannelIsEmpty);
 	}
-
+	
 	@Test
-	void testSchedulerIssuesTurnOffDirectionLampToFloor() {
+	void testSchedulerElevatorSameDirectionAsFloorRequest() {
 		Direction direction = Direction.UP;
 		int floor = 1;
 		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floor, direction);
-
+		
 		int elevatorId = 1;
 		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, direction, floor);
-
+		
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
-
+		
 		scheduler.start();
-
+		
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
+		
 		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerFloorCommand message3 = (SchedulerFloorCommand) floorSubsystemReceiverChannel.popMessage();
-
+		
 		assertTrue(message1.getCommand() == ElevatorCommand.STOP);
 		assertTrue(message2.getCommand() == ElevatorCommand.OPEN_DOORS);
 		assertTrue(message3.getCommand() == FloorCommand.TURN_OFF_FLOOR_LAMP);
-		assertTrue(message3.getLampButtonDirection() == direction);
+		assertTrue(message3.getDirection() == direction);
 		assertTrue(message3.getFloorId() == floor);
+	}
+	
+	@Test
+	void testSchedulerElevatorNotSameDirectionAsFloorRequest() {
+		Direction direction = Direction.UP;
+		int floor = 1;
+		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floor, direction);
+		
+		int elevatorId = 1;
+		Direction currDirection = Direction.DOWN;
+		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, floor);
+		
+		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
+		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
+		
+		scheduler.start();
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		boolean floorChannelIsEmpty = floorSubsystemReceiverChannel.isEmpty();
+		boolean elevatorChannelIsEmpty = elevatorSubsystemReceiverChannel.isEmpty();
+		
+		assertTrue(floorChannelIsEmpty);
+		assertTrue(elevatorChannelIsEmpty);
 	}
 }

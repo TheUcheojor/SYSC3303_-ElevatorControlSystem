@@ -3,7 +3,7 @@ package common.messages.scheduler;
 import common.messages.Message;
 import common.messages.MessageType;
 /**
- * This class stores a command to be sent to the elevator from the scheduler
+ * Elevator job requests from elevators
  * 
  * @author Favour
  *
