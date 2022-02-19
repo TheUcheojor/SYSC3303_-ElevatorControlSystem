@@ -132,9 +132,8 @@ class SchedulerTest {
 		int elevatorId = 1;
 		int currFloor = 1;
 		Direction currDirection = Direction.IDLE;
-
-		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
-
+		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor, null);
+		
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
 
@@ -162,9 +161,8 @@ class SchedulerTest {
 		int elevatorId = 1;
 		Direction currDirection = Direction.IDLE;
 		int currFloor = 2;
-
-		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
-
+		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor, null);
+		
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
 
@@ -193,8 +191,8 @@ class SchedulerTest {
 		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floor, direction);
 
 		int elevatorId = 1;
-		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, direction, floor);
-
+		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, direction, floor, null);
+		
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
 
@@ -225,7 +223,7 @@ class SchedulerTest {
 
 		int elevatorId = 1;
 		Direction currDirection = Direction.DOWN;
-		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, floor);
+		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, floor, null);
 
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
