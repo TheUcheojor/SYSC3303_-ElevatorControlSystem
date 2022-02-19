@@ -29,7 +29,6 @@ public class IdentifierDrivenMessage extends Message {
 	 * @param targetEntityId     the target entity id
 	 * @param messageType        the message type
 	 */
-
 	public IdentifierDrivenMessage(int requestingEntityId, int targetEntityId, MessageType messageType) {
 		super(messageType);
 		this.sourceEntityId = requestingEntityId;

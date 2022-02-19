@@ -6,12 +6,12 @@ package FloorSubsystem;
 import common.Direction;
 
 /**
- * The class represents a button that turns on a lamp
+ * The class represents a button that turns on a direction lamp
  *
  * @author paulokenne
  *
  */
-public class LampButton {
+public class DirectionLampButton {
 
 	/**
 	 * The status of the floor lamp
@@ -29,9 +29,9 @@ public class LampButton {
 	private Direction direction;
 
 	/**
-	 * A LampButton constructor.
+	 * A DirectionLampButton constructor.
 	 */
-	public LampButton(Direction direction) {
+	public DirectionLampButton(Direction direction) {
 		this.direction = direction;
 	}
 
@@ -44,9 +44,9 @@ public class LampButton {
 	}
 
 	/**
-	 * Reset the button
+	 * Turn the button
 	 */
-	public void reset() {
+	public void turnOff() {
 		isButtonPressed = false;
 		isDirectionLampActive = false;
 	}
@@ -58,6 +58,15 @@ public class LampButton {
 	 */
 	public boolean isButtonPressed() {
 		return isButtonPressed;
+	}
+
+	/**
+	 * Set the button pressed flag
+	 *
+	 * @param isButtonPressed the button pressed flag
+	 */
+	public void setButtonPressed(boolean isButtonPressed) {
+		this.isButtonPressed = isButtonPressed;
 	}
 
 	/**

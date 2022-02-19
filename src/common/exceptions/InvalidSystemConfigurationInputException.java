@@ -12,6 +12,11 @@ package common.exceptions;
  */
 public class InvalidSystemConfigurationInputException extends Exception {
 
+	/**
+	 * A InvalidSystemConfigurationInputException constructor
+	 *
+	 * @param message
+	 */
 	public InvalidSystemConfigurationInputException(String message) {
 		super(message);
 	}

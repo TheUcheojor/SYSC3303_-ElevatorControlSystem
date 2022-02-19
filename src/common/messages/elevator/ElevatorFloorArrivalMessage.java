@@ -3,8 +3,7 @@
  */
 package common.messages.elevator;
 
-import common.messages.IdentifierDrivenMessage;
-import common.messages.MessageType;
+import common.messages.FloorElevatorTargetedMessage;
 
 /**
  * This class represents a message that is sent by the floor to the elevator to
@@ -13,23 +12,25 @@ import common.messages.MessageType;
  * @author paulokenne
  *
  */
-public class ElevatorFloorArrivalMessage extends IdentifierDrivenMessage {
+public class ElevatorFloorArrivalMessage extends FloorElevatorTargetedMessage {
 
 	/**
-	 * The current elevator speed.
+	 * The current elevator speed at the floor.
 	 */
 	private double newCurrentElevatorSpeed;
 
 	/**
 	 * A ElevatorFloorArrivalMessage constructor.
 	 */
-	public ElevatorFloorArrivalMessage(int floorId, int elevatorId, double newCurrentElevatorSpeed) {
-		super(floorId, elevatorId, MessageType.FLOOR_ARRIVAL_MESSAGE);
+	public ElevatorFloorArrivalMessage(int elevatorId, int floorId, double newCurrentElevatorSpeed) {
+		super(elevatorId, floorId, ElevatorFloorRequestType.FLOOR_ARRIVAL_MESSAGE);
 		this.newCurrentElevatorSpeed = newCurrentElevatorSpeed;
 	}
 
 	/**
-	 * @return the newCurrentElevatorSpeed
+	 * Return the new elevator speed at the floor
+	 *
+	 * @return the new elevator speed
 	 */
 	public double getNewCurrentElevatorSpeed() {
 		return newCurrentElevatorSpeed;

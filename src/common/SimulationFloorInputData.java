@@ -30,8 +30,8 @@ public class SimulationFloorInputData {
 	private Integer currentFloor;
 
 	/**
-	 * The elevator elevatorDirection that the passenger wishes to go to reach his or her
-	 * destination
+	 * The elevator elevatorDirection that the passenger wishes to go to reach his
+	 * or her destination
 	 */
 	private Direction floorDirectionButton;
 
