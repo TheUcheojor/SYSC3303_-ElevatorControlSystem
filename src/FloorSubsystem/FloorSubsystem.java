@@ -14,6 +14,7 @@ import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.floor.ElevatorFloorRequest;
+import common.messages.scheduler.SchedulerFloorCommand;
 
 /**
  * This class simulates the FloorSubsystem thread
@@ -192,9 +193,33 @@ public class FloorSubsystem implements Runnable {
 			floors[floorId].elevatorLeavingFloor(sourceEntityId);
 			break;
 
+		case SCHEDULER_FLOOR_COMMAND:
+			handleSchedulerFloorCommand((SchedulerFloorCommand) message);
+			break;
+
 		default:
 			break;
 		}
 	}
 
+	/**
+	 * Handle scheduler floor command
+	 */
+	private void handleSchedulerFloorCommand(SchedulerFloorCommand command) {
+
+		// Validate the floor id
+		if (!SystemValidationUtil.isFloorNumberInRange(command.getFloorId())) {
+			return;
+		}
+		switch (command.getCommand()) {
+
+		case TURN_OFF_FLOOR_LAMP:
+
+			break;
+
+		default:
+			break;
+		}
+
+	}
 }

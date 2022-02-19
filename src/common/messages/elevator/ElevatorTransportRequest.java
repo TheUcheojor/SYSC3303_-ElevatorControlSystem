@@ -5,7 +5,7 @@ import common.messages.ElevatorJobMessage;
 import common.messages.MessageType;
 
 /**
- * This class represents when an elevator is requested to moved a passenger to a
+ * This class represents when an elevator is requested to move a passenger to a
  * destination floor
  *
  * @author ryanfife, paulokenne
