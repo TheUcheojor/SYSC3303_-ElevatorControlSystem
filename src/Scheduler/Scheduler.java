@@ -12,6 +12,7 @@ import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
+import common.messages.MessageType;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.floor.ElevatorFloorRequest;
@@ -142,6 +143,9 @@ public class Scheduler implements Runnable {
 				toRemove.add(currRequest);
 				jobServed = true;
 			}
+//			if(!shouldTurnOffLamp &&
+//			   currRequest.getMessageType() == MessageType.ELEVATOR_FLOOR_REQUEST &&
+//			   currRequest.getDirection() == elevatorDirection) shouldTurnOffLamp = true;
 			switch(currRequest.getMessageType()) {
 				case ELEVATOR_FLOOR_REQUEST:
 					if(currRequest.getDirection() == elevatorDirection) shouldTurnOffLamp = true;
@@ -167,11 +171,9 @@ public class Scheduler implements Runnable {
 	private void startJob() {
 		ElevatorJobMessage firstJob = elevatorJobQueue.peekFirst();
 		if(firstJob.getDestinationFloor() > elevatorFloorNumber) {
-			
 			closeElevatorDoors();
 			moveElevatorUp();
 		} else if(firstJob.getDestinationFloor() < elevatorFloorNumber) {
-	
 			closeElevatorDoors();
 			moveElevatorDown();
 		}
@@ -206,9 +208,9 @@ public class Scheduler implements Runnable {
 		switch (message.getMessageType()) {
 
 		case ELEVATOR_STATUS_MESSAGE:
-			elevatorFloorNumber = ((ElevatorStatusMessage) message).floorNumber;
-			elevatorDirection = ((ElevatorStatusMessage) message).direction;
-			elevatorId = ((ElevatorStatusMessage) message).elevatorId;
+			elevatorFloorNumber = ((ElevatorStatusMessage) message).getFloorNumber();
+			elevatorDirection = ((ElevatorStatusMessage) message).getDirection();
+			elevatorId = ((ElevatorStatusMessage) message).getElevatorId();
 			break;
 
 		case ELEVATOR_TRANSPORT_REQUEST:

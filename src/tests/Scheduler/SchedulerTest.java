@@ -155,7 +155,7 @@ class SchedulerTest {
 		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		
-		
+		System.out.println(message1.getCommand() + " " + message2.getCommand());
 		assertTrue(message1.getCommand() == ElevatorCommand.CLOSE_DOORS);
 		assertTrue(message2.getCommand() == ElevatorCommand.MOVE_UP);
 	}
@@ -185,7 +185,6 @@ class SchedulerTest {
 		
 		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
-		
 		
 		assertTrue(message1.getCommand() == ElevatorCommand.STOP);
 		assertTrue(message2.getCommand() == ElevatorCommand.OPEN_DOORS);
