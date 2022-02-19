@@ -18,11 +18,6 @@ import common.messages.elevator.ElevatorFloorArrivalMessage;
 public class FloorElevatorComponents {
 
 	/**
-	 * The floor number
-	 */
-	private int floorNumber;
-
-	/**
 	 * The elevator id
 	 */
 	private int elevatorId;
@@ -34,36 +29,46 @@ public class FloorElevatorComponents {
 	private boolean arrivalSensorState = false;
 
 	/**
-	 * The elevatorDirection lamp for the elevator shaft which denotes the arrival and
-	 * elevatorDirection of an elevator at the floor.
-	 *
+	 * The elevatorDirection lamp for the elevator shaft which denotes the arrival
+	 * and elevatorDirection of an elevator at the floor.
 	 */
-	private Direction directionLamp = null;
+	private DirectionLamp directionLamp = new DirectionLamp();
 
 	/**
 	 * A FloorElevatorSensor constructor
 	 */
-	public FloorElevatorComponents(int floorNumber, int elevatorId) {
-		this.floorNumber = floorNumber;
+	public FloorElevatorComponents(int elevatorId) {
 		this.elevatorId = elevatorId;
+		System.out.println("this.elevatorId " + this.elevatorId);
 	}
 
 	/**
-	 * The elevator is arriving at floor with a given elevatorDirection
+	 * The elevator has arrived at a floor with a given elevator direction
 	 *
-	 * @param elevatorDirection the elevatorDirection
+	 * @param elevatorDirection the elevator's direction
+	 * @param floorNumber       the floor number
 	 */
-	public void elevatorArrivedAtFloor(Direction direction) {
-		arrivalSensorState = false;
-		directionLamp = direction;
+	public void elevatorArrivedAtFloor(Direction elevatorDirection, int floorNumber) {
+		setArrivalSensorState(true);
+		directionLamp.setFloorNumber(floorNumber);
+		directionLamp.setElevatorDirection(elevatorDirection);
+
+	}
+
+	/**
+	 * Set the elevator arrival sensor state
+	 *
+	 * @param state the state
+	 */
+	public void setArrivalSensorState(boolean state) {
+		arrivalSensorState = state;
 	}
 
 	/**
 	 * The elevator is leaving the floor
 	 */
 	public void elevatorLeavingFloor() {
-		arrivalSensorState = false;
-		directionLamp = null;
+		setArrivalSensorState(false);
 	}
 
 	/**
@@ -83,9 +88,11 @@ public class FloorElevatorComponents {
 	}
 
 	/**
-	 * @return the directionLamp
+	 * Get the elevator direction lamp
+	 *
+	 * @return the direction Lamp
 	 */
-	public Direction getDirectionLamp() {
+	public DirectionLamp getDirectionLamp() {
 		return directionLamp;
 	}
 
@@ -99,7 +106,7 @@ public class FloorElevatorComponents {
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
 	 */
-	public void notifyElevatorAtFloorArrival(int elevatorId, ElevatorMotor elevatorMotor,
+	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor,
 			MessageChannel elevatorSubsystemReceiverChannel, boolean isFloorFinalDestination) {
 
 		double topSpeed = elevatorMotor.getTopSpeed();
@@ -167,13 +174,13 @@ public class FloorElevatorComponents {
 
 				System.out.println("\nThe evelator has reached the floor " + floorNumber);
 
-				// For now, we will assume that the motor's elevatorDirection is where the elevator
-				// plans to go
+				// For now, we will assume that the motor's elevatorDirection is where the
+				// elevator plans to go
 				// TODO Reevaluate the assumption.
-				elevatorArrivedAtFloor(elevatorMotor.getDirection());
+				elevatorArrivedAtFloor(elevatorMotor.getDirection(), floorNumber);
 
-				elevatorSubsystemReceiverChannel
-						.appendMessage(new ElevatorFloorArrivalMessage(floorNumber, elevatorId, newCurrentElevatorSpeed));
+				elevatorSubsystemReceiverChannel.appendMessage(
+						new ElevatorFloorArrivalMessage(elevatorId, floorNumber, newCurrentElevatorSpeed));
 			}
 
 		};

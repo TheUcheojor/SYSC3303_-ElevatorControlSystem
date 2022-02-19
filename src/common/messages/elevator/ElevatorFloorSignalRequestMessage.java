@@ -4,8 +4,7 @@
 package common.messages.elevator;
 
 import ElevatorSubsystem.ElevatorMotor;
-import common.messages.IdentifierDrivenMessage;
-import common.messages.MessageType;
+import common.messages.FloorElevatorTargetedMessage;
 
 /**
  * This class represents a request that sent to the floor that indicates the
@@ -14,7 +13,7 @@ import common.messages.MessageType;
  * @author paulokenne
  *
  */
-public class ElevatorFloorSignalRequestMessage extends IdentifierDrivenMessage {
+public class ElevatorFloorSignalRequestMessage extends FloorElevatorTargetedMessage {
 
 	/**
 	 * A flag indicating whether the floor is the final destination
@@ -31,7 +30,7 @@ public class ElevatorFloorSignalRequestMessage extends IdentifierDrivenMessage {
 	 */
 	public ElevatorFloorSignalRequestMessage(int elevatorId, int floorId, ElevatorMotor elevatorMotor,
 			boolean isFloorFinalDestination) {
-		super(elevatorId, floorId, MessageType.EVELATOR_FLOOR_SIGNAL_REQUEST);
+		super(elevatorId, floorId, ElevatorFloorRequestType.ELEVATOR_FLOOR_SIGNAL_REQUEST);
 		this.isFloorFinalDestination = isFloorFinalDestination;
 		this.elevatorMotor = elevatorMotor;
 	}

@@ -12,11 +12,7 @@ import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
-import common.messages.MessageType;
 import common.messages.elevator.ElevatorStatusMessage;
-import common.messages.elevator.ElevatorTransportRequest;
-import common.messages.floor.ElevatorFloorRequest;
-import common.messages.floor.JobRequest;
 import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.FloorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
@@ -29,47 +25,46 @@ import common.messages.scheduler.SchedulerFloorCommand;
  *
  */
 public class Scheduler implements Runnable {
-		/**
-	 *  channel that receives messages from floor subsystem
+	/**
+	 * channel that receives messages from floor subsystem
 	 */
 	private MessageChannel incomingFloorChannel;
-	
+
 	/**
-	 * floor channel that gets messages from the scheduler 
+	 * floor channel that gets messages from the scheduler
 	 */
 	private MessageChannel outgoingFloorChannel;
-	
+
 	/**
 	 * channel that receives messages from the elevator subsystem
 	 */
 	private MessageChannel incomingElevatorChannel;
-	
+
 	/**
 	 * elevator channel that gets messages from the scheduler
 	 */
 	private MessageChannel outgoingElevatorChannel;
-	
 
 	/**
 	 * elevator job queue
 	 */
 	private ArrayDeque<ElevatorJobMessage> elevatorJobQueue;
-	
+
 	/**
 	 * elevator jobs that aren't assigned to a queue
 	 */
 	private ArrayList<ElevatorJobMessage> unassignedElevatorJobs = new ArrayList<ElevatorJobMessage>();
-	
+
 	/**
-	 * elevator floor number 
+	 * elevator floor number
 	 */
 	private int elevatorFloorNumber;
-	
+
 	/**
-	 * elevator floor number 
+	 * elevator floor number
 	 */
 	public Direction elevatorDirection;
-	
+
 	/**
 	 * elevator id
 	 */
@@ -88,10 +83,10 @@ public class Scheduler implements Runnable {
 
 		this.incomingElevatorChannel = receiveElevatorChannel;
 		this.incomingFloorChannel = receiveFloorChannel;
-		
+
 		this.outgoingFloorChannel = floorSubsystemReceiverChannel;
 		this.outgoingElevatorChannel = elevatorSubsystemReceiverChannel;
-		
+
 		// TODO (rfife) for iter 3: scale this to multiple elevators
 		this.elevatorJobQueue = new ArrayDeque<ElevatorJobMessage>();
 		this.unassignedElevatorJobs = new ArrayList<ElevatorJobMessage>();
@@ -106,9 +101,9 @@ public class Scheduler implements Runnable {
 				Message floorRequest = incomingFloorChannel.popMessage();
 				handleFloorRequest(floorRequest);
 			}
-			
+
 			// Move unassigned jobs to the elevator
-			if(unassignedElevatorJobs.size() != 0) {
+			if (unassignedElevatorJobs.size() != 0) {
 				assignUnassignedJobs();
 			}
 
@@ -129,17 +124,17 @@ public class Scheduler implements Runnable {
 			}
 		}
 	}
-	
+
 	private void assignUnassignedJobs() {
 		List<ElevatorJobMessage> toRemove = new ArrayList<ElevatorJobMessage>();
-		
+
 		unassignedElevatorJobs.forEach((ElevatorJobMessage job) -> {
 			elevatorJobQueue.add(job);
 			toRemove.add(job);
 		});
 		unassignedElevatorJobs.removeAll(toRemove);
 	}
-	
+
 	/**
 	 * Serves all elevator job requests for the current floor
 	 */
@@ -148,55 +143,57 @@ public class Scheduler implements Runnable {
 		boolean jobServed = false;
 		boolean shouldTurnOffLamp = false;
 		List<ElevatorJobMessage> toRemove = new ArrayList<ElevatorJobMessage>();
-		
-		// iterate over job requests, remove jobs that are completed by arriving at this floor
-		while(iterator.hasNext()) {
+
+		// iterate over job requests, remove jobs that are completed by arriving at this
+		// floor
+		while (iterator.hasNext()) {
 			ElevatorJobMessage currRequest = iterator.next();
 			boolean shouldRemove = false;
-			
-			if(currRequest.getDestinationFloor() == elevatorFloorNumber) {
-				switch(currRequest.getMessageType()) {
-					case ELEVATOR_FLOOR_REQUEST:
-						if(currRequest.getDirection() == elevatorDirection) {
-							shouldRemove = true;
-							shouldTurnOffLamp = true;
-						}
-						break;
-					case ELEVATOR_TRANSPORT_REQUEST:
+
+			if (currRequest.getDestinationFloor() == elevatorFloorNumber) {
+				switch (currRequest.getMessageType()) {
+				case ELEVATOR_FLOOR_REQUEST:
+					if (currRequest.getDirection() == elevatorDirection) {
 						shouldRemove = true;
-						break;
-					default:
-						break;
-					
+						shouldTurnOffLamp = true;
+					}
+					break;
+				case ELEVATOR_TRANSPORT_REQUEST:
+					shouldRemove = true;
+					break;
+				default:
+					break;
+
 				}
 			}
-			if(shouldRemove) {
+			if (shouldRemove) {
 				toRemove.add(currRequest);
 				jobServed = true;
 			}
 		}
-		if(jobServed) {
+		if (jobServed) {
 			elevatorJobQueue.removeAll(toRemove);
 			stopElevator();
 			openElevatorDoors();
 		}
-		if(shouldTurnOffLamp) {
+		if (shouldTurnOffLamp) {
 			turnOffFloorDirectionButtonLamp(elevatorFloorNumber, elevatorDirection);
 		}
 	}
-	
+
 	/**
-	 * Issues the necessary commands to the elevator for starting the first job in the queue.
+	 * Issues the necessary commands to the elevator for starting the first job in
+	 * the queue.
 	 */
 	private void startJob() {
 		ElevatorJobMessage firstJob = elevatorJobQueue.peekFirst();
-		if(firstJob.getDestinationFloor() > elevatorFloorNumber) {
+		if (firstJob.getDestinationFloor() > elevatorFloorNumber) {
 			closeElevatorDoors();
 			moveElevatorUp();
-		} else if(firstJob.getDestinationFloor() < elevatorFloorNumber) {
+		} else if (firstJob.getDestinationFloor() < elevatorFloorNumber) {
 			closeElevatorDoors();
 			moveElevatorDown();
-		} else if(firstJob.getDestinationFloor() == elevatorFloorNumber) {
+		} else if (firstJob.getDestinationFloor() == elevatorFloorNumber) {
 			openElevatorDoors();
 		}
 	}
@@ -204,12 +201,12 @@ public class Scheduler implements Runnable {
 	/**
 	 * Handles floor messages accordingly.
 	 *
-	 * @param message 
+	 * @param message
 	 */
 	private void handleFloorRequest(Message message) {
 
 		switch (message.getMessageType()) {
-	
+
 		case ELEVATOR_FLOOR_REQUEST:
 			unassignedElevatorJobs.add((ElevatorJobMessage) message);
 			break;
@@ -245,43 +242,44 @@ public class Scheduler implements Runnable {
 		}
 
 	}
-	
+
 	/**
-	 * This method sends a command to the elevator to stop moving 
+	 * This method sends a command to the elevator to stop moving
 	 */
 	private void stopElevator() {
 		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP));
 	}
-	
+
 	/**
-	 * This method sends a command to the elevator to close elevator doors 
+	 * This method sends a command to the elevator to close elevator doors
 	 */
 	private void closeElevatorDoors() {
 		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.CLOSE_DOORS));
 	}
-	
+
 	/**
 	 * This method sends a command to the elevator to open elevator doors
 	 */
-	private void openElevatorDoors () {
+	private void openElevatorDoors() {
 		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS));
 	}
-	
+
 	/**
-	 * This method sends a command to the elevator to start moving up 
+	 * This method sends a command to the elevator to start moving up
 	 */
 	private void moveElevatorUp() {
 		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP));
 	}
-	
+
 	/**
 	 * This method sends a command to the elevator to start moving down
 	 */
 	private void moveElevatorDown() {
 		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN));
 	}
-	
+
 	private void turnOffFloorDirectionButtonLamp(int floorId, Direction direction) {
-		outgoingFloorChannel.appendMessage(new SchedulerFloorCommand(FloorCommand.TURN_OFF_FLOOR_LAMP, floorId, direction));
+		outgoingFloorChannel
+				.appendMessage(new SchedulerFloorCommand(FloorCommand.TURN_OFF_FLOOR_LAMP, floorId, direction));
 	}
 }

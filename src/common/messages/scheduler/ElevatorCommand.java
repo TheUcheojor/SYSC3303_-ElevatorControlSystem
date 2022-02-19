@@ -17,6 +17,7 @@ public enum ElevatorCommand {
 	 * The close doors elevator command.
 	 */
 	CLOSE_DOORS,
+
 	/**
 	 * The open doors elevator command.
 	 */
@@ -26,6 +27,7 @@ public enum ElevatorCommand {
 	 * The move up elevator command.
 	 */
 	MOVE_UP,
+
 	/**
 	 * The move down elevator command.
 	 */

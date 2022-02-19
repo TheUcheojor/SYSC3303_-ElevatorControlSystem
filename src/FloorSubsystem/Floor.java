@@ -20,21 +20,26 @@ public class Floor {
 	/**
 	 * The up lamp button
 	 */
-	private LampButton upLampButton = null;
+	private DirectionLampButton upLampButton = null;
 
 	/**
 	 * The down lamp button
 	 */
-	private LampButton downLampButton = null;
+	private DirectionLampButton downLampButton = null;
 
 	/**
-	 * The elevator components (arrival sensor and elevatorDirection lamp), one per elevator
+	 * The elevator components (arrival sensor and direction lamp), one per elevator
 	 * shaft
 	 *
-	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS. Hence, they
-	 * can be mapped with an array.
+	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS - 1. Hence,
+	 * they can be mapped with an array.
 	 */
-	private FloorElevatorComponents[] elevatorComponents = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
+	private final static FloorElevatorComponents[] elevatorComponents = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
+	static {
+		for (int j = 0; j < elevatorComponents.length; j++) {
+			elevatorComponents[j] = new FloorElevatorComponents(j);
+		}
+	}
 
 	/**
 	 * A FloorInfo constructor
@@ -43,19 +48,15 @@ public class Floor {
 	 */
 	public Floor(int floorNumber) {
 
-		for (int i = 0; i < elevatorComponents.length; i++) {
-			elevatorComponents[i] = new FloorElevatorComponents(floorNumber, i);
-		}
-
 		// Create buttons depending on the floor number
 		if (floorNumber == 0) {
-			downLampButton = new LampButton(Direction.DOWN);
+			downLampButton = new DirectionLampButton(Direction.DOWN);
 		} else if (floorNumber == FloorSubsystem.NUMBER_OF_FLOORS - 1) {
-			upLampButton = new LampButton(Direction.UP);
+			upLampButton = new DirectionLampButton(Direction.UP);
 		} else {
 
-			upLampButton = new LampButton(Direction.UP);
-			downLampButton = new LampButton(Direction.DOWN);
+			upLampButton = new DirectionLampButton(Direction.UP);
+			downLampButton = new DirectionLampButton(Direction.DOWN);
 		}
 	}
 
@@ -69,9 +70,9 @@ public class Floor {
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
 	 */
-	public void notifyElevatorAtFloorArrival(int elevatorId, ElevatorMotor elevatorMotor,
+	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor,
 			MessageChannel elevatorSubsystemReceiverChannel, boolean isFloorFinalDestination) {
-		elevatorComponents[elevatorId].notifyElevatorAtFloorArrival(elevatorId, elevatorMotor,
+		elevatorComponents[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor,
 				elevatorSubsystemReceiverChannel, isFloorFinalDestination);
 	}
 
@@ -82,15 +83,44 @@ public class Floor {
 	 */
 	public void pressFloorButton(Direction direction) {
 		switch (direction) {
+
 		case UP:
 			if (upLampButton != null) {
 				upLampButton.press();
 			}
 			break;
+
 		case DOWN:
 			if (downLampButton != null) {
 				downLampButton.press();
 			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * Turn off the lamp button with the given direction
+	 *
+	 * @param direction the direction of the button
+	 */
+	public void turnOffLampButton(Direction direction) {
+		switch (direction) {
+		case UP:
+			if (upLampButton != null) {
+				upLampButton.turnOff();
+			}
+			break;
+
+		case DOWN:
+			if (downLampButton != null) {
+				downLampButton.turnOff();
+			}
+			break;
+
+		default:
 			break;
 		}
 	}
@@ -125,14 +155,14 @@ public class Floor {
 	/**
 	 * @return the upLampButton
 	 */
-	public LampButton getUpLampButton() {
+	public DirectionLampButton getUpLampButton() {
 		return upLampButton;
 	}
 
 	/**
 	 * @return the downLampButton
 	 */
-	public LampButton getDownLampButton() {
+	public DirectionLampButton getDownLampButton() {
 		return downLampButton;
 	}
 
