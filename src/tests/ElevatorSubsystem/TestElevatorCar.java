@@ -1,8 +1,6 @@
 package tests.ElevatorSubsystem;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +47,7 @@ class TestElevatorCar {
 		ElevatorStatusMessage statusMessage = elevatorCar.createStatusMessage();
 
 		// elevator should format status message correctly
-		assertEquals(statusMessage.direction, Direction.UP);
+		assertEquals(statusMessage.getDirection(), Direction.UP);
 	}
 
 	@Test

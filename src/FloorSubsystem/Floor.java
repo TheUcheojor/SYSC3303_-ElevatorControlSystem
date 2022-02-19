@@ -34,7 +34,8 @@ public class Floor {
 	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS - 1. Hence,
 	 * they can be mapped with an array.
 	 */
-	private final static FloorElevatorComponents[] elevatorComponents = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
+	private final static FloorElevatorComponents[] elevatorComponents = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS
+			- 1];
 
 	/**
 	 * A FloorInfo constructor

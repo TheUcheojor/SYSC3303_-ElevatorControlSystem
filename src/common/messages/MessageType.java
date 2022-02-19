@@ -43,10 +43,16 @@ public enum MessageType {
 	EVELATOR_LEAVING_FLOOR_MESSAGE,
 
 	/**
-	 * A subset of messages, commands, used for communication between the scheduler
-	 * and elevator
+	 * A subset of messages, elevator commands, used for communication between the
+	 * scheduler and elevator
 	 */
 	SCHEDULER_ELEVATOR_COMMAND,
+
+	/**
+	 * A subset of messages, floor commands, used for communication between the
+	 * scheduler and floor
+	 */
+	SCHEDULER_FLOOR_COMMAND,
 
 	/**
 	 * A message indicates that the elevator to arrive at a destination floor

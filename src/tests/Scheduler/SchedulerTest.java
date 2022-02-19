@@ -3,7 +3,6 @@
  */
 package tests.Scheduler;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
@@ -12,13 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import Scheduler.Scheduler;
 import common.Direction;
-import common.SimulationFloorInputData;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.MessageType;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.floor.ElevatorFloorRequest;
-import common.messages.floor.JobRequest;
 import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
 
@@ -78,7 +75,7 @@ class SchedulerTest {
 		scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel,
 				elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel), SCHEDULER_NAME);
 	}
-	
+
 	@AfterEach
 	void tearDown() {
 		floorSubsystemTransmissonChannel = null;
@@ -128,65 +125,63 @@ class SchedulerTest {
 		// scheduler
 		assertTrue(elevatorSubsystemTransmissonChannel.isEmpty());
 	}
-	
+
 	@Test
 	void testSchedulerIssuesMoveUpToFloorCommandsToElevator() {
 		int floorDest = 3;
 		Direction directionRequested = Direction.UP;
 		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floorDest, directionRequested);
-		
+
 		int elevatorId = 1;
 		int currFloor = 1;
 		Direction currDirection = Direction.IDLE;
-		
+
 		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
-		
+
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
-		
+
 		scheduler.start();
-		
+
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
-		
-		
+
 		assertTrue(message1.getCommand() == ElevatorCommand.CLOSE_DOORS);
 		assertTrue(message2.getCommand() == ElevatorCommand.MOVE_UP);
 	}
-	
+
 	@Test
 	void testSchedulerIssuesStopAtFloorCommandsToElevator() {
 		int floorDest = 1;
 		Direction directionRequested = Direction.UP;
 		ElevatorFloorRequest floorRequest = new ElevatorFloorRequest(floorDest, directionRequested);
-		
+
 		int elevatorId = 1;
 		int currFloor = 1;
 		Direction currDirection = Direction.UP;
-		
+
 		ElevatorStatusMessage elevatorStatus = new ElevatorStatusMessage(elevatorId, currDirection, currFloor);
-		
+
 		floorSubsystemTransmissonChannel.appendMessage(floorRequest);
 		elevatorSubsystemTransmissonChannel.appendMessage(elevatorStatus);
-		
+
 		scheduler.start();
-		
+
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		SchedulerElevatorCommand message1 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
 		SchedulerElevatorCommand message2 = (SchedulerElevatorCommand) elevatorSubsystemReceiverChannel.popMessage();
-		
-		
+
 		assertTrue(message1.getCommand() == ElevatorCommand.STOP);
 		assertTrue(message2.getCommand() == ElevatorCommand.OPEN_DOORS);
 	}

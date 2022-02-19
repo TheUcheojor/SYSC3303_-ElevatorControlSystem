@@ -2,7 +2,6 @@ package common.messages.floor;
 
 import common.Direction;
 import common.messages.ElevatorJobMessage;
-import common.messages.Message;
 import common.messages.MessageType;
 
 /**
@@ -11,7 +10,7 @@ import common.messages.MessageType;
  * @author ryanfire, paulokenne
  *
  */
-public class ElevatorFloorRequest extends Message implements ElevatorJobMessage {
+public class ElevatorFloorRequest extends ElevatorJobMessage {
 
 	/**
 	 * The floor that the passenger is requesting from.

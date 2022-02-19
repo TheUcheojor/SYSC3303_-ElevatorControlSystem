@@ -35,7 +35,7 @@ public class FloorSubsystem implements Runnable {
 	/**
 	 * The floors.
 	 */
-	private Floor[] floors = new Floor[NUMBER_OF_FLOORS];;
+	private Floor[] floors = new Floor[NUMBER_OF_FLOORS - 1];
 
 	/**
 	 * The name of the input text file
