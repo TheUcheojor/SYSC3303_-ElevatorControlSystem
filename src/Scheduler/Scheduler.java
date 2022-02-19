@@ -187,6 +187,8 @@ public class Scheduler implements Runnable {
 		} else if(firstJob.getDestinationFloor() < elevatorFloorNumber) {
 			closeElevatorDoors();
 			moveElevatorDown();
+		} else if(firstJob.getDestinationFloor() == elevatorFloorNumber) {
+			openElevatorDoors();
 		}
 	}
 

@@ -46,10 +46,3 @@ Elevator: Jake + Delight
 Each team member is expected to contribute to the UML diagrams, implementation code, and testing for their assigned subsystem this week.
 
 --------------------------------------------------------
-Iteration 1 End to End Demo
-
-User —-Presses Down Button—> Floor
-Floor —-InputDataFile—> Scheduler
-Scheduler —JobRequest—> Elevator
-Elevator —-ElevatorStatus—> Scheduler
-Scheduler —ElevatorStatus—> Floor
