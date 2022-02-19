@@ -54,6 +54,10 @@ public class Scheduler implements Runnable {
 	 * elevator job queue
 	 */
 	private ArrayDeque<ElevatorJobMessage> elevatorJobQueue;
+	
+	/**
+	 * elevator jobs that aren't assigned to a queue
+	 */
 	private ArrayList<ElevatorJobMessage> unassignedElevatorJobs = new ArrayList<ElevatorJobMessage>();
 	
 	/**
@@ -143,9 +147,6 @@ public class Scheduler implements Runnable {
 				toRemove.add(currRequest);
 				jobServed = true;
 			}
-//			if(!shouldTurnOffLamp &&
-//			   currRequest.getMessageType() == MessageType.ELEVATOR_FLOOR_REQUEST &&
-//			   currRequest.getDirection() == elevatorDirection) shouldTurnOffLamp = true;
 			switch(currRequest.getMessageType()) {
 				case ELEVATOR_FLOOR_REQUEST:
 					if(currRequest.getDirection() == elevatorDirection) shouldTurnOffLamp = true;
@@ -180,9 +181,9 @@ public class Scheduler implements Runnable {
 	}
 
 	/**
-	 * Handles floor request accordingly.
+	 * Handles floor messages accordingly.
 	 *
-	 * @param message the request
+	 * @param message 
 	 */
 	private void handleFloorRequest(Message message) {
 
@@ -201,7 +202,7 @@ public class Scheduler implements Runnable {
 	/**
 	 * Handles elevator messages accordingly.
 	 *
-	 * @param message the request
+	 * @param message
 	 */
 	private void handleElevatorMessage(Message message) {
 
