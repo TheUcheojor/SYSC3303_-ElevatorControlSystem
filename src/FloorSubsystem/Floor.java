@@ -28,13 +28,13 @@ public class Floor {
 	private LampButton downLampButton = null;
 
 	/**
-	 * The elevator components (arrival sensor and elevatorDirection lamp), one per elevator
+	 * The elevator components (arrival sensor and direction lamp), one per elevator
 	 * shaft
 	 *
-	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS. Hence, they
-	 * can be mapped with an array.
+	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS - 1. Hence,
+	 * they can be mapped with an array.
 	 */
-	private FloorElevatorComponents[] elevatorComponents = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
+	private final static FloorElevatorComponents[] elevatorComponents = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
 
 	/**
 	 * A FloorInfo constructor
@@ -91,6 +91,8 @@ public class Floor {
 			if (downLampButton != null) {
 				downLampButton.press();
 			}
+			break;
+		default:
 			break;
 		}
 	}
