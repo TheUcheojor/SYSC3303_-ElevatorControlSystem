@@ -2,7 +2,19 @@ package common.messages;
 
 import common.Direction;
 
-public interface ElevatorJobMessage {
-	public int getDestinationFloor();
-	public Direction getDirection();
+public abstract class ElevatorJobMessage extends Message {
+	private int destinationFloor;
+	private Direction direction;
+	
+	public ElevatorJobMessage(MessageType messageType) {
+		super(messageType);
+	}
+	
+	public int getDestinationFloor() {
+		return destinationFloor;
+	}
+
+	public Direction getDirection() {
+		return direction;
+	}
 }
