@@ -34,11 +34,10 @@ public class FloorElevatorComponents {
 	private boolean arrivalSensorState = false;
 
 	/**
-	 * The elevatorDirection lamp for the elevator shaft which denotes the arrival and
-	 * elevatorDirection of an elevator at the floor.
-	 *
+	 * The elevatorDirection lamp for the elevator shaft which denotes the arrival
+	 * and elevatorDirection of an elevator at the floor.
 	 */
-	private Direction directionLamp = null;
+	private DirectionLamp directionLamp = null;
 
 	/**
 	 * A FloorElevatorSensor constructor
@@ -49,13 +48,15 @@ public class FloorElevatorComponents {
 	}
 
 	/**
-	 * The elevator is arriving at floor with a given elevatorDirection
+	 * The elevator is arriving at floor with a given elevator direction
 	 *
-	 * @param elevatorDirection the elevatorDirection
+	 * @param elevatorDirection the elevator's direction
 	 */
-	public void elevatorArrivedAtFloor(Direction direction) {
+	public void elevatorArrivedAtFloor(Direction elevatorDirection) {
 		arrivalSensorState = false;
-		directionLamp = direction;
+		directionLamp.setFloorNumber(floorNumber);
+		directionLamp.setElevatorDirection(elevatorDirection);
+
 	}
 
 	/**
@@ -63,7 +64,6 @@ public class FloorElevatorComponents {
 	 */
 	public void elevatorLeavingFloor() {
 		arrivalSensorState = false;
-		directionLamp = null;
 	}
 
 	/**
@@ -83,9 +83,11 @@ public class FloorElevatorComponents {
 	}
 
 	/**
-	 * @return the directionLamp
+	 * Get the elevator direction lamp
+	 *
+	 * @return the direction Lamp
 	 */
-	public Direction getDirectionLamp() {
+	public DirectionLamp getDirectionLamp() {
 		return directionLamp;
 	}
 
@@ -167,13 +169,14 @@ public class FloorElevatorComponents {
 
 				System.out.println("\nThe evelator has reached the floor " + floorNumber);
 
-				// For now, we will assume that the motor's elevatorDirection is where the elevator
+				// For now, we will assume that the motor's elevatorDirection is where the
+				// elevator
 				// plans to go
 				// TODO Reevaluate the assumption.
 				elevatorArrivedAtFloor(elevatorMotor.getDirection());
 
-				elevatorSubsystemReceiverChannel
-						.appendMessage(new ElevatorFloorArrivalMessage(floorNumber, elevatorId, newCurrentElevatorSpeed));
+				elevatorSubsystemReceiverChannel.appendMessage(
+						new ElevatorFloorArrivalMessage(floorNumber, elevatorId, newCurrentElevatorSpeed));
 			}
 
 		};
