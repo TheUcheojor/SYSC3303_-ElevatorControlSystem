@@ -2,6 +2,11 @@ package common.messages;
 
 import common.Direction;
 
+/*
+ * Message superclass for elevator jobs
+ * 
+ * @author Ryan Fife
+ */
 public abstract class ElevatorJobMessage extends Message {
 	private int destinationFloor;
 	private Direction direction;

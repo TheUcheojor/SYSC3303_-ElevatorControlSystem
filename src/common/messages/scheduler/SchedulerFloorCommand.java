@@ -4,6 +4,12 @@ import common.Direction;
 import common.messages.Message;
 import common.messages.MessageType;
 
+/*
+ * Elevator job requests from floors
+ * 
+ * @author Ryan Fife
+ */
+
 public class SchedulerFloorCommand extends Message {
 	/**
 	 * The scheduler command for the floor 

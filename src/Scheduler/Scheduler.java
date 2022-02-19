@@ -143,17 +143,27 @@ public class Scheduler implements Runnable {
 		// iterate over job requests, remove jobs that are completed by arriving at this floor
 		while(iterator.hasNext()) {
 			ElevatorJobMessage currRequest = iterator.next();
+			boolean shouldRemove = false;
+			
 			if(currRequest.getDestinationFloor() == elevatorFloorNumber) {
+				switch(currRequest.getMessageType()) {
+					case ELEVATOR_FLOOR_REQUEST:
+						if(currRequest.getDirection() == elevatorDirection) {
+							shouldRemove = true;
+							shouldTurnOffLamp = true;
+						}
+						break;
+					case ELEVATOR_TRANSPORT_REQUEST:
+						shouldRemove = true;
+						break;
+					default:
+						break;
+					
+				}
+			}
+			if(shouldRemove) {
 				toRemove.add(currRequest);
 				jobServed = true;
-			}
-			switch(currRequest.getMessageType()) {
-				case ELEVATOR_FLOOR_REQUEST:
-					if(currRequest.getDirection() == elevatorDirection) shouldTurnOffLamp = true;
-					break;
-				default:
-					break;
-					
 			}
 		}
 		if(jobServed) {
