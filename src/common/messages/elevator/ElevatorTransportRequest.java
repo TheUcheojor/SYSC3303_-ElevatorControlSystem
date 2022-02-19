@@ -9,7 +9,7 @@ public class ElevatorTransportRequest extends ElevatorJobMessage  {
 	private int elevatorId;
 	
 	public ElevatorTransportRequest(int destinationFloor, int elevatorId, Direction direction) {
-		super(MessageType.ELEVATOR_TRANSPORT_REQUEST);
+		super(MessageType.ELEVATOR_TRANSPORT_REQUEST, destinationFloor, direction);
 		this.elevatorId = elevatorId;
 	}
 
