@@ -27,20 +27,10 @@ public enum MessageType {
 	ELEVATOR_STATUS_MESSAGE,
 
 	/**
-	 * A message indicating that the elevator has arrived to the floor
+	 * A subset of message, elevator-floor messages, that enable communication
+	 * between the elevator and floor
 	 */
-	FLOOR_ARRIVAL_MESSAGE,
-
-	/**
-	 * A message indicating that the elevator is coming in the elevatorDirection of
-	 * the floor
-	 */
-	EVELATOR_FLOOR_SIGNAL_REQUEST,
-
-	/**
-	 * A message indicating that the elevator is leaving the floor
-	 */
-	EVELATOR_LEAVING_FLOOR_MESSAGE,
+	ELEVATOR_FLOOR_MESSAGE,
 
 	/**
 	 * A subset of messages, elevator commands, used for communication between the

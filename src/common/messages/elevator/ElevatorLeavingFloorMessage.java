@@ -3,8 +3,7 @@
  */
 package common.messages.elevator;
 
-import common.messages.IdentifierDrivenMessage;
-import common.messages.MessageType;
+import common.messages.FloorElevatorTargetedMessage;
 
 /**
  * This class represents a message that the elevator sends to the floor to
@@ -13,12 +12,12 @@ import common.messages.MessageType;
  * @author paulokenne
  *
  */
-public class ElevatorLeavingFloorMessage extends IdentifierDrivenMessage {
+public class ElevatorLeavingFloorMessage extends FloorElevatorTargetedMessage {
 
 	/**
-	 * A ElevatorLeavingFloorMessage leaving constructor.
+	 * A ElevatorLeavingFloorMessage constructor.
 	 */
-	public ElevatorLeavingFloorMessage(int elevatorId, int floorId, MessageType messageType) {
-		super(elevatorId, floorId, messageType);
+	public ElevatorLeavingFloorMessage(int elevatorId, int floorId) {
+		super(elevatorId, floorId, ElevatorFloorRequestType.ELEVATOR_LEAVING_FLOOR_MESSAGE);
 	}
 }
