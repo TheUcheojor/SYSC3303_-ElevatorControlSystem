@@ -63,17 +63,19 @@ public class Scheduler implements Runnable {
 	/**
 	 * elevator floor number
 	 */
-	public Direction elevatorDirection;
+	private Direction elevatorDirection;
 
 	/**
 	 * elevator id
 	 */
-	public int elevatorId;
+	private int elevatorId;
 	
 	/**
 	 * elevator error state
 	 */
-	public Exception elevatorErrorState;
+	private Exception elevatorErrorState;
+	
+	private boolean elevatorIsReadyForJob = true;
 
 	/**
 	 * a constructor
@@ -94,14 +96,7 @@ public class Scheduler implements Runnable {
 
 	@Override
 	public void run() {
-		int i = 0;
 		while (true) {
-			try {
-				Thread.sleep(0);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			if (!incomingFloorChannel.isEmpty()) {
 				Message floorRequest = incomingFloorChannel.popMessage();
 				handleFloorRequest(floorRequest);
@@ -122,7 +117,7 @@ public class Scheduler implements Runnable {
 			if(elevatorErrorState == null) {
 				if(elevatorJobQueue.size() > 0) {
 					if(elevatorDirection != Direction.IDLE) serveJob();
-					else executeFirstJob();
+					else if(elevatorIsReadyForJob) executeFirstJob();
 				}
 			} else {
 				System.out.println("[ERROR] Elevator in error state: " + elevatorErrorState.getMessage());
@@ -178,10 +173,11 @@ public class Scheduler implements Runnable {
 			}
 		}
 		if (jobServed) {
-			System.out.println("Scheduler serving jobs");
+			System.out.println("Scheduler serving jobs\n");
 			elevatorJobQueue.removeAll(toRemove);
 			stopElevator();
 			openElevatorDoors();
+			elevatorIsReadyForJob = true;
 		}
 		if (shouldTurnOffLamp) {
 			turnOffFloorDirectionButtonLamp(elevatorFloorNumber, elevatorDirection);
@@ -193,12 +189,14 @@ public class Scheduler implements Runnable {
 	 * the queue.
 	 */
 	private void executeFirstJob() {
-		System.out.println("Scheduler executing first job");
+		System.out.println("Scheduler executing first job\n");
 		ElevatorJobMessage firstJob = elevatorJobQueue.peekFirst();
 		if (firstJob.getDestinationFloor() > elevatorFloorNumber) {
 			moveElevatorUp();
+			elevatorIsReadyForJob = false;
 		} else if (firstJob.getDestinationFloor() < elevatorFloorNumber) {
 			moveElevatorDown();
+			elevatorIsReadyForJob = false;
 		}
 	}
 
@@ -240,6 +238,7 @@ public class Scheduler implements Runnable {
 			elevatorId = ((ElevatorStatusMessage) message).getElevatorId();
 			elevatorErrorState = ((ElevatorStatusMessage) message).getErrorState();
 			System.out.println("Scheduler set internal elevator status: [EF: " + elevatorFloorNumber + ", ED: " + elevatorDirection + ", EID: " + elevatorId + ", ES:" + elevatorErrorState +" ]\n");
+			// TODO (rfife): cleanup executeFirstJob() use
 			if(shouldExecFirstJob) executeFirstJob();
 			break;
 

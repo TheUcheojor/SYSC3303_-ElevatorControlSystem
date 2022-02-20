@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
  *
  */
 public class MessageChannel {
+	private boolean DEBUG = false;
 	/**
 	 * The default queue size.
 	 */
@@ -62,14 +63,14 @@ public class MessageChannel {
 		// Wait if channel full
 		while (messages.size() >= maxSize) {
 			try {
-				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
+				if (DEBUG) System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
 				wait();
 			} catch (InterruptedException exception) {
 			}
 		}
 
 		this.messages.add(message);
-		System.out.println(Thread.currentThread().getName() + " has sent a " + message.getMessageType()
+		if (DEBUG) System.out.println(Thread.currentThread().getName() + " has sent a " + message.getMessageType()
 				+ " message in the " + channelName + " channel.\n");
 
 		notifyAll();
@@ -84,7 +85,7 @@ public class MessageChannel {
 		// Wait if channel empty
 		while (messages.size() == 0) {
 			try {
-				System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
+				if (DEBUG) System.out.println(Thread.currentThread().getName() + " is waiting in " + channelName + " channel.\n");
 
 				wait();
 			} catch (InterruptedException exception) {
@@ -93,7 +94,7 @@ public class MessageChannel {
 
 		Message tempMessage = this.messages.pop();
 
-		System.out.println(
+		if (DEBUG) System.out.println(
 				Thread.currentThread().getName() + " has received message from the " + channelName + " channel.\n");
 
 		notifyAll();
