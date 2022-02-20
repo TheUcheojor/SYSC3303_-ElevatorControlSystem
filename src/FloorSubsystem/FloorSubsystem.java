@@ -292,10 +292,12 @@ public class FloorSubsystem implements Runnable {
 		assignedFloorDataCollection.forEach(floorData -> {
 			// Check whether the input data is at the required floor and the requested
 			// direction is the same
-			if (floorData.getCurrentFloor() == floorId
-					&& floorData.getFloorDirectionButton().equals(elevatorDirection)) {
+			// TODO Check that the floor data direction and elevator direction match. Not
+			// currently supported to work.
+			if (floorData.getCurrentFloor() == floorId) {
 				destinationFloors.add(floorData.getDestinationFloorCarButton());
 			}
+
 		});
 
 		return destinationFloors;
