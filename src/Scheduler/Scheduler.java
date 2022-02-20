@@ -63,17 +63,19 @@ public class Scheduler implements Runnable {
 	/**
 	 * elevator floor number
 	 */
-	public Direction elevatorDirection;
+	private Direction elevatorDirection;
 
 	/**
 	 * elevator id
 	 */
-	public int elevatorId;
+	private int elevatorId;
 	
 	/**
 	 * elevator error state
 	 */
-	public Exception elevatorErrorState;
+	private Exception elevatorErrorState;
+	
+	private boolean elevatorIsReadyForJob = true;
 
 	/**
 	 * a constructor
@@ -94,9 +96,7 @@ public class Scheduler implements Runnable {
 
 	@Override
 	public void run() {
-
 		while (true) {
-
 			if (!incomingFloorChannel.isEmpty()) {
 				Message floorRequest = incomingFloorChannel.popMessage();
 				handleFloorRequest(floorRequest);
@@ -117,7 +117,7 @@ public class Scheduler implements Runnable {
 			if(elevatorErrorState == null) {
 				if(elevatorJobQueue.size() > 0) {
 					if(elevatorDirection != Direction.IDLE) serveJob();
-					else startJob();
+					else if(elevatorIsReadyForJob) executeFirstJob();
 				}
 			} else {
 				System.out.println("[ERROR] Elevator in error state: " + elevatorErrorState.getMessage());
@@ -126,6 +126,7 @@ public class Scheduler implements Runnable {
 	}
 
 	private void assignUnassignedJobs() {
+		System.out.println("Scheduler assigning unassigned jobs.\n");
 		List<ElevatorJobMessage> toRemove = new ArrayList<ElevatorJobMessage>();
 
 		unassignedElevatorJobs.forEach((ElevatorJobMessage job) -> {
@@ -153,7 +154,7 @@ public class Scheduler implements Runnable {
 			if (currRequest.getDestinationFloor() == elevatorFloorNumber) {
 				switch (currRequest.getMessageType()) {
 				case ELEVATOR_FLOOR_REQUEST:
-					if (currRequest.getDirection() == elevatorDirection) {
+					if (currRequest.getDirection() == elevatorDirection || currRequest == elevatorJobQueue.peekFirst()) {
 						shouldRemove = true;
 						shouldTurnOffLamp = true;
 					}
@@ -172,9 +173,11 @@ public class Scheduler implements Runnable {
 			}
 		}
 		if (jobServed) {
+			System.out.println("Scheduler serving jobs\n");
 			elevatorJobQueue.removeAll(toRemove);
 			stopElevator();
 			openElevatorDoors();
+			elevatorIsReadyForJob = true;
 		}
 		if (shouldTurnOffLamp) {
 			turnOffFloorDirectionButtonLamp(elevatorFloorNumber, elevatorDirection);
@@ -185,16 +188,15 @@ public class Scheduler implements Runnable {
 	 * Issues the necessary commands to the elevator for starting the first job in
 	 * the queue.
 	 */
-	private void startJob() {
+	private void executeFirstJob() {
+		System.out.println("Scheduler executing first job\n");
 		ElevatorJobMessage firstJob = elevatorJobQueue.peekFirst();
 		if (firstJob.getDestinationFloor() > elevatorFloorNumber) {
-			closeElevatorDoors();
 			moveElevatorUp();
+			elevatorIsReadyForJob = false;
 		} else if (firstJob.getDestinationFloor() < elevatorFloorNumber) {
-			closeElevatorDoors();
 			moveElevatorDown();
-		} else if (firstJob.getDestinationFloor() == elevatorFloorNumber) {
-			openElevatorDoors();
+			elevatorIsReadyForJob = false;
 		}
 	}
 
@@ -208,7 +210,9 @@ public class Scheduler implements Runnable {
 		switch (message.getMessageType()) {
 
 		case ELEVATOR_FLOOR_REQUEST:
-			unassignedElevatorJobs.add((ElevatorJobMessage) message);
+			ElevatorJobMessage job = (ElevatorJobMessage) message;
+			unassignedElevatorJobs.add(job);
+			System.out.println("Scheduler received floorRequest: go to floor " + job.getDestinationFloor() + "\n");
 			break;
 
 		default:
@@ -227,10 +231,15 @@ public class Scheduler implements Runnable {
 		switch (message.getMessageType()) {
 
 		case ELEVATOR_STATUS_MESSAGE:
+			boolean shouldExecFirstJob = false;
+			if(elevatorFloorNumber != ((ElevatorStatusMessage) message).getFloorNumber()) shouldExecFirstJob = true;
 			elevatorFloorNumber = ((ElevatorStatusMessage) message).getFloorNumber();
 			elevatorDirection = ((ElevatorStatusMessage) message).getDirection();
 			elevatorId = ((ElevatorStatusMessage) message).getElevatorId();
 			elevatorErrorState = ((ElevatorStatusMessage) message).getErrorState();
+			System.out.println("Scheduler set internal elevator status: [EF: " + elevatorFloorNumber + ", ED: " + elevatorDirection + ", EID: " + elevatorId + ", ES:" + elevatorErrorState +" ]\n");
+			// TODO (rfife): cleanup executeFirstJob() use
+			if(shouldExecFirstJob) executeFirstJob();
 			break;
 
 		case ELEVATOR_TRANSPORT_REQUEST:

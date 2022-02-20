@@ -1,4 +1,4 @@
-Elevator System Control Simulator Iteration #1
+Elevator System Control Simulator Iteration #2
 Team members: Ryan Fife, Paul Okenne, Jacob Charpentier, Favour Olotu, Delight Oluwayemi
 
 System Overview:
@@ -18,11 +18,18 @@ FloorSubsystem- This class manages sending and receiving of job requests from an
 Scheduler - This class manages the communication between the Elevator and the Floor sub systems.
 
 System Flow:
-Floor Subsystem determines if there is a valid input data (user presses a button)
-Using the Floor Transmission Channel the job request is sent to the Scheduler
-Scheduler sends a job request to the ElevatorCar using the elevator transmission channel
-ElevatorCar receives the job request and responds to the scheduler
-Scheduler updates the floor subsystem
+
+** All communication between subsystems is done over synchronized message queue channels
+
+1. Floor Subsystem determines if there is a valid input data (user presses a button)
+2. input data is sent to Scheduler
+3. Scheduler starts serving the request received by floor, starts moving elevator
+4. Elevator moves towards requested floor, notifying scheduler of each floor it passes
+5. Scheduler stops Elevator at desired floor
+6. Scheduler notifies floor subsystem
+6. Floor subsystem sends the elevator button press to the elevator subsystem
+7. Elevator sends the request to the scheduler
+8. Repeat steps 3 -> 5 
 
 HOW TO RUN THE PROGRAM
 Running any Java application begins with executing the static main(String[] args) function.

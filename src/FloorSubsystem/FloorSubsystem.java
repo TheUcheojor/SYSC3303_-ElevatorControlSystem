@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import common.Direction;
 import common.SimulationFloorInputData;
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
@@ -13,6 +14,7 @@ import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
+import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.floor.ElevatorFloorRequest;
 import common.messages.scheduler.SchedulerFloorCommand;
 
@@ -44,9 +46,16 @@ public class FloorSubsystem implements Runnable {
 	private String inputFileName;
 
 	/**
-	 * Collection of the simulation input objects
+	 * Collection of the simulation input objects that have not been sent to the
+	 * scheduler. Therefore, they are unassigned.
 	 */
-	private ArrayList<SimulationFloorInputData> floorDataCollection = new ArrayList<>();
+	private ArrayList<SimulationFloorInputData> unassignedFloorDataCollection = new ArrayList<>();
+
+	/**
+	 * Collection of the simulation input objects that have been sent to the
+	 * scheduler. Therefore, they are assigned.
+	 */
+	private ArrayList<SimulationFloorInputData> assignedFloorDataCollection = new ArrayList<>();
 
 	/**
 	 * The floor subsystem transmission message channel.
@@ -111,7 +120,7 @@ public class FloorSubsystem implements Runnable {
 
 		try {
 			while ((input = bufferedReader.readLine()) != null) {
-				floorDataCollection.add(new SimulationFloorInputData(input));
+				unassignedFloorDataCollection.add(new SimulationFloorInputData(input));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -133,10 +142,10 @@ public class FloorSubsystem implements Runnable {
 			 * Place input data in the transmission channel if we have data to send and the
 			 * transmission channel is free.
 			 */
-			if (floorSubsystemTransmissonChannel.isEmpty() && !floorDataCollection.isEmpty()) {
+			if (floorSubsystemTransmissonChannel.isEmpty() && !unassignedFloorDataCollection.isEmpty()) {
 
-				SimulationFloorInputData floorInputData = floorDataCollection.get(0);
-				floorDataCollection.remove(0);
+				SimulationFloorInputData floorInputData = unassignedFloorDataCollection.get(0);
+				unassignedFloorDataCollection.remove(0);
 
 				ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(floorInputData.getCurrentFloor(),
 						floorInputData.getFloorDirectionButton());
@@ -148,6 +157,10 @@ public class FloorSubsystem implements Runnable {
 
 				// sending the job to the scheduler
 				floorSubsystemTransmissonChannel.appendMessage(elevatorFloorRequest);
+
+				// Add the floor input data to the assigned floor data collection
+				assignedFloorDataCollection.add(floorInputData);
+
 			}
 
 			// Checking if we have a request message
@@ -230,20 +243,63 @@ public class FloorSubsystem implements Runnable {
 	 */
 	private void handleSchedulerFloorCommand(SchedulerFloorCommand command) {
 
+		int floorId = command.getFloorId();
+
 		// Validate the floor id
-		if (!SystemValidationUtil.isFloorNumberInRange(command.getFloorId())) {
+		if (!SystemValidationUtil.isFloorNumberInRange(floorId)) {
 			return;
 		}
 
 		switch (command.getCommand()) {
 
 		case TURN_OFF_FLOOR_LAMP:
-			floors[command.getFloorId()].turnOffLampButton(command.getLampButtonDirection());
+			floors[floorId].turnOffLampButton(command.getLampButtonDirection());
+
+			ArrayList<Integer> destinationFloors = getFloorPassengerDestinationFloors(floorId,
+					command.getLampButtonDirection());
+			// For now, I will only send the one item in the destination floor collection
+			// for this iteration.
+			// The elevator and scheduler do not support more than one at the moment.
+			//
+			// TODO Send the full collection of destination floors. Requires cooperation
+			// with the elevator and scheduler. Also, the id of the elevator needs to be
+			// sent.
+			// Since we have one elevator, we will hard code the elevator id of 0.
+			int elevatorId = 0;
+			ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloors.get(0),
+					elevatorId, command.getLampButtonDirection());
+			elevatorSubsystemReceiverChannel.appendMessage(elevatorTransportRequest);
 			break;
 
 		default:
 			break;
 		}
 
+	}
+
+	/**
+	 * Given the elevator direction, returns a floor's list of passenger
+	 * destinations (car buttons pressed)
+	 *
+	 * @param floorId           the floor id
+	 * @param elevatorDirection
+	 * @return
+	 */
+	private ArrayList<Integer> getFloorPassengerDestinationFloors(int floorId, Direction elevatorDirection) {
+
+		ArrayList<Integer> destinationFloors = new ArrayList<>();
+
+		assignedFloorDataCollection.forEach(floorData -> {
+			// Check whether the input data is at the required floor and the requested
+			// direction is the same
+			// TODO Check that the floor data direction and elevator direction match. Not
+			// currently supported to work.
+			if (floorData.getCurrentFloor() == floorId) {
+				destinationFloors.add(floorData.getDestinationFloorCarButton());
+			}
+
+		});
+
+		return destinationFloors;
 	}
 }

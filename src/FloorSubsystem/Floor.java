@@ -34,10 +34,10 @@ public class Floor {
 	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS - 1. Hence,
 	 * they can be mapped with an array.
 	 */
-	private final static FloorElevatorComponents[] elevatorComponents = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
+	private final static FloorElevatorComponents[] ELEVATOR_COMPONENTS = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
 	static {
-		for (int j = 0; j < elevatorComponents.length; j++) {
-			elevatorComponents[j] = new FloorElevatorComponents(j);
+		for (int j = 0; j < ELEVATOR_COMPONENTS.length; j++) {
+			ELEVATOR_COMPONENTS[j] = new FloorElevatorComponents(j);
 		}
 	}
 
@@ -72,7 +72,7 @@ public class Floor {
 	 */
 	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor,
 			MessageChannel elevatorSubsystemReceiverChannel, boolean isFloorFinalDestination) {
-		elevatorComponents[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor,
+		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor,
 				elevatorSubsystemReceiverChannel, isFloorFinalDestination);
 	}
 
@@ -138,7 +138,7 @@ public class Floor {
 			System.out.println("The user has pushed the DOWN floor button at floor: " + floorNumber + " ..");
 		}
 
-		for (FloorElevatorComponents elevatorSensor : elevatorComponents) {
+		for (FloorElevatorComponents elevatorSensor : ELEVATOR_COMPONENTS) {
 			if (elevatorSensor.getArrivalSensorState()) {
 				System.out.println("The elevator has arrived at floor: " + floorNumber + " ..");
 			}
@@ -149,7 +149,7 @@ public class Floor {
 	 * The elevator is leaving the floor
 	 */
 	public void elevatorLeavingFloor(int elevatorId) {
-		elevatorComponents[elevatorId].elevatorLeavingFloor();
+		ELEVATOR_COMPONENTS[elevatorId].elevatorLeavingFloor();
 	}
 
 	/**
@@ -167,10 +167,10 @@ public class Floor {
 	}
 
 	/**
-	 * @return the elevatorComponents
+	 * @return the ELEVATOR_COMPONENTS
 	 */
 	public FloorElevatorComponents[] getElevatorComponents() {
-		return elevatorComponents;
+		return ELEVATOR_COMPONENTS;
 	}
 
 	/**

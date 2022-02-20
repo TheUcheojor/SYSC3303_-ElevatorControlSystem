@@ -20,6 +20,7 @@ public enum Direction {
 	 */
 	DOWN,
 	
-	IDLE
+	IDLE,
+	STOPPED
 
 }
