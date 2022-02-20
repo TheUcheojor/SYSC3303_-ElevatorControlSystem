@@ -2,6 +2,7 @@ package ElevatorSubsystem;
 
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
+import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
 import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
@@ -22,12 +23,11 @@ public class ElevatorCar implements Runnable {
 	private int id;
 	private boolean inService;
 	private MessageChannel outgoingSchedulerChannel;
-	private MessageChannel incomingSchedulerChannel;
 	private MessageChannel outgoingFloorChannel;
-	private MessageChannel incomingFloorChannel;
+	private MessageChannel incomingChannel;
 	private ElevatorMotor motor;
 	private ElevatorDoor door;
-	private int floorNumber;
+	private int floorNumber = 0;
 	private Exception errorState;
 
 	/**
@@ -53,9 +53,8 @@ public class ElevatorCar implements Runnable {
 
 	public ElevatorCar(int id,
 			MessageChannel outgoingSchedulerChannel,
-			MessageChannel incomingSchedulerChannel,
-			MessageChannel outgoingFloorChannel,
-			MessageChannel incomingFloorChannel) {
+			MessageChannel incomingChannel,
+			MessageChannel outgoingFloorChannel) {
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -68,7 +67,8 @@ public class ElevatorCar implements Runnable {
 
 		this.id = id;
 		this.outgoingSchedulerChannel = outgoingSchedulerChannel;
-		this.incomingSchedulerChannel = incomingSchedulerChannel;
+		this.outgoingFloorChannel = outgoingFloorChannel;
+		this.incomingChannel = incomingChannel;
 		this.inService = true;
 		door = new ElevatorDoor(DOOR_SPEED);
 		motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
@@ -103,7 +103,7 @@ public class ElevatorCar implements Runnable {
 
 		while (true) {
 			// send status message and wait for a response from scheduler response in loop
-			Message message = incomingSchedulerChannel.popMessage();
+			Message message = incomingChannel.popMessage();
 			handleMessage(message);
 		}
 	}
@@ -131,14 +131,12 @@ public class ElevatorCar implements Runnable {
 			
 		case SCHEDULER_ELEVATOR_COMMAND:
 			handleElevatorCommand((SchedulerElevatorCommand) message);
+			ElevatorStatusMessage postCommandStatus = createStatusMessage();
+			outgoingSchedulerChannel.appendMessage(postCommandStatus);
 			break;
 			
-		case FLOOR_ARRIVAL_MESSAGE:
-			ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
-			floorNumber = arrivalMessage.getSourceEntityId();
-			
-			ElevatorStatusMessage arrivalStatus = createStatusMessage();
-			outgoingSchedulerChannel.appendMessage(arrivalStatus);
+		case ELEVATOR_FLOOR_MESSAGE:
+			handleFloorMessage((FloorElevatorTargetedMessage) message);
 			break;
 			
 		default:
@@ -147,7 +145,26 @@ public class ElevatorCar implements Runnable {
 		}
 	}
 	
+	private void handleFloorMessage(FloorElevatorTargetedMessage message) {
+		switch(message.getRequestType()) {
+		case FLOOR_ARRIVAL_MESSAGE:
+			ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
+			floorNumber = arrivalMessage.getFloorId();
+			
+			System.out.println("Elevator has reached floor: " + floorNumber);
+			ElevatorStatusMessage arrivalStatus = createStatusMessage();
+			outgoingSchedulerChannel.appendMessage(arrivalStatus);
+			break;
+			
+		default:
+			break;
+		}
+	}
+	
 	private void handleElevatorCommand(SchedulerElevatorCommand command) {
+		ElevatorLeavingFloorMessage leavingMessage;
+		ElevatorFloorSignalRequestMessage comingMessage;
+		
 		switch(command.getCommand()) {
 			case STOP:
 				if(!door.isOpen()) {
@@ -170,31 +187,29 @@ public class ElevatorCar implements Runnable {
 				}
 				break;
 			case MOVE_UP:
-				if(!door.isOpen()) {
-					System.out.println("Elevator moving up\n.");
-					motor.goUp();
-					// Elevator
-					ElevatorLeavingFloorMessage leavingMessage = new ElevatorLeavingFloorMessage(id, floorNumber);
-					ElevatorFloorSignalRequestMessage comingMessage = new ElevatorFloorSignalRequestMessage(id, floorNumber, motor, true);
-					
-					outgoingFloorChannel.appendMessage(leavingMessage);
-					outgoingFloorChannel.appendMessage(comingMessage);
-				}else {
-					errorState = new Exception("Attempted to start motor up while doors open");
-				}
+				System.out.println("Elevator door closing\n.");
+				door.closeDoor();
+				System.out.println("Elevator moving up\n.");
+				motor.goUp();
+				
+				leavingMessage = new ElevatorLeavingFloorMessage(id, floorNumber);
+				comingMessage = new ElevatorFloorSignalRequestMessage(id, floorNumber + 1, motor, true);
+				
+				outgoingFloorChannel.appendMessage(leavingMessage);
+				outgoingFloorChannel.appendMessage(comingMessage);
 				break;
 			case MOVE_DOWN:
-				if(!door.isOpen()) {
-					System.out.println("Elevator moving down\n.");
-					motor.goDown();
-					ElevatorLeavingFloorMessage leavingMessage = new ElevatorLeavingFloorMessage(id, floorNumber);
-					ElevatorFloorSignalRequestMessage comingMessage = new ElevatorFloorSignalRequestMessage(id, floorNumber, motor, true);
-					
-					outgoingFloorChannel.appendMessage(leavingMessage);
-					outgoingFloorChannel.appendMessage(comingMessage);
-				}else {
-					errorState = new Exception("Attempted to start motor down while doors open");
-				}
+				System.out.println("Elevator door closing\n.");
+				door.closeDoor();
+				System.out.println("Elevator moving down\n.");
+				motor.goDown();
+				
+				leavingMessage = new ElevatorLeavingFloorMessage(id, floorNumber);
+				comingMessage = new ElevatorFloorSignalRequestMessage(id, floorNumber - 1, motor, true);
+				
+				outgoingFloorChannel.appendMessage(leavingMessage);
+				outgoingFloorChannel.appendMessage(comingMessage);
+			
 				break;
 		}
 	}

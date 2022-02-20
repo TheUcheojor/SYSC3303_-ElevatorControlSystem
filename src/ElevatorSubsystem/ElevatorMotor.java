@@ -19,7 +19,7 @@ public class ElevatorMotor {
 	/**
 	 * The elevatorDirection of the motor is moving the elevator
 	 */
-	private Direction direction = null;
+	private Direction direction = Direction.IDLE;
 
 	/**
 	 * The elevator acceleration in meter per second squared

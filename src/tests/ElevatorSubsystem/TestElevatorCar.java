@@ -19,22 +19,21 @@ class TestElevatorCar {
 	private ElevatorCar elevatorCar;
 	private final static int CAR_ID = 2;
 	private MessageChannel outgoingSchedulerChannel;
-	private MessageChannel incomingSchedulerChannel;
 	private MessageChannel outgoingFloorChannel;
-	private MessageChannel incomingFloorChannel;
+	private MessageChannel incomingChannel;
 
 	@BeforeEach
 	void setup() {
 		this.outgoingSchedulerChannel = new MessageChannel("Elevator Subsystem Transmisson Channel");
-		this.incomingSchedulerChannel = new MessageChannel("Elevator Subsystem Receiver Channel");
+		this.incomingChannel = new MessageChannel("Elevator Subsystem Receiver Channel");
 
-		elevatorCar = new ElevatorCar(CAR_ID, outgoingSchedulerChannel, incomingSchedulerChannel, outgoingFloorChannel, incomingFloorChannel);
+		elevatorCar = new ElevatorCar(CAR_ID, outgoingSchedulerChannel, incomingChannel, outgoingFloorChannel);
 	}
 
 	@AfterEach
 	void tearDown() {
 		outgoingSchedulerChannel = null;
-		incomingSchedulerChannel = null;
+		incomingChannel = null;
 
 		elevatorCar = null;
 	}
