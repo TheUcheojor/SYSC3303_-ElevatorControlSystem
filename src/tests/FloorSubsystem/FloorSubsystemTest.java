@@ -1,5 +1,6 @@
 package tests.FloorSubsystem;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
+import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.scheduler.FloorCommand;
 import common.messages.scheduler.SchedulerFloorCommand;
 
@@ -127,11 +129,12 @@ class FloorSubsystemTest {
 
 	/**
 	 * Test that when the scheduler sends a turn-off-floor-lamp request, the floor
-	 * subsystem turns off the appropriate floor lamp
+	 * subsystem turns off the appropriate floor lamp. The floor should also send
+	 * the destination floor to the elevator.
 	 *
 	 */
 	@Test
-	void testFloorTurnsOffSpecifiedFloorLampWhenRequested() {
+	void testBehaviourWhenFloorLampTurnOffIsRequested() {
 
 		// Set the DOWN and UP floor lamp
 		floorSubsystem.getFloors()[1].getUpLampButton().setButtonPressed(true);
@@ -146,7 +149,7 @@ class FloorSubsystemTest {
 
 		// Give floor subsystem thread time to work
 		try {
-			Thread.sleep(100);
+			Thread.sleep(1000);
 		} catch (Exception e) {
 		}
 
@@ -154,6 +157,15 @@ class FloorSubsystemTest {
 		assertTrue(floorSubsystem.getFloors()[1].getUpLampButton().isButtonPressed() == false);
 		assertTrue(floorSubsystem.getFloors()[1].getDownLampButton().isButtonPressed() == true);
 
+		// Check that the elevator subsystem will receive the destination floor (the car
+		// button press)
+		assertFalse(elevatorSubsystemReceiverChannel.isEmpty());
+
+		Message message = elevatorSubsystemReceiverChannel.popMessage();
+		assertTrue(message instanceof ElevatorTransportRequest);
+
+		ElevatorTransportRequest elevatorTransportRequest = (ElevatorTransportRequest) message;
+		assertTrue(elevatorTransportRequest.getDestinationFloor() == 2);
 	}
 
 }
