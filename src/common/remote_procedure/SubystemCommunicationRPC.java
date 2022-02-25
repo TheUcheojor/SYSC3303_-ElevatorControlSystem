@@ -57,6 +57,7 @@ public class SubystemCommunicationRPC {
 	 */
 	public Message sendRequestAndReceiveResponse(Message message) {
 		try {
+			System.out.println(message);
 			sendMessage(message);
 			return receiveMessage();
 		} catch (Exception e) {
