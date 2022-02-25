@@ -47,6 +47,7 @@ public class SubystemCommunicationRPC {
 	 */
 	public SubystemCommunicationRPC(DatagramSocket sendReceiveSocket, SubsystemCommunicationInfo targetSubsystemInfo) {
 		this.sendReceiveSocket = sendReceiveSocket;
+		this.targetSubsystemInfo = targetSubsystemInfo;
 	}
 
 	/**
@@ -57,7 +58,6 @@ public class SubystemCommunicationRPC {
 	 */
 	public Message sendRequestAndReceiveResponse(Message message) {
 		try {
-			System.out.println(message);
 			sendMessage(message);
 			return receiveMessage();
 		} catch (Exception e) {
@@ -78,7 +78,6 @@ public class SubystemCommunicationRPC {
 		int targetSubsystemPort = targetSubsystemInfo.getPortNumber();
 
 		try {
-
 			DatagramPacket sendPacket = new DatagramPacket(messageBytes, messageBytes.length,
 					InetAddress.getByName(targetSubsystemIpAddress), targetSubsystemPort);
 
