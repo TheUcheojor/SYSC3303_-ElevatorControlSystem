@@ -5,6 +5,8 @@ package common.remote_procedure;
 
 import java.net.DatagramSocket;
 
+import common.messages.Message;
+
 /**
  * This class enables communication between the subsystems using remote
  * procedure calls.
@@ -29,7 +31,7 @@ public class SubystemCommunicationRPC {
 	}
 
 	public Message sendAndReceiveData() {
-
+		return null;
 	}
 
 }
