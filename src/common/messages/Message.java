@@ -3,13 +3,15 @@
  */
 package common.messages;
 
+import java.io.Serializable;
+
 /**
  * This class represents a message entity
  *
  * @author paulokenne, ryanfife
  *
  */
-public class Message {
+public class Message implements Serializable {
 
 	/**
 	 * The message type.
