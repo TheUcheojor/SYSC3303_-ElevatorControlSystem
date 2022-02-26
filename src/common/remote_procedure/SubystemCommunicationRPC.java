@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Base64;
 
 import common.messages.CommunicationFailureMessage;
@@ -42,12 +43,24 @@ public class SubystemCommunicationRPC {
 	/**
 	 * A SubystemCommunicationRPC constructor
 	 *
-	 * @param sendReceiveSocket   the send and receive socket
-	 * @param targetSubsystemInfo the target subsystem communication info
+	 * @param sourceSubsystemType the source subsystem type
+	 * @param targetSubsystemType the target subsystem type
 	 */
-	public SubystemCommunicationRPC(DatagramSocket sendReceiveSocket, SubsystemCommunicationInfo targetSubsystemInfo) {
-		this.sendReceiveSocket = sendReceiveSocket;
-		this.targetSubsystemInfo = targetSubsystemInfo;
+	public SubystemCommunicationRPC(SubsystemComponentType sourceSubsystemType,
+			SubsystemComponentType targetSubsystemType) {
+
+		try {
+			// Set up the source's send and receive socket
+			SubsystemCommunicationInfo sourceCommunicationInfo = SubsystemCommunicationConfiguarations
+					.getSourceSubsystemCommunicationInfo(sourceSubsystemType, targetSubsystemType);
+			this.sendReceiveSocket = new DatagramSocket(sourceCommunicationInfo.getPortNumber());
+
+			targetSubsystemInfo = SubsystemCommunicationConfiguarations
+					.getSourceSubsystemCommunicationInfo(targetSubsystemType, sourceSubsystemType);
+
+		} catch (SocketException e) {
+			System.out.println(e);
+		}
 	}
 
 	/**
@@ -70,7 +83,7 @@ public class SubystemCommunicationRPC {
 	 *
 	 * @param message the message to be sent
 	 */
-	private void sendMessage(Message message) throws Exception {
+	public void sendMessage(Message message) throws Exception {
 
 		byte[] messageBytes = getByteArrayFromMessage(message);
 
@@ -92,7 +105,7 @@ public class SubystemCommunicationRPC {
 	 *
 	 * @return the response message
 	 */
-	private Message receiveMessage() throws Exception {
+	public Message receiveMessage() throws Exception {
 
 		byte[] data = new byte[MAX_BUFFER_SIZE];
 		DatagramPacket receivePacket = new DatagramPacket(data, data.length);

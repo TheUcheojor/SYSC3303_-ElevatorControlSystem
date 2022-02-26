@@ -1,5 +1,7 @@
 package common.remote_procedure;
 
+import java.net.InetAddress;
+
 /*
  * The class stores the communication information for a given subsystem.
  */
@@ -23,6 +25,17 @@ public class SubsystemCommunicationInfo {
 	 */
 	public SubsystemCommunicationInfo(String ipAddress, int portNumber) {
 		this.ipAddress = ipAddress;
+		this.portNumber = portNumber;
+	}
+
+	/**
+	 * A SubsystemCommunicationInfo constructor.
+	 *
+	 * @param inetAddress the inet-address
+	 * @param portNumber  the port number
+	 */
+	public SubsystemCommunicationInfo(InetAddress inetAddress, int portNumber) {
+		this.ipAddress = inetAddress.getHostAddress();
 		this.portNumber = portNumber;
 	}
 
