@@ -26,7 +26,7 @@ public final class SubsystemCommunicationConfiguarations {
 	private static final int SCHEDULER_TO_ELEVATOR_SEND_RECEIVE_PORT = 11001;
 
 	/**
-	 * The scheduler port mapping that provide the scheduler port for a given
+	 * The scheduler port mapping that provides the appropriate port for a given
 	 * subsystem.
 	 */
 	public static final Map<SubsystemComponentType, Integer> SCHEDULER_PORT_MAPPING = Map.ofEntries(
@@ -44,8 +44,8 @@ public final class SubsystemCommunicationConfiguarations {
 	private static final int ELEVATOR_TO_SCHEDULER_SEND_RECEIVE_PORT = 12001;
 
 	/**
-	 * The scheduler port mapping that provide the elevator-subsystem port for a
-	 * given subsystem.
+	 * The elevator port mapping that provides the appropriate port for a given
+	 * subsystem.
 	 */
 	public static final Map<SubsystemComponentType, Integer> ELEVATOR_PORT_MAPPING = Map.ofEntries(
 			Map.entry(SubsystemComponentType.SCHEDULER, ELEVATOR_TO_SCHEDULER_SEND_RECEIVE_PORT),
@@ -62,7 +62,7 @@ public final class SubsystemCommunicationConfiguarations {
 	private static final int FlOOR_TO_SCHEDULER_SEND_RECEIVE_PORT = 13001;
 
 	/**
-	 * The scheduler port mapping that provide the floor-subsystem port for a given
+	 * The floor port mapping that provides the appropriate port for a given
 	 * subsystem.
 	 */
 	public static final Map<SubsystemComponentType, Integer> FLOOR_PORT_MAPPING = Map.ofEntries(
