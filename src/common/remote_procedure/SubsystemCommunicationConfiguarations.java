@@ -54,7 +54,7 @@ public final class SubsystemCommunicationConfiguarations {
 	/**
 	 * The floor subsystem send/receive port for the elevator subsystem
 	 */
-	private static final int FlOOR_TO_ELEVATOR_SEND_RECEIVE_PORT = 13001;
+	private static final int FlOOR_TO_ELEVATOR_SEND_RECEIVE_PORT = 13000;
 
 	/**
 	 * The floor subsystem send/receive port for the scheduler
