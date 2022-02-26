@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import common.messages.Message;
 import common.messages.MessageType;
-import common.remote_procedure.SubsystemCommunicationInfo;
+import common.remote_procedure.SubsystemCommunicationConfiguarations;
+import common.remote_procedure.SubsystemComponentType;
 import common.remote_procedure.SubystemCommunicationRPC;
 
 /**
@@ -45,15 +45,10 @@ public class SubystemCommunicationRPCTest {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		String hostIpAddress = InetAddress.getLocalHost().getHostAddress();
-		int portNumber = 8999;
-
-		targetSubsystemSocket = new DatagramSocket(portNumber);
-		sourceSubsystemSendReceiveSocket = new DatagramSocket();
-
-		SubsystemCommunicationInfo targetSubsystemInfo = new SubsystemCommunicationInfo(hostIpAddress, portNumber);
-		this.subsystemCommunication = new SubystemCommunicationRPC(sourceSubsystemSendReceiveSocket,
-				targetSubsystemInfo);
+		this.subsystemCommunication = new SubystemCommunicationRPC(SubsystemComponentType.SCHEDULER,
+				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
+		this.targetSubsystemSocket = new DatagramSocket(
+				SubsystemCommunicationConfiguarations.ELEVATOR_PORT_MAPPING.get(SubsystemComponentType.SCHEDULER));
 
 		/**
 		 * The thread simulates the SubystemCommunicationRPC response by sending the
@@ -85,7 +80,6 @@ public class SubystemCommunicationRPCTest {
 	@AfterEach
 	void closeSockets() throws Exception {
 		targetSubsystemSocket.close();
-		sourceSubsystemSendReceiveSocket.close();
 	}
 
 	/**
@@ -93,7 +87,7 @@ public class SubystemCommunicationRPCTest {
 	 * receive a response
 	 */
 	@Test
-	public void testRPCCommunication() {
+	public void testRPCCommunicationForsendingRequestAndReceivingResponses() {
 		Message testMessage = new Message(MessageType.TEST_REQUEST);
 		Message responseMessage = subsystemCommunication.sendRequestAndReceiveResponse(testMessage);
 		assertTrue(responseMessage.getMessageType() == MessageType.TEST_REQUEST);
