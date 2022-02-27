@@ -17,6 +17,8 @@ import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.floor.ElevatorFloorRequest;
 import common.messages.scheduler.SchedulerFloorCommand;
+import common.remote_procedure.SubsystemCommunicationRPC;
+import common.remote_procedure.SubsystemComponentType;
 
 /**
  * This class simulates the FloorSubsystem thread
@@ -72,6 +74,16 @@ public class FloorSubsystem implements Runnable {
 	 */
 	private MessageChannel elevatorSubsystemReceiverChannel;
 
+	/**
+	 * Floor to Elevator UDP Communication
+	 */
+	private SubsystemCommunicationRPC floorElevatorUDP = new SubsystemCommunicationRPC(SubsystemComponentType.FLOOR_SUBSYSTEM, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
+	
+	/**
+	 * Floor to Scheduler UDP Communication
+	 */
+	private SubsystemCommunicationRPC floorSchedulerUDP = new SubsystemCommunicationRPC(SubsystemComponentType.FLOOR_SUBSYSTEM, SubsystemComponentType.SCHEDULER);
+	
 	/**
 	 * This is the default constructor of the class
 	 *

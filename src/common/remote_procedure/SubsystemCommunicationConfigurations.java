@@ -13,7 +13,7 @@ import java.util.Map;
  * @author paulokenne
  *
  */
-public final class SubsystemCommunicationConfiguarations {
+public final class SubsystemCommunicationConfigurations {
 
 	/**
 	 * The scheduler send/receive port for the floor subsystem
@@ -88,7 +88,7 @@ public final class SubsystemCommunicationConfiguarations {
 	/**
 	 * A private SubsystemCommunicationConfiguarations constructor
 	 */
-	private SubsystemCommunicationConfiguarations() {
+	private SubsystemCommunicationConfigurations() {
 	}
 
 	/**
