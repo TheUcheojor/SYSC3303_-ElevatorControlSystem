@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import common.messages.Message;
 import common.messages.MessageType;
-import common.remote_procedure.SubsystemCommunicationConfiguarations;
+import common.remote_procedure.SubsystemCommunicationConfigurations;
 import common.remote_procedure.SubsystemComponentType;
-import common.remote_procedure.SubystemCommunicationRPC;
+import common.remote_procedure.SubsystemCommunicationRPC;
 
 /**
  * This class tests the send and receive functionality of
@@ -23,12 +23,12 @@ import common.remote_procedure.SubystemCommunicationRPC;
  * @author delightoluwayemi
  *
  */
-public class SubystemCommunicationRPCTest {
+public class SubsystemCommunicationRPCTest {
 
 	/**
 	 * Create a new SubystemCommunicationRPC object.
 	 */
-	private SubystemCommunicationRPC subsystemCommunication;
+	private SubsystemCommunicationRPC subsystemCommunication;
 
 	/**
 	 * The target subsystem socket
@@ -45,10 +45,10 @@ public class SubystemCommunicationRPCTest {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		this.subsystemCommunication = new SubystemCommunicationRPC(SubsystemComponentType.SCHEDULER,
+		this.subsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.SCHEDULER,
 				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
 		this.targetSubsystemSocket = new DatagramSocket(
-				SubsystemCommunicationConfiguarations.ELEVATOR_PORT_MAPPING.get(SubsystemComponentType.SCHEDULER));
+				SubsystemCommunicationConfigurations.ELEVATOR_PORT_MAPPING.get(SubsystemComponentType.SCHEDULER));
 
 		/**
 		 * The thread simulates the SubystemCommunicationRPC response by sending the
@@ -58,7 +58,7 @@ public class SubystemCommunicationRPCTest {
 
 			@Override
 			public void run() {
-				byte[] data = new byte[SubystemCommunicationRPC.MAX_BUFFER_SIZE];
+				byte[] data = new byte[SubsystemCommunicationRPC.MAX_BUFFER_SIZE];
 				DatagramPacket receivePacket = new DatagramPacket(data, data.length);
 				try {
 					targetSubsystemSocket.receive(receivePacket);

@@ -24,7 +24,7 @@ import common.messages.Message;
  * @author paulokenne, delight
  *
  */
-public class SubystemCommunicationRPC {
+public class SubsystemCommunicationRPC {
 
 	/**
 	 * The maximum buffer size
@@ -46,16 +46,16 @@ public class SubystemCommunicationRPC {
 	 * @param sourceSubsystemType the source subsystem type
 	 * @param targetSubsystemType the target subsystem type
 	 */
-	public SubystemCommunicationRPC(SubsystemComponentType sourceSubsystemType,
+	public SubsystemCommunicationRPC(SubsystemComponentType sourceSubsystemType,
 			SubsystemComponentType targetSubsystemType) {
 
 		try {
 			// Set up the source's send and receive socket
-			SubsystemCommunicationInfo sourceCommunicationInfo = SubsystemCommunicationConfiguarations
+			SubsystemCommunicationInfo sourceCommunicationInfo = SubsystemCommunicationConfigurations
 					.getSourceSubsystemCommunicationInfo(sourceSubsystemType, targetSubsystemType);
 			this.sendReceiveSocket = new DatagramSocket(sourceCommunicationInfo.getPortNumber());
 
-			targetSubsystemInfo = SubsystemCommunicationConfiguarations
+			targetSubsystemInfo = SubsystemCommunicationConfigurations
 					.getSourceSubsystemCommunicationInfo(targetSubsystemType, sourceSubsystemType);
 
 		} catch (SocketException e) {
