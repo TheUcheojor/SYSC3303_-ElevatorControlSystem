@@ -1,4 +1,4 @@
-import ElevatorSubsystem.ElevatorCar;
+import ElevatorSubsystem.ElevatorController;
 import FloorSubsystem.FloorSubsystem;
 import Scheduler.Scheduler;
 import common.messages.MessageChannel;
@@ -32,7 +32,7 @@ public class SystemExecutor {
 				floorSubsystemReceiverChannel, elevatorSubsystemReceiverChannel), "Floor Subsystem");
 
 		Thread elevatorSubsystem = new Thread(
-				new ElevatorCar(0, elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel, floorSubsystemReceiverChannel),
+				new ElevatorController(elevatorSubsystemTransmissonChannel, elevatorSubsystemReceiverChannel, floorSubsystemReceiverChannel),
 				"Elevator Car");
 
 		Thread scheduler = new Thread(new Scheduler(floorSubsystemTransmissonChannel, floorSubsystemReceiverChannel,

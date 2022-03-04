@@ -15,18 +15,19 @@ import common.messages.elevator.ElevatorFloorArrivalMessage;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
 import common.messages.elevator.ElevatorStatusMessage;
+import common.messages.elevator.ElevatorStatusRequest;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 
 /**
- * @author Ryan Fife
+ * @author Ryan Fife, Favour
  *
  */
 public class ElevatorController implements Runnable {
 	/**
 	 * The number of elevators in the system
 	 */
-	public final static int NUMBER_OF_ELEVATORS = 1;
+	public final static int NUMBER_OF_ELEVATORS = 2;
 	/**
 	 * The door opening and closing time in seconds
 	 */
@@ -45,7 +46,7 @@ public class ElevatorController implements Runnable {
 	private MessageChannel outgoingFloorChannel;
 	private MessageChannel incomingChannel;
 	private Map<Integer, ElevatorCar> elevators;
-	
+	private int floorNumber = 0;
 
 	public ElevatorController(
 			MessageChannel outgoingSchedulerChannel,
@@ -64,7 +65,7 @@ public class ElevatorController implements Runnable {
 
 		// initialize elevator cars
 		elevators = new HashMap<Integer, ElevatorCar>();
-		for(int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
+		for(int i = 1; i <= NUMBER_OF_ELEVATORS; i++) {
 			ElevatorDoor door = new ElevatorDoor(DOOR_SPEED);
 			ElevatorMotor motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
 			int carId = i;
@@ -77,6 +78,13 @@ public class ElevatorController implements Runnable {
 		this.outgoingSchedulerChannel = outgoingSchedulerChannel;
 		this.outgoingFloorChannel = outgoingFloorChannel;
 		this.incomingChannel = incomingChannel;
+	}
+	
+	/**
+	 * This method returns the colection of elevator cars
+	 */
+	public Map<Integer, ElevatorCar> getElevators(){
+		return this.elevators;
 	}
 	
 	@Override
@@ -110,8 +118,8 @@ public class ElevatorController implements Runnable {
 		
 
 		case ELEVATOR_STATUS_REQUEST:
-			ElevatorStatusMessage statusMessage = (ElevatorStatusMessage)message;
-			outgoingSchedulerChannel.appendMessage(elevators.get(statusMessage.getElevatorId()).createStatusMessage());
+			ElevatorStatusRequest statusRequest = (ElevatorStatusRequest)message;
+			outgoingSchedulerChannel.appendMessage(elevators.get(statusRequest.getId()).createStatusMessage());
 			break;
 			
 		case ELEVATOR_TRANSPORT_REQUEST:
@@ -140,7 +148,7 @@ public class ElevatorController implements Runnable {
 		switch(message.getRequestType()) {
 		case FLOOR_ARRIVAL_MESSAGE:
 			ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
-			int floorNumber = arrivalMessage.getFloorId();
+			floorNumber = arrivalMessage.getFloorId();
 			
 			System.out.println("Elevator has reached floor: " + floorNumber);
 			ElevatorStatusMessage arrivalStatus = elevators.get(message.getElevatorId()).createStatusMessage();
@@ -155,48 +163,48 @@ public class ElevatorController implements Runnable {
 	private void handleElevatorCommand(SchedulerElevatorCommand command) {
 		ElevatorLeavingFloorMessage leavingMessage;
 		ElevatorFloorSignalRequestMessage comingMessage;
-		
+		ElevatorCar car = elevators.get(command.getElevatorID());
 		switch(command.getCommand()) {
 			case STOP:
-				if(!door.isOpen()) {
+				if(!car.getDoor().isOpen()) {
 					System.out.println("Elevator stopping\n.");
-					motor.turnOff();
+					car.getMotor().turnOff();
 				}else {
-					errorState = new Exception("Attempted to stop while doors open");
+					car.setErrorState(new Exception("Attempted to stop while doors open"));
 				}
 				break;
 			case CLOSE_DOORS:
 				System.out.println("Elevator door closing\n.");
-				door.closeDoor();
+				car.getDoor().closeDoor();
 				break;
 			case OPEN_DOORS:
-				if(!motor.getIsRunning()) {
+				if(!car.getMotor().getIsRunning()) {
 					System.out.println("Elevator door opening\n.");
-					door.openDoor();
+					car.getDoor().openDoor();
 				}else {
-					errorState = new Exception("Attempted to open doors while motor running");
+					car.setErrorState(new Exception("Attempted to open doors while motor running"));
 				}
 				break;
 			case MOVE_UP:
 				System.out.println("Elevator door closing\n.");
-				door.closeDoor();
+				car.getDoor().closeDoor();
 				System.out.println("Elevator moving up\n.");
-				motor.goUp();
+				car.getMotor().goUp();
 				
-				leavingMessage = new ElevatorLeavingFloorMessage(id, floorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(id, floorNumber + 1, motor, true);
+				leavingMessage = new ElevatorLeavingFloorMessage(car.getId(), floorNumber);
+				comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), floorNumber + 1, car.getMotor(), true);
 				
 				outgoingFloorChannel.appendMessage(leavingMessage);
 				outgoingFloorChannel.appendMessage(comingMessage);
 				break;
 			case MOVE_DOWN:
 				System.out.println("Elevator door closing\n.");
-				door.closeDoor();
+				car.getDoor().closeDoor();
 				System.out.println("Elevator moving down\n.");
-				motor.goDown();
+				car.getMotor().goDown();
 				
-				leavingMessage = new ElevatorLeavingFloorMessage(id, floorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(id, floorNumber - 1, motor, true);
+				leavingMessage = new ElevatorLeavingFloorMessage(car.getId(), floorNumber);
+				comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), floorNumber - 1, car.getMotor(), true);
 				
 				outgoingFloorChannel.appendMessage(leavingMessage);
 				outgoingFloorChannel.appendMessage(comingMessage);
