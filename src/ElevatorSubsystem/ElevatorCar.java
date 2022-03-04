@@ -19,59 +19,19 @@ import common.messages.scheduler.SchedulerElevatorCommand;
  * @author Ryan Fife, paulokenne
  *
  */
-public class ElevatorCar implements Runnable {
+public class ElevatorCar {
 	private int id;
 	private boolean inService;
-	private MessageChannel outgoingSchedulerChannel;
-	private MessageChannel outgoingFloorChannel;
-	private MessageChannel incomingChannel;
 	private ElevatorMotor motor;
 	private ElevatorDoor door;
 	private int floorNumber = 0;
 	private Exception errorState;
 
-	/**
-	 * The number of elevators in the system
-	 *
-	 * TODO to be relocated to a elevator subsystem level
-	 */
-	public final static int NUMBER_OF_ELEVATORS = 1;
-	/**
-	 * The door opening and closing time in seconds
-	 */
-	public final static double DOOR_SPEED = 3000;
-
-	/**
-	 * The elevator speed in meters per second.
-	 */
-	public final static double MAX_ELEVATOR_SPEED = 3;
-	/**
-	 * The elevator acceleration in meters per second squared.
-	 */
-	public final static double ELEVATOR_ACCELERATION = 1.5;
-	
-
-	public ElevatorCar(int id,
-			MessageChannel outgoingSchedulerChannel,
-			MessageChannel incomingChannel,
-			MessageChannel outgoingFloorChannel) {
-		// Validate that the elevator values are valid
-		try {
-			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
-			SystemValidationUtil.validateElevatorAcceleration(ELEVATOR_ACCELERATION);
-		} catch (InvalidSystemConfigurationInputException e) {
-			System.out.println("InvalidSystemConfigurationInputException: " + e);
-			// Terminate if the elevation configuration are invalid.
-			System.exit(1);
-		}
-
+	public ElevatorCar(int id, ElevatorMotor motor, ElevatorDoor door) {
 		this.id = id;
-		this.outgoingSchedulerChannel = outgoingSchedulerChannel;
-		this.outgoingFloorChannel = outgoingFloorChannel;
-		this.incomingChannel = incomingChannel;
 		this.inService = true;
-		door = new ElevatorDoor(DOOR_SPEED);
-		motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
+		this.motor = motor;
+		this.door = door;
 	}
 
 	public int getId() {
@@ -92,20 +52,6 @@ public class ElevatorCar implements Runnable {
 
 	public void setInService(boolean service) {
 		inService = service;
-	}
-
-	@Override
-	public void run() {
-
-		// The elevator is ready
-		ElevatorStatusMessage status = createStatusMessage();
-		outgoingSchedulerChannel.appendMessage(status);
-
-		while (true) {
-			// send status message and wait for a response from scheduler response in loop
-			Message message = incomingChannel.popMessage();
-			handleMessage(message);
-		}
 	}
 
 	/**
@@ -220,7 +166,6 @@ public class ElevatorCar implements Runnable {
 	 *
 	 * @return status response message
 	 */
-	// @PublicForTestOnly
 	public ElevatorStatusMessage createStatusMessage() {
 		ElevatorStatusMessage status = new ElevatorStatusMessage(
 				id,
@@ -228,7 +173,6 @@ public class ElevatorCar implements Runnable {
 				floorNumber,
 				errorState
 				);
-		// TODO (rfife): Pass current floor
 
 		return status;
 	}
