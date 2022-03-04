@@ -68,17 +68,14 @@ public class ElevatorCar {
 
 		case ELEVATOR_STATUS_REQUEST:
 			ElevatorStatusMessage status = createStatusMessage();
-			outgoingSchedulerChannel.appendMessage(status);
 			break;
 			
 		case ELEVATOR_TRANSPORT_REQUEST:
-			outgoingSchedulerChannel.appendMessage((ElevatorTransportRequest) message);
 			break;
 			
 		case SCHEDULER_ELEVATOR_COMMAND:
 			handleElevatorCommand((SchedulerElevatorCommand) message);
 			ElevatorStatusMessage postCommandStatus = createStatusMessage();
-			outgoingSchedulerChannel.appendMessage(postCommandStatus);
 			break;
 			
 		case ELEVATOR_FLOOR_MESSAGE:
