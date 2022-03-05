@@ -42,7 +42,6 @@ class TestElevatorController {
 	void tearDown() {
 		outgoingSchedulerChannel = null;
 		incomingChannel = null;
-
 		elevatorController = null;
 	}
 	
