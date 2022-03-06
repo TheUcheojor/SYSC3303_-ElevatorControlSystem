@@ -25,6 +25,7 @@ import common.messages.scheduler.SchedulerFloorCommand;
  *
  */
 public class Scheduler implements Runnable {
+
 	/**
 	 * channel that receives messages from floor subsystem
 	 */
@@ -46,7 +47,7 @@ public class Scheduler implements Runnable {
 	private MessageChannel outgoingElevatorChannel;
 
 	/**
-	 * elevator job queue
+	 * The elevator job queue
 	 */
 	private ArrayDeque<ElevatorJobMessage> elevatorJobQueue;
 
@@ -69,12 +70,12 @@ public class Scheduler implements Runnable {
 	 * elevator id
 	 */
 	private int elevatorId;
-	
+
 	/**
 	 * elevator error state
 	 */
 	private Exception elevatorErrorState;
-	
+
 	private boolean elevatorIsReadyForJob = true;
 
 	/**
@@ -113,11 +114,13 @@ public class Scheduler implements Runnable {
 				Message elevatorRequest = incomingElevatorChannel.popMessage();
 				handleElevatorMessage(elevatorRequest);
 			}
-			
-			if(elevatorErrorState == null) {
-				if(elevatorJobQueue.size() > 0) {
-					if(elevatorDirection != Direction.IDLE) serveJob();
-					else if(elevatorIsReadyForJob) executeFirstJob();
+
+			if (elevatorErrorState == null) {
+				if (elevatorJobQueue.size() > 0) {
+					if (elevatorDirection != Direction.IDLE)
+						serveJob();
+					else if (elevatorIsReadyForJob)
+						executeFirstJob();
 				}
 			} else {
 				System.out.println("[ERROR] Elevator in error state: " + elevatorErrorState.getMessage());
@@ -154,7 +157,8 @@ public class Scheduler implements Runnable {
 			if (currRequest.getDestinationFloor() == elevatorFloorNumber) {
 				switch (currRequest.getMessageType()) {
 				case ELEVATOR_FLOOR_REQUEST:
-					if (currRequest.getDirection() == elevatorDirection || currRequest == elevatorJobQueue.peekFirst()) {
+					if (currRequest.getDirection() == elevatorDirection
+							|| currRequest == elevatorJobQueue.peekFirst()) {
 						shouldRemove = true;
 						shouldTurnOffLamp = true;
 					}
@@ -232,14 +236,17 @@ public class Scheduler implements Runnable {
 
 		case ELEVATOR_STATUS_MESSAGE:
 			boolean shouldExecFirstJob = false;
-			if(elevatorFloorNumber != ((ElevatorStatusMessage) message).getFloorNumber()) shouldExecFirstJob = true;
+			if (elevatorFloorNumber != ((ElevatorStatusMessage) message).getFloorNumber())
+				shouldExecFirstJob = true;
 			elevatorFloorNumber = ((ElevatorStatusMessage) message).getFloorNumber();
 			elevatorDirection = ((ElevatorStatusMessage) message).getDirection();
 			elevatorId = ((ElevatorStatusMessage) message).getElevatorId();
 			elevatorErrorState = ((ElevatorStatusMessage) message).getErrorState();
-			System.out.println("Scheduler set internal elevator status: [EF: " + elevatorFloorNumber + ", ED: " + elevatorDirection + ", EID: " + elevatorId + ", ES:" + elevatorErrorState +" ]\n");
+			System.out.println("Scheduler set internal elevator status: [EF: " + elevatorFloorNumber + ", ED: "
+					+ elevatorDirection + ", EID: " + elevatorId + ", ES:" + elevatorErrorState + " ]\n");
 			// TODO (rfife): cleanup executeFirstJob() use
-			if(shouldExecFirstJob) executeFirstJob();
+			if (shouldExecFirstJob)
+				executeFirstJob();
 			break;
 
 		case ELEVATOR_TRANSPORT_REQUEST:
