@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import ElevatorSubsystem.ElevatorCar;
 import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
@@ -17,6 +18,8 @@ import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.FloorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.messages.scheduler.SchedulerFloorCommand;
+import common.remote_procedure.SubsystemCommunicationRPC;
+import common.remote_procedure.SubsystemComponentType;
 
 /**
  * This represents the scheduler which manages the elevator and floor subsystem.
@@ -26,6 +29,7 @@ import common.messages.scheduler.SchedulerFloorCommand;
  */
 public class Scheduler implements Runnable {
 
+	// TODO DELETE MESSAGE CHANNELS
 	/**
 	 * channel that receives messages from floor subsystem
 	 */
@@ -45,6 +49,28 @@ public class Scheduler implements Runnable {
 	 * elevator channel that gets messages from the scheduler
 	 */
 	private MessageChannel outgoingElevatorChannel;
+
+	/**
+	 * The UDP communication between the scheduler and floor
+	 */
+	private SubsystemCommunicationRPC schedulerFloorCommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.FLOOR_SUBSYSTEM);
+
+	/**
+	 * The UDP communication between the scheduler and elevator
+	 */
+	private SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
+
+	/**
+	 * The job management for each elevator
+	 */
+	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorCar.NUMBER_OF_ELEVATORS];
+
+	/**
+	 * The floor job Message queue
+	 */
+//	MessageWorkQueue floorJobMessageQueue = new MessageWorkQueue();
 
 	/**
 	 * The elevator job queue
@@ -79,7 +105,7 @@ public class Scheduler implements Runnable {
 	private boolean elevatorIsReadyForJob = true;
 
 	/**
-	 * a constructor
+	 * The Scheduler constructor
 	 */
 	public Scheduler(MessageChannel receiveFloorChannel, MessageChannel floorSubsystemReceiverChannel,
 			MessageChannel receiveElevatorChannel, MessageChannel elevatorSubsystemReceiverChannel) {
@@ -93,6 +119,10 @@ public class Scheduler implements Runnable {
 		// TODO (rfife) for iter 3: scale this to multiple elevators
 		this.elevatorJobQueue = new ArrayDeque<ElevatorJobMessage>();
 		this.unassignedElevatorJobs = new ArrayList<ElevatorJobMessage>();
+
+		for (int i = 0; i < elevatorJobManagements.length; i++) {
+			elevatorJobManagements[i] = new ElevatorJobManagement(i);
+		}
 	}
 
 	@Override
