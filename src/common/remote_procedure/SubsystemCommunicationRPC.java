@@ -69,13 +69,17 @@ public class SubsystemCommunicationRPC {
 	 * @param message the message to be sent
 	 * @return the response messages
 	 */
-	public Message sendRequestAndReceiveResponse(Message message) {
+	public synchronized Message sendRequestAndReceiveResponse(Message message) {
+
+		Message receivedMessage = new CommunicationFailureMessage();
 		try {
 			sendMessage(message);
-			return receiveMessage();
+			receivedMessage = receiveMessage();
 		} catch (Exception e) {
-			return new CommunicationFailureMessage();
 		}
+
+		notifyAll();
+		return receivedMessage;
 	}
 
 	/**
@@ -83,7 +87,7 @@ public class SubsystemCommunicationRPC {
 	 *
 	 * @param message the message to be sent
 	 */
-	public void sendMessage(Message message) throws Exception {
+	public synchronized void sendMessage(Message message) throws Exception {
 
 		byte[] messageBytes = getByteArrayFromMessage(message);
 
@@ -98,6 +102,8 @@ public class SubsystemCommunicationRPC {
 		} catch (Exception e) {
 			System.out.print(e);
 		}
+
+		notifyAll();
 	}
 
 	/**
@@ -105,7 +111,7 @@ public class SubsystemCommunicationRPC {
 	 *
 	 * @return the response message
 	 */
-	public Message receiveMessage() throws Exception {
+	public synchronized Message receiveMessage() throws Exception {
 
 		byte[] data = new byte[MAX_BUFFER_SIZE];
 		DatagramPacket receivePacket = new DatagramPacket(data, data.length);
