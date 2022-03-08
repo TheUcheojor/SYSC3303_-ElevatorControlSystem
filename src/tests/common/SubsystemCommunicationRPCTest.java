@@ -2,19 +2,16 @@ package tests.common;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import common.messages.Message;
 import common.messages.MessageType;
-import common.remote_procedure.SubsystemCommunicationConfigurations;
-import common.remote_procedure.SubsystemComponentType;
 import common.remote_procedure.SubsystemCommunicationRPC;
+import common.remote_procedure.SubsystemComponentType;
 
 /**
  * This class tests the send and receive functionality of
@@ -33,12 +30,12 @@ public class SubsystemCommunicationRPCTest {
 	/**
 	 * The target subsystem socket
 	 */
-	DatagramSocket targetSubsystemSocket;
+	DatagramSocket sourceSubsystemSendReceiveSocket;
 
 	/**
-	 * The target subsystem socket
+	 * The received message from target subsystem
 	 */
-	DatagramSocket sourceSubsystemSendReceiveSocket;
+	private Message receivedTargetSystemResponseMessage;
 
 	/**
 	 * @throws java.lang.Exception
@@ -47,8 +44,6 @@ public class SubsystemCommunicationRPCTest {
 	void setUp() throws Exception {
 		this.subsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.SCHEDULER,
 				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
-		this.targetSubsystemSocket = new DatagramSocket(
-				SubsystemCommunicationConfigurations.ELEVATOR_PORT_MAPPING.get(SubsystemComponentType.SCHEDULER));
 
 		/**
 		 * The thread simulates the SubystemCommunicationRPC response by sending the
@@ -61,10 +56,12 @@ public class SubsystemCommunicationRPCTest {
 				byte[] data = new byte[SubsystemCommunicationRPC.MAX_BUFFER_SIZE];
 				DatagramPacket receivePacket = new DatagramPacket(data, data.length);
 				try {
-					targetSubsystemSocket.receive(receivePacket);
-					targetSubsystemSocket.send(receivePacket);
-					targetSubsystemSocket.close();
-				} catch (IOException e) {
+					SubsystemCommunicationRPC subsystemCommunication = new SubsystemCommunicationRPC(
+							SubsystemComponentType.ELEVATOR_SUBSYSTEM, SubsystemComponentType.SCHEDULER);
+
+					receivedTargetSystemResponseMessage = subsystemCommunication.receiveMessage();
+
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -73,24 +70,32 @@ public class SubsystemCommunicationRPCTest {
 	}
 
 	/**
-	 * Close sockets
-	 *
-	 * @throws Exception if errors occur
-	 */
-	@AfterEach
-	void closeSockets() throws Exception {
-		targetSubsystemSocket.close();
-	}
-
-	/**
 	 * This test case tests that the RPC communication can send a request and
 	 * receive a response
 	 */
 	@Test
 	public void testRPCCommunicationForsendingRequestAndReceivingResponses() {
-		Message testMessage = new Message(MessageType.TEST_REQUEST);
-		Message responseMessage = subsystemCommunication.sendRequestAndReceiveResponse(testMessage);
-		assertTrue(responseMessage.getMessageType() == MessageType.TEST_REQUEST);
+
+		(new Thread() {
+			@Override
+			public void run() {
+				try {
+					Message testMessage = new Message(MessageType.TEST_REQUEST);
+					subsystemCommunication.sendMessage(testMessage);
+				} catch (Exception e) {
+				}
+
+			}
+		}).start();
+
+		// Let the thread work
+		try {
+			Thread.sleep(1000);
+		} catch (Exception e) {
+
+		}
+
+		assertTrue(receivedTargetSystemResponseMessage.getMessageType() == MessageType.TEST_REQUEST);
 	}
 
 }
