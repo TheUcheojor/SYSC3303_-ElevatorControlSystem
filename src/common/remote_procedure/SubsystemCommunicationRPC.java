@@ -32,7 +32,7 @@ public class SubsystemCommunicationRPC {
 	public static final int MAX_BUFFER_SIZE = 1000;
 
 	/**
-	 * The send and receive socket
+	 * The receive socket
 	 */
 	private DatagramSocket receiveSocket;
 
@@ -92,7 +92,7 @@ public class SubsystemCommunicationRPC {
 			// Close the socket
 			sendReceiveSocket.close();
 
-			if (receiveMessage != null && receiveMessage.getMessageType() != MessageType.ACKNOWLEDGEMENT_RESPONSE) {
+			if (receiveMessage == null || receiveMessage.getMessageType() != MessageType.ACKNOWLEDGEMENT_RESPONSE) {
 				throw new Exception("No acknowledgement message!");
 			}
 
