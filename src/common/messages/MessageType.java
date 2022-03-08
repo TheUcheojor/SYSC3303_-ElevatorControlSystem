@@ -59,9 +59,15 @@ public enum MessageType {
 	 * A request for testing purposes.
 	 */
 	TEST_REQUEST,
-	
+
 	/**
-	 * A message that indicates that the intended message did not send or could not be received.
+	 * A message that indicates that the intended message did not send or could not
+	 * be received.
 	 */
-	COMMUNICATION_FAILURE
+	COMMUNICATION_FAILURE,
+
+	/**
+	 * A message that indicates that the sent message was received
+	 */
+	ACKNOWLEDGEMENT_RESPONSE
 }

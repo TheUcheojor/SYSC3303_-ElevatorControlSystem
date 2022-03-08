@@ -14,8 +14,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Base64;
 
-import common.messages.CommunicationFailureMessage;
 import common.messages.Message;
+import common.messages.MessageType;
 
 /**
  * This class enables communication between the subsystems using remote
@@ -30,10 +30,11 @@ public class SubsystemCommunicationRPC {
 	 * The maximum buffer size
 	 */
 	public static final int MAX_BUFFER_SIZE = 1000;
+
 	/**
 	 * The send and receive socket
 	 */
-	private DatagramSocket sendReceiveSocket;
+	private DatagramSocket receiveSocket;
 
 	/**
 	 * The target subsystem communication info which includes the port and ip
@@ -53,28 +54,13 @@ public class SubsystemCommunicationRPC {
 			// Set up the source's send and receive socket
 			SubsystemCommunicationInfo sourceCommunicationInfo = SubsystemCommunicationConfigurations
 					.getSourceSubsystemCommunicationInfo(sourceSubsystemType, targetSubsystemType);
-			this.sendReceiveSocket = new DatagramSocket(sourceCommunicationInfo.getPortNumber());
+			this.receiveSocket = new DatagramSocket(sourceCommunicationInfo.getPortNumber());
 
 			targetSubsystemInfo = SubsystemCommunicationConfigurations
 					.getSourceSubsystemCommunicationInfo(targetSubsystemType, sourceSubsystemType);
 
 		} catch (SocketException e) {
 			System.out.println(e);
-		}
-	}
-
-	/**
-	 * Sends a given request message and returns the response
-	 *
-	 * @param message the message to be sent
-	 * @return the response messages
-	 */
-	public Message sendRequestAndReceiveResponse(Message message) {
-		try {
-			sendMessage(message);
-			return receiveMessage();
-		} catch (Exception e) {
-			return new CommunicationFailureMessage();
 		}
 	}
 
@@ -94,26 +80,84 @@ public class SubsystemCommunicationRPC {
 			DatagramPacket sendPacket = new DatagramPacket(messageBytes, messageBytes.length,
 					InetAddress.getByName(targetSubsystemIpAddress), targetSubsystemPort);
 
+			// Send the message
+			DatagramSocket sendReceiveSocket = new DatagramSocket();
 			sendReceiveSocket.send(sendPacket);
+
+			// Expect an acknowledgement message
+			byte[] data = new byte[MAX_BUFFER_SIZE];
+			DatagramPacket receivePacket = new DatagramPacket(data, data.length);
+			Message receiveMessage = receiveMessage(sendReceiveSocket, receivePacket);
+
+			// Close the socket
+			sendReceiveSocket.close();
+
+			if (receiveMessage != null && receiveMessage.getMessageType() != MessageType.ACKNOWLEDGEMENT_RESPONSE) {
+				throw new Exception("No acknowledgement message!");
+			}
+
 		} catch (Exception e) {
 			System.out.print(e);
 		}
 	}
 
 	/**
-	 * Receive the response message.
+	 * Receive a response message the subsystem receive socket.
 	 *
+	 * @param sendReceiveSocket the send and receive socket
 	 * @return the response message
 	 */
 	public Message receiveMessage() throws Exception {
-
 		byte[] data = new byte[MAX_BUFFER_SIZE];
 		DatagramPacket receivePacket = new DatagramPacket(data, data.length);
+		Message receivedMessage = receiveMessage(receiveSocket, receivePacket);
+
+		// Send the acknowledgement message
+		sendAcknowledgmentMessage(receiveSocket, receivePacket);
+		return receivedMessage;
+	}
+
+	/**
+	 * Receive a response message on the given socket.
+	 *
+	 * @param receiveSocket the socket
+	 * @param receivePacket the receievePacket
+	 * @return the response message
+	 */
+	private Message receiveMessage(DatagramSocket receiveSocket, DatagramPacket receivePacket) throws Exception {
+		try {
+			// Receive a message
+			receiveSocket.receive(receivePacket);
+			return getMessageFromPacket(receivePacket);
+
+		} catch (Exception excepetion) {
+			System.out.print(excepetion);
+			throw excepetion;
+		}
+	}
+
+	/**
+	 * Send an acknowledgment message.
+	 *
+	 * @param receiveSocket the socket
+	 * @return the response message
+	 */
+	private void sendAcknowledgmentMessage(DatagramSocket receiveSocket, DatagramPacket receivePacket)
+			throws Exception {
 
 		try {
-			sendReceiveSocket.receive(receivePacket);
+			// Creating the acknowledgement message bytes
+			Message acknowledgmentMessage = new Message(MessageType.ACKNOWLEDGEMENT_RESPONSE);
+			byte[] acknowledgmentMessageBytes = getByteArrayFromMessage(acknowledgmentMessage);
 
-			return getMessageFromPacket(receivePacket);
+			// Send the acknowledgement message bytes
+			DatagramPacket sendPacket = new DatagramPacket(acknowledgmentMessageBytes,
+					acknowledgmentMessageBytes.length, receivePacket.getAddress(), receivePacket.getPort());
+
+			DatagramSocket sendSocket = new DatagramSocket();
+			sendSocket.send(sendPacket);
+			sendSocket.close();
+
 		} catch (Exception excepetion) {
 			System.out.print(excepetion);
 			throw excepetion;
