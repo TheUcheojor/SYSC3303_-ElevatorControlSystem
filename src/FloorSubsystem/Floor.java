@@ -1,6 +1,6 @@
 package FloorSubsystem;
 
-import ElevatorSubsystem.ElevatorCar;
+import ElevatorSubsystem.ElevatorController;
 import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
 import common.messages.MessageChannel;
@@ -34,7 +34,7 @@ public class Floor {
 	 * Elevators are given identification from 0 to NUMBER_OF_ELEVATORS - 1. Hence,
 	 * they can be mapped with an array.
 	 */
-	private final static FloorElevatorComponents[] ELEVATOR_COMPONENTS = new FloorElevatorComponents[ElevatorCar.NUMBER_OF_ELEVATORS];
+	private final static FloorElevatorComponents[] ELEVATOR_COMPONENTS = new FloorElevatorComponents[ElevatorController.NUMBER_OF_ELEVATORS];
 	static {
 		for (int j = 0; j < ELEVATOR_COMPONENTS.length; j++) {
 			ELEVATOR_COMPONENTS[j] = new FloorElevatorComponents(j);

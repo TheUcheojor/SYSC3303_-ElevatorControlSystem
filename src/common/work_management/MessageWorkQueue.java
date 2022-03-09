@@ -39,7 +39,7 @@ public abstract class MessageWorkQueue {
 	 *
 	 * @param message the given message
 	 */
-	protected void enqueueMessage(Message message) {
+	public void enqueueMessage(Message message) {
 
 		synchronized (messageWorkQueue) {
 			messageWorkQueue.add(message);

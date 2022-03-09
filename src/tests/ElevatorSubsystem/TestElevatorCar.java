@@ -18,23 +18,18 @@ import common.messages.elevator.ElevatorStatusRequest;
 class TestElevatorCar {
 	private ElevatorCar elevatorCar;
 	private final static int CAR_ID = 2;
-	private MessageChannel outgoingSchedulerChannel;
-	private MessageChannel outgoingFloorChannel;
-	private MessageChannel incomingChannel;
+	private static final double MOTOR_SPEED = 0.5;
+	private static final double DOOR_SPEED = 3000;
 
 	@BeforeEach
 	void setup() {
-		this.outgoingSchedulerChannel = new MessageChannel("Elevator Subsystem Transmisson Channel");
-		this.incomingChannel = new MessageChannel("Elevator Subsystem Receiver Channel");
-
-		elevatorCar = new ElevatorCar(CAR_ID, outgoingSchedulerChannel, incomingChannel, outgoingFloorChannel);
+		ElevatorDoor elevatorDoor = new ElevatorDoor(DOOR_SPEED);
+		ElevatorMotor elevatorMotor = new ElevatorMotor(MOTOR_SPEED);
+		elevatorCar = new ElevatorCar(CAR_ID, elevatorMotor, elevatorDoor);
 	}
 
 	@AfterEach
 	void tearDown() {
-		outgoingSchedulerChannel = null;
-		incomingChannel = null;
-
 		elevatorCar = null;
 	}
 
@@ -49,18 +44,6 @@ class TestElevatorCar {
 
 		// elevator should format status message correctly
 		assertEquals(statusMessage.getDirection(), Direction.UP);
-	}
-
-	@Test
-	void testStatusRequestReceived() {
-		try {
-			elevatorCar.handleMessage(new ElevatorStatusRequest(CAR_ID));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		Message message = outgoingSchedulerChannel.popMessage();
-
-		// elevator should place a status response in the channel
-		assertEquals(message instanceof ElevatorStatusMessage, true);
+		assertEquals(statusMessage.getElevatorId(), elevatorCar.getId());
 	}
 }

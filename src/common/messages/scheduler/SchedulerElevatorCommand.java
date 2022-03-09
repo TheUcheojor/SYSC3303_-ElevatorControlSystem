@@ -15,13 +15,18 @@ public class SchedulerElevatorCommand extends Message{
 	private ElevatorCommand elevatorCommand;
 	
 	/**
+	 * The ID of the elevator getting the command
+	 */
+	private int elevatorID;
+	/**
 	 * The primary constructor
 	 * 
 	 * @param schedulerCommands
 	 */
-	public SchedulerElevatorCommand(ElevatorCommand elevatorCommand) {
+	public SchedulerElevatorCommand(ElevatorCommand elevatorCommand, int elevatorID) {
 		super(MessageType.SCHEDULER_ELEVATOR_COMMAND);
 		this.elevatorCommand = elevatorCommand;
+		this.elevatorID = elevatorID;
 	}
 
 	/**
@@ -32,4 +37,14 @@ public class SchedulerElevatorCommand extends Message{
 	public ElevatorCommand getCommand() {
 		return elevatorCommand;
 	}
+
+	/**
+	 * This method returns the elevator ID number
+	 * @return - The elevator ID
+	 */
+	public int getElevatorID() {
+		return elevatorID;
+	}
+	
+	
 }
