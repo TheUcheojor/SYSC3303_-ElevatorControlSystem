@@ -46,9 +46,9 @@ public class ElevatorJobManagement {
 	private Exception errorState = null;
 
 	/**
-	 * A flag indicating if the elevator is running a job
+	 * An idicator signifying if an elevator is ready for a job or not.
 	 */
-	private boolean runningJob = false;
+	private boolean readyForJob;
 
 	/**
 	 * THe constructor for ElevatorJobManagement
@@ -80,25 +80,25 @@ public class ElevatorJobManagement {
 	}
 
 	/**
-	 * Return a flag indicating whether the elevator is ready for a job
+	 * Return a flag indicating whether the elevator is running a job
 	 *
-	 * @return true if the elevator is ready for a job; otherwise, return false
+	 * @return true if the elevator is running a job; otherwise, return false
 	 */
 	public synchronized boolean isRunningJob() {
 		notifyAll();
-		return runningJob;
+		return elevatorDirection != Direction.IDLE;
 	}
 
 	/**
-	 * Set the running-job flag
-	 *
-	 * @param runningJob a running job flag
+	 * Return a flag indicating whether the elevator is ready for a job
+	 * 
+	 * @return true if the elevator is ready for a job; otherwise, return false
 	 */
-	public synchronized void setRunningJob(boolean runningJob) {
-		this.runningJob = runningJob;
+	public synchronized boolean isReadyForJob() {
 		notifyAll();
+		return readyForJob;
 	}
-
+	
 	/**
 	 * Return a flag indicating whether the elevator is at or greater than the job
 	 * Threshold
@@ -119,6 +119,26 @@ public class ElevatorJobManagement {
 	public synchronized Direction getElevatorDirection() {
 		notifyAll();
 		return elevatorDirection;
+	}
+	
+	/**
+	 * Set the current direction that the elevator is heading towards
+	 * 
+	 * @param elevatorDirection
+	 */
+	public synchronized void setElevatorDirection(Direction elevatorDirection) {
+		this.elevatorDirection = elevatorDirection;
+		notifyAll();
+	}
+
+	/**
+	 * Set that the elevator is ready for a job
+	 * 
+	 * @param readyForJob the readyForJob to set
+	 */
+	public void setReadyForJob(boolean readyForJob) {
+		this.readyForJob = readyForJob;
+		notifyAll();
 	}
 
 	/**
