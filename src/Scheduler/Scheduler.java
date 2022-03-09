@@ -186,14 +186,14 @@ public class Scheduler implements Runnable {
 
 			if (currRequest.getDestinationFloor() == elevatorFloorNumber) {
 				switch (currRequest.getMessageType()) {
-				case ELEVATOR_FLOOR_REQUEST:
+				case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 					if (currRequest.getDirection() == elevatorDirection
 							|| currRequest == elevatorJobQueue.peekFirst()) {
 						shouldRemove = true;
 						shouldTurnOffLamp = true;
 					}
 					break;
-				case ELEVATOR_TRANSPORT_REQUEST:
+				case ELEVATOR_DROP_PASSENGER_REQUEST:
 					shouldRemove = true;
 					break;
 				default:
@@ -243,7 +243,7 @@ public class Scheduler implements Runnable {
 
 		switch (message.getMessageType()) {
 
-		case ELEVATOR_FLOOR_REQUEST:
+		case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 			ElevatorJobMessage job = (ElevatorJobMessage) message;
 			unassignedElevatorJobs.add(job);
 			System.out.println("Scheduler received floorRequest: go to floor " + job.getDestinationFloor() + "\n");
@@ -279,7 +279,7 @@ public class Scheduler implements Runnable {
 				executeFirstJob();
 			break;
 
-		case ELEVATOR_TRANSPORT_REQUEST:
+		case ELEVATOR_DROP_PASSENGER_REQUEST:
 			elevatorJobQueue.add((ElevatorJobMessage) message);
 			break;
 		default:
