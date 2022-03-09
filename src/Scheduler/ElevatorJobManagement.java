@@ -31,7 +31,7 @@ public class ElevatorJobManagement {
 	private int currentFloorNumber = 0;
 
 	/**
-	 * The elevator's direction
+	 * The direction the elevator its plans to travel to drop off the passenger
 	 */
 	private Direction elevatorDirection = Direction.IDLE;
 
@@ -69,8 +69,6 @@ public class ElevatorJobManagement {
 		if (elevatorJob.getDirection() == elevatorDirection || elevatorDirection == Direction.IDLE) {
 			elevatorJobs.add(elevatorJob);
 		}
-
-		notifyAll();
 	}
 
 	/**
@@ -79,7 +77,6 @@ public class ElevatorJobManagement {
 	 * @return true if elevator is in an error state; otherwise, return false
 	 */
 	public synchronized boolean isElevatorInError() {
-		notifyAll();
 		return errorState != null;
 	}
 
@@ -89,7 +86,6 @@ public class ElevatorJobManagement {
 	 * @return true if the elevator is running a job; otherwise, return false
 	 */
 	public synchronized boolean isRunningJob() {
-		notifyAll();
 		return elevatorDirection != Direction.IDLE;
 	}
 
@@ -99,7 +95,6 @@ public class ElevatorJobManagement {
 	 * @return true if the elevator is ready for a job; otherwise, return false
 	 */
 	public synchronized boolean isReadyForJob() {
-		notifyAll();
 		return readyForJob;
 	}
 
@@ -111,7 +106,6 @@ public class ElevatorJobManagement {
 	 *         otherwise, return false
 	 */
 	public synchronized boolean isAtElevatorJobThreshold() {
-		notifyAll();
 		return elevatorJobs.size() >= ELEVATOR_JOB_THRESHOLD;
 	}
 
@@ -121,7 +115,6 @@ public class ElevatorJobManagement {
 	 * @return the elevatorDirection
 	 */
 	public synchronized Direction getElevatorDirection() {
-		notifyAll();
 		return elevatorDirection;
 	}
 
@@ -132,7 +125,6 @@ public class ElevatorJobManagement {
 	 */
 	public synchronized void setElevatorDirection(Direction elevatorDirection) {
 		this.elevatorDirection = elevatorDirection;
-		notifyAll();
 	}
 
 	/**
@@ -142,7 +134,6 @@ public class ElevatorJobManagement {
 	 */
 	public void setReadyForJob(boolean readyForJob) {
 		this.readyForJob = readyForJob;
-		notifyAll();
 	}
 
 	/**
@@ -151,7 +142,6 @@ public class ElevatorJobManagement {
 	 * @return the elevatorId
 	 */
 	public synchronized int getElevatorId() {
-		notifyAll();
 		return elevatorId;
 	}
 
@@ -162,7 +152,6 @@ public class ElevatorJobManagement {
 	 */
 	public synchronized void setErrorState(Exception errorState) {
 		this.errorState = errorState;
-		notifyAll();
 	}
 
 	/**
@@ -183,7 +172,6 @@ public class ElevatorJobManagement {
 				largestDestinationFloor = elevatorJobs.get(i).getDestinationFloor();
 			}
 		}
-		notifyAll();
 		return largestDestinationFloor;
 	}
 
@@ -205,7 +193,6 @@ public class ElevatorJobManagement {
 				smallestDestinationFloor = elevatorJobs.get(i).getDestinationFloor();
 			}
 		}
-		notifyAll();
 		return smallestDestinationFloor;
 
 	}
@@ -243,7 +230,6 @@ public class ElevatorJobManagement {
 			}
 		}
 
-		notifyAll();
 		return jobsAtFloorNumber;
 	}
 
@@ -254,7 +240,6 @@ public class ElevatorJobManagement {
 	 */
 	public synchronized void removeJobs(ArrayList<ElevatorJobMessage> jobs) {
 		elevatorJobs.removeAll(jobs);
-		notifyAll();
 	}
 
 	/**
@@ -263,9 +248,7 @@ public class ElevatorJobManagement {
 	 * @return the currentFloorNumber
 	 */
 	public synchronized int getCurrentFloorNumber() {
-		notifyAll();
 		return currentFloorNumber;
-
 	}
 
 	/**
@@ -275,18 +258,79 @@ public class ElevatorJobManagement {
 	 */
 	public synchronized void setCurrentFloorNumber(int currentFloorNumber) {
 		this.currentFloorNumber = currentFloorNumber;
-		notifyAll();
 	}
 
 	/**
-	 * Return the number of job
+	 * Return whether an elevator has primary jobs,which are jobs that in the same
+	 * direction of the elevator
 	 *
-	 * @return true if the elevator is at or greater than the job Threshold;
-	 *         otherwise, return false
+	 *
+	 * @return true if the elevator has primary jobs; otherwise, return false
+	 */
+	public synchronized boolean hasPrimaryJobs() {
+		return elevatorJobs.stream().anyMatch(elevatorJobs -> elevatorJobs.getDirection() == elevatorDirection);
+	}
+
+	/**
+	 * Return whether an elevator has secondary jobs, which are jobs that in the
+	 * opposite direction of the elevator
+	 *
+	 * @return true if the elevator has secondary jobs
+	 */
+	public synchronized void loadSecondaryJobs() {
+		Direction oppositeElevatorDirection = getOppositeElevatorDirection();
+		setElevatorDirection(oppositeElevatorDirection);
+	}
+
+	/**
+	 * Return whether an elevator has secondary jobs, which are jobs that in the
+	 * opposite direction of the elevator
+	 *
+	 * @return true if the elevator has secondary jobs
+	 */
+	public synchronized boolean hasSecondaryJobs() {
+
+		final Direction oppositeElevatorDirection = getOppositeElevatorDirection();
+
+		// An idle elevator cannot have jobs
+		if (oppositeElevatorDirection == Direction.IDLE) {
+			return false;
+		}
+
+		// Return true if we have secondary jobs
+		return elevatorJobs.stream().anyMatch(elevatorJobs -> elevatorJobs.getDirection() == oppositeElevatorDirection);
+	}
+
+	/**
+	 * Get the direction opposite of the elevator's
+	 *
+	 * @return the opposite direction
+	 */
+	private Direction getOppositeElevatorDirection() {
+
+		Direction oppositeElevatorDirection = Direction.IDLE;
+		switch (elevatorDirection) {
+		case UP:
+			oppositeElevatorDirection = Direction.DOWN;
+			break;
+		case DOWN:
+			oppositeElevatorDirection = Direction.UP;
+			break;
+		default:
+			break;
+		}
+
+		return oppositeElevatorDirection;
+	}
+
+	/**
+	 * Return the number of jobs in the direction of the elevator
+	 *
+	 * @return the number of primary jobs
 	 */
 	public synchronized int getNumberOfPrimaryJobs() {
-		notifyAll();
-		return elevatorJobs.size();
+		return (int) elevatorJobs.stream().filter(elevatorJobs -> elevatorJobs.getDirection() == elevatorDirection)
+				.count();
 	}
 
 }
