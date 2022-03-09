@@ -125,7 +125,7 @@ public class ElevatorCar implements Runnable {
 			outgoingSchedulerChannel.appendMessage(status);
 			break;
 			
-		case ELEVATOR_TRANSPORT_REQUEST:
+		case ELEVATOR_DROP_PASSENGER_REQUEST:
 			outgoingSchedulerChannel.appendMessage((ElevatorTransportRequest) message);
 			break;
 			

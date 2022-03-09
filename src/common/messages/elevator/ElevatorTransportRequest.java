@@ -26,7 +26,7 @@ public class ElevatorTransportRequest extends ElevatorJobMessage {
 	 * @param direction        the direction
 	 */
 	public ElevatorTransportRequest(int destinationFloor, int elevatorId, Direction direction) {
-		super(MessageType.ELEVATOR_TRANSPORT_REQUEST, destinationFloor, direction);
+		super(MessageType.ELEVATOR_DROP_PASSENGER_REQUEST, destinationFloor, direction);
 		this.elevatorId = elevatorId;
 	}
 
