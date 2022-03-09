@@ -31,7 +31,7 @@ public class ElevatorJobManagement {
 	private int currentFloorNumber = 0;
 
 	/**
-	 * The elevator's directon
+	 * The elevator's direction
 	 */
 	private Direction elevatorDirection = Direction.IDLE;
 
@@ -46,7 +46,7 @@ public class ElevatorJobManagement {
 	private Exception errorState = null;
 
 	/**
-	 * An idicator signifying if an elevator is ready for a job or not.
+	 * An indicator signifying if an elevator is ready for a job or not.
 	 */
 	private boolean readyForJob;
 
@@ -60,19 +60,23 @@ public class ElevatorJobManagement {
 	}
 
 	/**
-	 * Add an elevator job
+	 * Add an elevator job to the primary jobs
 	 *
 	 * @param elevatorJob the elevator job
 	 */
 	public synchronized void addJob(ElevatorJobMessage elevatorJob) {
-		elevatorJobs.add(elevatorJob);
+
+		if (elevatorJob.getDirection() == elevatorDirection || elevatorDirection == Direction.IDLE) {
+			elevatorJobs.add(elevatorJob);
+		}
+
 		notifyAll();
 	}
 
 	/**
 	 * Return a flag indicating whether the elevator is in an error state
 	 *
-	 * @return true if elevator is in an error state; otherise, return false
+	 * @return true if elevator is in an error state; otherwise, return false
 	 */
 	public synchronized boolean isElevatorInError() {
 		notifyAll();
@@ -91,14 +95,14 @@ public class ElevatorJobManagement {
 
 	/**
 	 * Return a flag indicating whether the elevator is ready for a job
-	 * 
+	 *
 	 * @return true if the elevator is ready for a job; otherwise, return false
 	 */
 	public synchronized boolean isReadyForJob() {
 		notifyAll();
 		return readyForJob;
 	}
-	
+
 	/**
 	 * Return a flag indicating whether the elevator is at or greater than the job
 	 * Threshold
@@ -120,10 +124,10 @@ public class ElevatorJobManagement {
 		notifyAll();
 		return elevatorDirection;
 	}
-	
+
 	/**
 	 * Set the current direction that the elevator is heading towards
-	 * 
+	 *
 	 * @param elevatorDirection
 	 */
 	public synchronized void setElevatorDirection(Direction elevatorDirection) {
@@ -133,7 +137,7 @@ public class ElevatorJobManagement {
 
 	/**
 	 * Set that the elevator is ready for a job
-	 * 
+	 *
 	 * @param readyForJob the readyForJob to set
 	 */
 	public void setReadyForJob(boolean readyForJob) {
@@ -207,17 +211,34 @@ public class ElevatorJobManagement {
 	}
 
 	/**
-	 * Get the jobs at a given floor number
+	 * Get the primary jobs at a given floor number. Primary Jobs are jobs that are
+	 * in the same direction as the elevator
 	 *
 	 * @param floorNumber the floor number
+	 * @param direction   the direction of the job
+	 *
 	 * @return the jobs at a given floor number
 	 */
-	public synchronized ArrayList<ElevatorJobMessage> getJobsAtFloorNumber(int floorNumber) {
+	public synchronized ArrayList<ElevatorJobMessage> getPrimaryJobsAtFloorNumber(int floorNumber) {
+		return getJobsAtFloorNumberAndDirection(floorNumber, elevatorDirection);
+	}
+
+	/**
+	 * Get the jobs at a given floor number and direction
+	 *
+	 * @param floorNumber the floor number
+	 * @param direction   the direction of the job
+	 *
+	 * @return the jobs at a given floor number
+	 */
+	public synchronized ArrayList<ElevatorJobMessage> getJobsAtFloorNumberAndDirection(int floorNumber,
+			Direction direction) {
 
 		ArrayList<ElevatorJobMessage> jobsAtFloorNumber = new ArrayList<>();
 
 		for (int i = 0; i < elevatorJobs.size(); i++) {
-			if (elevatorJobs.get(i).getDestinationFloor() == floorNumber) {
+			if (elevatorJobs.get(i).getDestinationFloor() == floorNumber
+					&& elevatorJobs.get(i).getDirection() == direction) {
 				jobsAtFloorNumber.add(elevatorJobs.get(i));
 			}
 		}
@@ -255,6 +276,17 @@ public class ElevatorJobManagement {
 	public synchronized void setCurrentFloorNumber(int currentFloorNumber) {
 		this.currentFloorNumber = currentFloorNumber;
 		notifyAll();
+	}
+
+	/**
+	 * Return the number of job
+	 *
+	 * @return true if the elevator is at or greater than the job Threshold;
+	 *         otherwise, return false
+	 */
+	public synchronized int getNumberOfPrimaryJobs() {
+		notifyAll();
+		return elevatorJobs.size();
 	}
 
 }
