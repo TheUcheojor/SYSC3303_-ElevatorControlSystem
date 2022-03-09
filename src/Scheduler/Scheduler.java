@@ -263,35 +263,35 @@ public class Scheduler implements Runnable {
 	 * This method sends a command to the elevator to stop moving
 	 */
 	private void stopElevator() {
-		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP));
+		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP, elevatorId));
 	}
 
 	/**
 	 * This method sends a command to the elevator to close elevator doors
 	 */
 	private void closeElevatorDoors() {
-		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.CLOSE_DOORS));
+		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.CLOSE_DOORS, elevatorId));
 	}
 
 	/**
 	 * This method sends a command to the elevator to open elevator doors
 	 */
 	private void openElevatorDoors() {
-		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS));
+		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS, elevatorId));
 	}
 
 	/**
 	 * This method sends a command to the elevator to start moving up
 	 */
 	private void moveElevatorUp() {
-		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP));
+		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 	}
 
 	/**
 	 * This method sends a command to the elevator to start moving down
 	 */
 	private void moveElevatorDown() {
-		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN));
+		outgoingElevatorChannel.appendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
 	}
 
 	private void turnOffFloorDirectionButtonLamp(int floorId, Direction direction) {

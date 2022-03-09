@@ -3,7 +3,7 @@
  */
 package common;
 
-import ElevatorSubsystem.ElevatorCar;
+import ElevatorSubsystem.ElevatorController;
 import FloorSubsystem.FloorSubsystem;
 import common.exceptions.InvalidSystemConfigurationInputException;
 
@@ -39,14 +39,14 @@ public final class SystemValidationUtil {
 		// Verify that within floor-to-floor distance, we can slow down from the top
 		// speed in time.
 		if (evelatorMaxSpeed > Math
-				.sqrt(FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE * 2 * ElevatorCar.ELEVATOR_ACCELERATION)) {
+				.sqrt(FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE * 2 * ElevatorController.ELEVATOR_ACCELERATION)) {
 			throw new InvalidSystemConfigurationInputException("The elevator max speed cannot be negative.");
 		}
 
 		// Verify that we can reach the top speed at some distance between adjacent
 		// floors.
 		double maxDistanceTraveledWhenAcceleratingToTopSpeed = (Math.pow(evelatorMaxSpeed, 2))
-				/ (2 * ElevatorCar.ELEVATOR_ACCELERATION);
+				/ (2 * ElevatorController.ELEVATOR_ACCELERATION);
 		if (maxDistanceTraveledWhenAcceleratingToTopSpeed > FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE) {
 			throw new InvalidSystemConfigurationInputException(
 					"The elevator max speed cannot be reached between adjacent floors");
@@ -68,7 +68,7 @@ public final class SystemValidationUtil {
 		}
 
 		// Verify that we can slow down from the top speed in time.
-		if (evelatorAcceleration < Math.pow(ElevatorCar.MAX_ELEVATOR_SPEED, 2)
+		if (evelatorAcceleration < Math.pow(ElevatorController.MAX_ELEVATOR_SPEED, 2)
 				/ (2 * FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE)) {
 			throw new InvalidSystemConfigurationInputException("The elevator acceleration is invalid.");
 		}
@@ -91,8 +91,8 @@ public final class SystemValidationUtil {
 
 		// Verify that floor to floor distance is large enough to ensure the elevator
 		// can reach the top speed and decelerate to 0.
-		if (floorToFloorDistance < Math.pow(ElevatorCar.MAX_ELEVATOR_SPEED, 2)
-				/ (2 * ElevatorCar.ELEVATOR_ACCELERATION)) {
+		if (floorToFloorDistance < Math.pow(ElevatorController.MAX_ELEVATOR_SPEED, 2)
+				/ (2 * ElevatorController.ELEVATOR_ACCELERATION)) {
 			throw new InvalidSystemConfigurationInputException("The floor to floor distance is invalid.");
 		}
 
@@ -117,6 +117,6 @@ public final class SystemValidationUtil {
 	 * @return
 	 */
 	public static boolean isElevatorNumberInRange(int elevatorId) {
-		return elevatorId >= 0 && elevatorId < ElevatorCar.NUMBER_OF_ELEVATORS;
+		return elevatorId >= 0 && elevatorId < ElevatorController.NUMBER_OF_ELEVATORS;
 	}
 }

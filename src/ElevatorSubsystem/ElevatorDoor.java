@@ -35,5 +35,8 @@ public class ElevatorDoor {
 		}
 	}
 	
+	public double getDoorSpeed() {
+		return this.doorSpeed;
+	}
 	
 }
