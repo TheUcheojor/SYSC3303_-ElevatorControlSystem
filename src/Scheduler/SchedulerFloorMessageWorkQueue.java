@@ -3,9 +3,15 @@
  */
 package Scheduler;
 
-import common.Direction;
+import java.util.ArrayList;
+
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
+import common.messages.MessageType;
+import common.messages.scheduler.ElevatorCommand;
+import common.messages.scheduler.FloorCommand;
+import common.messages.scheduler.SchedulerElevatorCommand;
+import common.messages.scheduler.SchedulerFloorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
 
@@ -52,7 +58,7 @@ public class SchedulerFloorMessageWorkQueue extends MessageWorkQueue {
 	protected void handleMessage(Message message) {
 		switch (message.getMessageType()) {
 
-		case ELEVATOR_FLOOR_REQUEST:
+		case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 			ElevatorJobMessage job = (ElevatorJobMessage) message;
 			System.out.println("Scheduler received floor request: go to floor " + job.getDestinationFloor() + "\n");
 
@@ -77,38 +83,87 @@ public class SchedulerFloorMessageWorkQueue extends MessageWorkQueue {
 			return;
 		}
 		// Considering load balancing, we will assign jobs to the most free and closest
-		// elevator up to a threshold. If the elevator is too busy, we will try not give
-		// it other jobs.
+		// elevator.
 		//
-		// We will assume that the first elevator is the most free and closest
-		// elevator. We will then iterate through the elevator, comparing them to find
-		// the ideal elevator.
-		ElevatorJobManagement elevatorJobManagement = elevatorJobManagements[0];
+		// We will assume that the first in-service elevator we find is the most free
+		// and closest elevator. We will then iterate through the elevators, comparing
+		// them to find the ideal elevator.
+		//
+		// If there are no in-service elevators, we will discard the request as we do
+		// not know how long a elevator may be out of service.
 
+		// Finding an in-service elevator
+		ElevatorJobManagement assumedBestElevatorJobManagement = null;
+		for (int i = 0; i < elevatorJobManagements.length; i++) {
+
+			if (elevatorJobManagements[i].isReadyForJob()) {
+				assumedBestElevatorJobManagement = elevatorJobManagements[i];
+				break;
+			}
+		}
+
+		// If we do not have an in-service elevator, we will discard the request and
+		// provide a log
+		if (assumedBestElevatorJobManagement == null) {
+			System.out.print(
+					"No Elevator is available...Scheduler is ingoring the received Passenger-Pick-Up REQUEST @ Floor "
+							+ elevatorFloorJob.getDestinationFloor());
+			return;
+		}
+
+		// Going through the elevators to find the ideal elevator
 		for (int i = 0; i < elevatorJobManagements.length; i++) {
 			ElevatorJobManagement currentElevatorJobManagement = elevatorJobManagements[i];
 
+			boolean doesCurrentElevatorHaveEqualJobs = currentElevatorJobManagement
+					.getNumberOfPrimaryJobs() == assumedBestElevatorJobManagement.getNumberOfPrimaryJobs();
+			boolean doesCurrentElevatorHaveLessJobs = currentElevatorJobManagement
+					.getNumberOfPrimaryJobs() <= assumedBestElevatorJobManagement.getNumberOfPrimaryJobs();
+
+			boolean isCurrentElevatorInValidDirection = !currentElevatorJobManagement.isRunningJob()
+					|| currentElevatorJobManagement.getElevatorDirection() == elevatorFloorJob.getDirection();
+			boolean isAssumedBestElevatorInValidDirection = !assumedBestElevatorJobManagement.isRunningJob()
+					|| assumedBestElevatorJobManagement.getElevatorDirection() == elevatorFloorJob.getDirection();
+
 			int currentElevatorFloorDistance = Math
 					.abs(currentElevatorJobManagement.getCurrentFloorNumber() - elevatorFloorJob.getDestinationFloor());
+			int assumedBestFloorDistance = Math.abs(
+					assumedBestElevatorJobManagement.getCurrentFloorNumber() - elevatorFloorJob.getDestinationFloor());
+			boolean isCurrentElevatorFloorDistanceSmaller = currentElevatorFloorDistance < assumedBestFloorDistance;
 
-			int assumedBestfloorDistance = Math
-					.abs(elevatorJobManagement.getCurrentFloorNumber() - elevatorFloorJob.getDestinationFloor());
+			// If the assumed best elevator is not going in valid direction and the current
+			// elevator is, we will change the assumed best elevator
+			if (!isAssumedBestElevatorInValidDirection && isCurrentElevatorInValidDirection) {
+				assumedBestElevatorJobManagement = currentElevatorJobManagement;
 
-			if (!elevatorJobManagement.isAtElevatorJobThreshold()
-					// Check that the elevator is idle or going in the same direction
-					&& (currentElevatorJobManagement.getElevatorDirection() == Direction.IDLE
-							|| currentElevatorJobManagement.getElevatorDirection() == elevatorFloorJob.getDirection())
-					// Check if the current elevator floor distance is favorable
-					&& (currentElevatorFloorDistance < assumedBestfloorDistance)) {
+			}
 
-				elevatorJobManagement = currentElevatorJobManagement;
+			// If we both elevators have valid directions, we change the assumed best
+			// elevator based on other factors
+			else if (isAssumedBestElevatorInValidDirection && isCurrentElevatorInValidDirection) {
+
+				// if the current elevator is less busy, we will change the assumed best
+				// elevator
+				if (doesCurrentElevatorHaveLessJobs) {
+					assumedBestElevatorJobManagement = currentElevatorJobManagement;
+				}
+
+				// if the current elevator is equally busy, we will change the assumed best
+				// elevator if the current elevator is closer.
+				if (doesCurrentElevatorHaveEqualJobs && isCurrentElevatorFloorDistanceSmaller) {
+					assumedBestElevatorJobManagement = currentElevatorJobManagement;
+				}
+
 			}
 
 		}
 
-		elevatorJobManagement.addJob(elevatorFloorJob);
-		if (!elevatorJobManagement.isRunningJob()) {
-			executeNextElevatorCommand(elevatorJobManagement);
+		assumedBestElevatorJobManagement.addJob(elevatorFloorJob);
+
+		if (!assumedBestElevatorJobManagement.isRunningJob()) {
+
+			assumedBestElevatorJobManagement.setElevatorDirection(elevatorFloorJob.getDirection());
+			executeNextElevatorCommand(assumedBestElevatorJobManagement);
 		}
 	}
 
@@ -119,6 +174,78 @@ public class SchedulerFloorMessageWorkQueue extends MessageWorkQueue {
 	 */
 	private void executeNextElevatorCommand(ElevatorJobManagement elevatorJobManagement) {
 
+		int nearestTargetFloor = -1;
+		switch (elevatorJobManagement.getElevatorDirection()) {
+
+		case UP:
+			nearestTargetFloor = elevatorJobManagement.getSmallestDestinationFloor();
+			break;
+
+		case DOWN:
+			nearestTargetFloor = elevatorJobManagement.getLargestDestinationFloor();
+			break;
+
+		default:
+			break;
+		}
+
+		if (nearestTargetFloor != -1) {
+			handleElevatorBehavior(elevatorJobManagement, nearestTargetFloor);
+		} else {
+			// This should never happen...If it ever occurs, we need to know
+			System.out.println("Invalid Nearest Target Floor! Some thing is wrong...");
+		}
+
+	}
+
+	/**
+	 * Given an elevator management and the nearest target floor, handle the
+	 * elevator's behavior
+	 *
+	 * @param elevatorJobManagement the elevator management
+	 * @param nearestTargetFloor    the nearest target floor
+	 */
+	private void handleElevatorBehavior(ElevatorJobManagement elevatorJobManagement, int nearestTargetFloor) {
+		try {
+			// Move down if we above the target floor
+			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
+				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP));
+
+			}
+			// Move up if we below the target floor
+			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
+				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN));
+
+			} else {
+				// If we are at a target floor, take action
+				// Find all the jobs at this floor and address them appropriately
+				ArrayList<ElevatorJobMessage> jobsAtTargetFloor = elevatorJobManagement
+						.getPrimaryJobsAtFloorNumber(nearestTargetFloor);
+
+				// If we have one ELEVATOR_PICK_UP_PASSENGER_REQUEST, we turn off the
+				// corresponding lamps.
+				for (ElevatorJobMessage elevatorJob : jobsAtTargetFloor) {
+					if (elevatorJob.getMessageType() == MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST) {
+						schedulerFloorCommunication
+								.sendMessage(new SchedulerFloorCommand(FloorCommand.TURN_OFF_FLOOR_LAMP,
+										nearestTargetFloor, elevatorJobManagement.getElevatorDirection()));
+
+						// We break because floor buttons should only be turned off once
+						break;
+					}
+				}
+
+				// Stop the elevator and open the doors
+				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP));
+				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS));
+
+				// We can delete these jobs as we know we have addressed them
+				elevatorJobManagement.removeJobs(jobsAtTargetFloor);
+			}
+
+		} catch (Exception e) {
+			System.out.println("Error Occurred in handleElevatorBehavior: " + e);
+		}
 	}
 
 }
