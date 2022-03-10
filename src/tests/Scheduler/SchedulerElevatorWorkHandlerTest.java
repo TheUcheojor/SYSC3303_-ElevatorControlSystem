@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.ElevatorController;
 import Scheduler.ElevatorJobManagement;
-import Scheduler.SchedulerElevatorMessageWorkQueue;
+import Scheduler.SchedulerElevatorWorkHandler;
 import common.Direction;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
@@ -30,11 +30,11 @@ import common.remote_procedure.SubsystemComponentType;
  * @author paulokenne
  *
  */
-public class SchedulerElevatorMessageWorkQueueTest {
+public class SchedulerElevatorWorkHandlerTest {
 	/**
-	 * The scheduler elevator message work queue
+	 * The scheduler elevator message work handler
 	 */
-	SchedulerElevatorMessageWorkQueue schedulerElevatorMessageWorkQueue;
+	SchedulerElevatorWorkHandler schedulerElevatorWorkHandler;
 
 	/**
 	 * The Scheduler UDP communication between the scheduler and floor
@@ -76,7 +76,7 @@ public class SchedulerElevatorMessageWorkQueueTest {
 			elevatorJobManagements[i] = new ElevatorJobManagement(i);
 		}
 
-		this.schedulerElevatorMessageWorkQueue = new SchedulerElevatorMessageWorkQueue(schedulerFloorCommunication,
+		this.schedulerElevatorWorkHandler = new SchedulerElevatorWorkHandler(schedulerFloorCommunication,
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
@@ -108,7 +108,7 @@ public class SchedulerElevatorMessageWorkQueueTest {
 		ElevatorTransportRequest elevatorTransportMessage = new ElevatorTransportRequest(0, elevatorId, Direction.DOWN);
 
 		// Let the scheduler work
-		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorTransportMessage);
+		schedulerElevatorWorkHandler.enqueueMessage(elevatorTransportMessage);
 		try {
 			Thread.sleep(100);
 		} catch (Exception e) {
@@ -130,7 +130,7 @@ public class SchedulerElevatorMessageWorkQueueTest {
 				currentFloorNumber, null);
 
 		// Add elevator message and let the scheduler work
-		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorStatusMessage);
+		schedulerElevatorWorkHandler.enqueueMessage(elevatorStatusMessage);
 		try {
 			Thread.sleep(100);
 		} catch (Exception e) {
@@ -153,7 +153,7 @@ public class SchedulerElevatorMessageWorkQueueTest {
 		simulateElevatorSubsystemWaitingForCommand();
 
 		// Add elevator message and let the scheduler work
-		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorStatusMessage);
+		schedulerElevatorWorkHandler.enqueueMessage(elevatorStatusMessage);
 		try {
 			Thread.sleep(100);
 		} catch (Exception e) {

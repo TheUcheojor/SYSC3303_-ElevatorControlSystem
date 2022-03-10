@@ -13,12 +13,7 @@ import common.remote_procedure.SubsystemCommunicationRPC;
  * @author paulokenne
  *
  */
-public class SchedulerElevatorMessageWorkQueue extends SchedulerMessageWorkQueue {
-
-	/**
-	 * The job management for each elevator
-	 */
-	private ElevatorJobManagement[] elevatorJobManagements;
+public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 	/**
 	 * The SchedulerFloorMessageWorkQueue constructor
@@ -26,12 +21,11 @@ public class SchedulerElevatorMessageWorkQueue extends SchedulerMessageWorkQueue
 	 * @param schedulerFloorCommunication    the scheduler floor UDP communication
 	 * @param schedulerElevatorCommunication the scheduler elevator UDP
 	 *                                       communication
-	 * @param elevatorJobManagements
+	 * @param elevatorJobManagements         the elevator job managements
 	 */
-	public SchedulerElevatorMessageWorkQueue(SubsystemCommunicationRPC schedulerFloorCommunication,
+	public SchedulerElevatorWorkHandler(SubsystemCommunicationRPC schedulerFloorCommunication,
 			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements) {
-		super(schedulerFloorCommunication, schedulerElevatorCommunication);
-		this.elevatorJobManagements = elevatorJobManagements;
+		super(schedulerFloorCommunication, schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
 	@Override

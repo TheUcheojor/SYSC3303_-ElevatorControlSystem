@@ -17,13 +17,17 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
 
 /**
- * * This class represents the scheduler's floor message work queue. Floor
- * messages added to the queue will be handled by a worker.
+ * * This class represents the scheduler's work queue handler.
  *
  * @author paulokenne
  *
  */
-public abstract class SchedulerMessageWorkQueue extends MessageWorkQueue {
+public abstract class SchedulerWorkHandler extends MessageWorkQueue {
+
+	/**
+	 * The job management for each elevator
+	 */
+	protected ElevatorJobManagement[] elevatorJobManagements;
 
 	/**
 	 * The UDP communication between the scheduler and floor
@@ -43,10 +47,11 @@ public abstract class SchedulerMessageWorkQueue extends MessageWorkQueue {
 	 *                                       communication
 	 * @param elevatorJobManagements
 	 */
-	public SchedulerMessageWorkQueue(SubsystemCommunicationRPC schedulerFloorCommunication,
-			SubsystemCommunicationRPC schedulerElevatorCommunication) {
+	public SchedulerWorkHandler(SubsystemCommunicationRPC schedulerFloorCommunication,
+			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements) {
 		this.schedulerFloorCommunication = schedulerFloorCommunication;
 		this.schedulerElevatorCommunication = schedulerElevatorCommunication;
+		this.elevatorJobManagements = elevatorJobManagements;
 	}
 
 	/**

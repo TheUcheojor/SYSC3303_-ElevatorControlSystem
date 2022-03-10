@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.ElevatorController;
 import Scheduler.ElevatorJobManagement;
-import Scheduler.SchedulerFloorMessageWorkQueue;
+import Scheduler.SchedulerFloorWorkHandler;
 import common.Direction;
 import common.messages.Message;
 import common.messages.floor.ElevatorFloorRequest;
@@ -27,12 +27,12 @@ import common.remote_procedure.SubsystemComponentType;
  * @author paulokenne
  *
  */
-public class SchedulerFloorMessageWorkQueueTest {
+public class SchedulerFloorWorkHandlerTest {
 
 	/**
-	 * The scheduler floor message work queue
+	 * The scheduler floor message work handler
 	 */
-	SchedulerFloorMessageWorkQueue schedulerFloorMessageWorkQueue;
+	SchedulerFloorWorkHandler schedulerFloorWorkHandler;
 
 	/**
 	 * The Scheduler UDP communication between the scheduler and floor
@@ -74,7 +74,7 @@ public class SchedulerFloorMessageWorkQueueTest {
 			elevatorJobManagements[i] = new ElevatorJobManagement(i);
 		}
 
-		this.schedulerFloorMessageWorkQueue = new SchedulerFloorMessageWorkQueue(schedulerFloorCommunication,
+		this.schedulerFloorWorkHandler = new SchedulerFloorWorkHandler(schedulerFloorCommunication,
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
@@ -116,7 +116,7 @@ public class SchedulerFloorMessageWorkQueueTest {
 			@Override
 			public void run() {
 				ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(2, Direction.DOWN);
-				schedulerFloorMessageWorkQueue.enqueueMessage(elevatorFloorRequest);
+				schedulerFloorWorkHandler.enqueueMessage(elevatorFloorRequest);
 			}
 		}).start();
 
