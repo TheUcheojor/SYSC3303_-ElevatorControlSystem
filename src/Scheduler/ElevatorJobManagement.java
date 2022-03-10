@@ -64,7 +64,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @param elevatorJob the elevator job
 	 */
-	public synchronized void addJob(ElevatorJobMessage elevatorJob) {
+	public void addJob(ElevatorJobMessage elevatorJob) {
 
 		if (elevatorJob.getDirection() == elevatorDirection || elevatorDirection == Direction.IDLE) {
 			elevatorJobs.add(elevatorJob);
@@ -76,7 +76,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return true if elevator is in an error state; otherwise, return false
 	 */
-	public synchronized boolean isElevatorInError() {
+	public boolean isElevatorInError() {
 		return errorState != null;
 	}
 
@@ -85,7 +85,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return true if the elevator is running a job; otherwise, return false
 	 */
-	public synchronized boolean isRunningJob() {
+	public boolean isRunningJob() {
 		return elevatorDirection != Direction.IDLE;
 	}
 
@@ -94,7 +94,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return true if the elevator is ready for a job; otherwise, return false
 	 */
-	public synchronized boolean isReadyForJob() {
+	public boolean isReadyForJob() {
 		return readyForJob;
 	}
 
@@ -105,7 +105,7 @@ public class ElevatorJobManagement {
 	 * @return true if the elevator is at or greater than the job Threshold;
 	 *         otherwise, return false
 	 */
-	public synchronized boolean isAtElevatorJobThreshold() {
+	public boolean isAtElevatorJobThreshold() {
 		return elevatorJobs.size() >= ELEVATOR_JOB_THRESHOLD;
 	}
 
@@ -114,7 +114,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return the elevatorDirection
 	 */
-	public synchronized Direction getElevatorDirection() {
+	public Direction getElevatorDirection() {
 		return elevatorDirection;
 	}
 
@@ -123,7 +123,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @param elevatorDirection
 	 */
-	public synchronized void setElevatorDirection(Direction elevatorDirection) {
+	public void setElevatorDirection(Direction elevatorDirection) {
 		this.elevatorDirection = elevatorDirection;
 	}
 
@@ -141,7 +141,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return the elevatorId
 	 */
-	public synchronized int getElevatorId() {
+	public int getElevatorId() {
 		return elevatorId;
 	}
 
@@ -150,7 +150,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @param errorState the error state to set
 	 */
-	public synchronized void setErrorState(Exception errorState) {
+	public void setErrorState(Exception errorState) {
 		this.errorState = errorState;
 	}
 
@@ -160,7 +160,7 @@ public class ElevatorJobManagement {
 	 * @return the largest floor destination floor
 	 *
 	 */
-	public synchronized int getLargestDestinationFloor() {
+	public int getLargestDestinationFloor() {
 		if (elevatorJobs.isEmpty()) {
 			return -1;
 		}
@@ -181,7 +181,7 @@ public class ElevatorJobManagement {
 	 * @return the smallest floor destination floor
 	 *
 	 */
-	public synchronized int getSmallestDestinationFloor() {
+	public int getSmallestDestinationFloor() {
 		if (elevatorJobs.isEmpty()) {
 			return -1;
 		}
@@ -206,7 +206,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return the jobs at a given floor number
 	 */
-	public synchronized ArrayList<ElevatorJobMessage> getPrimaryJobsAtFloorNumber(int floorNumber) {
+	public ArrayList<ElevatorJobMessage> getPrimaryJobsAtFloorNumber(int floorNumber) {
 		return getJobsAtFloorNumberAndDirection(floorNumber, elevatorDirection);
 	}
 
@@ -218,8 +218,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return the jobs at a given floor number
 	 */
-	public synchronized ArrayList<ElevatorJobMessage> getJobsAtFloorNumberAndDirection(int floorNumber,
-			Direction direction) {
+	public ArrayList<ElevatorJobMessage> getJobsAtFloorNumberAndDirection(int floorNumber, Direction direction) {
 
 		ArrayList<ElevatorJobMessage> jobsAtFloorNumber = new ArrayList<>();
 
@@ -238,7 +237,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @param ElevatorJobMessage
 	 */
-	public synchronized void removeJobs(ArrayList<ElevatorJobMessage> jobs) {
+	public void removeJobs(ArrayList<ElevatorJobMessage> jobs) {
 		elevatorJobs.removeAll(jobs);
 	}
 
@@ -247,7 +246,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return the currentFloorNumber
 	 */
-	public synchronized int getCurrentFloorNumber() {
+	public int getCurrentFloorNumber() {
 		return currentFloorNumber;
 	}
 
@@ -256,7 +255,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @param currentFloorNumber the currentFloorNumber to set
 	 */
-	public synchronized void setCurrentFloorNumber(int currentFloorNumber) {
+	public void setCurrentFloorNumber(int currentFloorNumber) {
 		this.currentFloorNumber = currentFloorNumber;
 	}
 
@@ -267,7 +266,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return true if the elevator has primary jobs; otherwise, return false
 	 */
-	public synchronized boolean hasPrimaryJobs() {
+	public boolean hasPrimaryJobs() {
 		return elevatorJobs.stream().anyMatch(elevatorJobs -> elevatorJobs.getDirection() == elevatorDirection);
 	}
 
@@ -277,7 +276,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return true if the elevator has secondary jobs
 	 */
-	public synchronized void loadSecondaryJobs() {
+	public void loadSecondaryJobs() {
 		Direction oppositeElevatorDirection = getOppositeElevatorDirection();
 		setElevatorDirection(oppositeElevatorDirection);
 	}
@@ -288,7 +287,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return true if the elevator has secondary jobs
 	 */
-	public synchronized boolean hasSecondaryJobs() {
+	public boolean hasSecondaryJobs() {
 
 		final Direction oppositeElevatorDirection = getOppositeElevatorDirection();
 
@@ -328,7 +327,7 @@ public class ElevatorJobManagement {
 	 *
 	 * @return the number of primary jobs
 	 */
-	public synchronized int getNumberOfPrimaryJobs() {
+	public int getNumberOfPrimaryJobs() {
 		return (int) elevatorJobs.stream().filter(elevatorJobs -> elevatorJobs.getDirection() == elevatorDirection)
 				.count();
 	}

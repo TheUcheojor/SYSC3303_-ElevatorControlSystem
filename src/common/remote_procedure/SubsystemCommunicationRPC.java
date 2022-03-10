@@ -51,7 +51,7 @@ public class SubsystemCommunicationRPC {
 			SubsystemComponentType targetSubsystemType) {
 
 		try {
-			// Set up the source's send and receive socket
+			// Set up the source's receive socket
 			SubsystemCommunicationInfo sourceCommunicationInfo = SubsystemCommunicationConfigurations
 					.getSourceSubsystemCommunicationInfo(sourceSubsystemType, targetSubsystemType);
 			this.receiveSocket = new DatagramSocket(sourceCommunicationInfo.getPortNumber());
