@@ -51,7 +51,7 @@ public class SubsystemCommunicationRPC {
 			SubsystemComponentType targetSubsystemType) {
 
 		try {
-			// Set up the source's send and receive socket
+			// Set up the source's receive socket
 			SubsystemCommunicationInfo sourceCommunicationInfo = SubsystemCommunicationConfigurations
 					.getSourceSubsystemCommunicationInfo(sourceSubsystemType, targetSubsystemType);
 			this.receiveSocket = new DatagramSocket(sourceCommunicationInfo.getPortNumber());
@@ -69,7 +69,7 @@ public class SubsystemCommunicationRPC {
 	 *
 	 * @param message the message to be sent
 	 */
-	public void sendMessage(Message message) throws Exception {
+	public synchronized void sendMessage(Message message) throws Exception {
 
 		byte[] messageBytes = getByteArrayFromMessage(message);
 
@@ -99,6 +99,8 @@ public class SubsystemCommunicationRPC {
 		} catch (Exception e) {
 			System.out.print(e);
 		}
+
+		notifyAll();
 	}
 
 	/**

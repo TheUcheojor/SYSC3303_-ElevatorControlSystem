@@ -20,7 +20,7 @@ public class SystemExecutor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MessageChannel floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson", DEFAULT_MESSAGE_QUEUE_SIZE);
+	/*	MessageChannel floorSubsystemTransmissonChannel = new MessageChannel("Floor Subsystem Transmisson", DEFAULT_MESSAGE_QUEUE_SIZE);
 		MessageChannel floorSubsystemReceiverChannel = new MessageChannel("Floor Subsystem Receiver", DEFAULT_MESSAGE_QUEUE_SIZE);
 
 		MessageChannel elevatorSubsystemTransmissonChannel = new MessageChannel("Elevator Subsystem Transmisson", DEFAULT_MESSAGE_QUEUE_SIZE);
@@ -41,6 +41,7 @@ public class SystemExecutor {
 		scheduler.start();
 		floorSubsystem.start();
 		elevatorSubsystem.start();
+		*/
 	}
 
 }
