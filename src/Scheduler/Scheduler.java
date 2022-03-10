@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import ElevatorSubsystem.ElevatorCar;
+import ElevatorSubsystem.ElevatorController;
 import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
@@ -65,7 +65,7 @@ public class Scheduler implements Runnable {
 	/**
 	 * The job management for each elevator
 	 */
-	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorCar.NUMBER_OF_ELEVATORS];
+	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
 
 	/**
 	 * The floor job Message queue

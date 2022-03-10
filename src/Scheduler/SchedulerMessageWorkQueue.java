@@ -96,15 +96,19 @@ public abstract class SchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @param nearestTargetFloor    the nearest target floor
 	 */
 	private void handleElevatorBehavior(ElevatorJobManagement elevatorJobManagement, int nearestTargetFloor) {
+
+		int elevatorId = elevatorJobManagement.getElevatorId();
 		try {
 			// Move down if we above the target floor
 			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
-				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP));
+				schedulerElevatorCommunication
+						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 
 			}
 			// Move up if we below the target floor
 			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
-				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN));
+				schedulerElevatorCommunication
+						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
 
 			} else {
 				// If we are at a target floor, take action
@@ -126,8 +130,10 @@ public abstract class SchedulerMessageWorkQueue extends MessageWorkQueue {
 				}
 
 				// Stop the elevator and open the doors
-				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP));
-				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS));
+				schedulerElevatorCommunication
+						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP, elevatorId));
+				schedulerElevatorCommunication
+						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS, elevatorId));
 
 				// We can delete these jobs as we know we have addressed them
 				elevatorJobManagement.removeJobs(jobsAtTargetFloor);
