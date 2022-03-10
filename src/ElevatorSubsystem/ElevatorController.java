@@ -8,27 +8,17 @@ import java.util.Map;
 
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
-import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
-import common.messages.MessageChannel;
-import common.messages.elevator.ElevatorFloorArrivalMessage;
-import common.messages.elevator.ElevatorFloorSignalRequestMessage;
-import common.messages.elevator.ElevatorLeavingFloorMessage;
-import common.messages.elevator.ElevatorStatusMessage;
-import common.messages.elevator.ElevatorStatusRequest;
-import common.messages.elevator.ElevatorTransportRequest;
-import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 import common.work_management.ElevatorFloorMessageWorkQueue;
 import common.work_management.ElevatorSchedulerMessageWorkQueue;
-import common.work_management.MessageWorkQueue;
 
 /**
  * @author Ryan Fife, Favour
  *
  */
-public class ElevatorController implements Runnable {
+public class ElevatorController {
 	/**
 	 * The number of elevators in the system
 	 */
@@ -47,13 +37,29 @@ public class ElevatorController implements Runnable {
 	 */
 	public final static double ELEVATOR_ACCELERATION = 1.5;
 
+	/**
+	 * Collection of the elevator cars in this subsystem
+	 */
 	private Map<Integer, ElevatorCar> elevators;
-	private int floorNumber = 0;
 
+	/**
+	 * Message queue for received floor messages
+	 */
 	private ElevatorFloorMessageWorkQueue floorMessageQueue;
+	
+	/**
+	 * Message queue for received scheduler messages
+	 */
 	private ElevatorSchedulerMessageWorkQueue schedulerMessageQueue;
 
+	/**
+	 * RPC communications channel for the scheduler
+	 */
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
+	
+	/**
+	 * RPC communications channel for the floor
+	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
 
 	public ElevatorController() {
@@ -78,17 +84,21 @@ public class ElevatorController implements Runnable {
 
 			elevators.put(carId, car);
 		}
-
+		
+		
+		// initialize the subsystem communication channels
 		schedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 				SubsystemComponentType.SCHEDULER);
 		floorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 				SubsystemComponentType.FLOOR_SUBSYSTEM);
 
+		// initialize the message queues
 		floorMessageQueue = new ElevatorFloorMessageWorkQueue(schedulerSubsystemCommunication,
-				floorSubsystemCommunication);
+				elevators);
 		schedulerMessageQueue = new ElevatorSchedulerMessageWorkQueue(schedulerSubsystemCommunication,
-				floorSubsystemCommunication);
+				floorSubsystemCommunication, elevators);
 		
+		// initialize the message receiving threads
 		(new Thread() {
 			@Override
 			public void run() {
@@ -122,12 +132,5 @@ public class ElevatorController implements Runnable {
 				}
 			}
 		}).start();
-	}
-
-	/**
-	 * This method returns the collection of elevator cars
-	 */
-	public Map<Integer, ElevatorCar> getElevators() {
-		return this.elevators;
 	}
 }

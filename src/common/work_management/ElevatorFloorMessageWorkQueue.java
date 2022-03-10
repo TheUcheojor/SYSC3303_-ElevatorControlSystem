@@ -1,5 +1,8 @@
 package common.work_management;
 
+import java.util.List;
+import java.util.Map;
+
 import ElevatorSubsystem.ElevatorCar;
 import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
@@ -13,28 +16,38 @@ import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 
 public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
-	private SubsystemCommunicationRPC subsystemCommunicationScheduler;
-	private SubsystemCommunicationRPC subsystemCommunicationFloor;
+	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
+	private SubsystemCommunicationRPC floorSubsystemCommunication;
 
-	public ElevatorFloorMessageWorkQueue(SubsystemCommunicationRPC subsystemCommunicationScheduler, SubsystemCommunicationRPC subsystemCommunicationFloor) {
-		this.subsystemCommunicationScheduler = subsystemCommunicationScheduler;
-		this.subsystemCommunicationFloor = subsystemCommunicationFloor;
+	private Map<Integer, ElevatorCar> elevators;
+
+	public ElevatorFloorMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication, Map<Integer, ElevatorCar> elevators) {
+		this.schedulerSubsystemCommunication = schedulerSubsystemCommunication;
+		this.elevators = elevators;
 	}
 	
 	@Override
 	protected void handleMessage(Message message) {
-		switch(((FloorElevatorTargetedMessage) message).getRequestType()) {
-			case FLOOR_ARRIVAL_MESSAGE:
-				ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
-				floorNumber = arrivalMessage.getFloorId();
+		FloorElevatorTargetedMessage floorMessage = (FloorElevatorTargetedMessage) message;
+		try {
+			switch(floorMessage.getRequestType()) {
 				
-				System.out.println("Elevator has reached floor: " + floorNumber);
-				ElevatorStatusMessage arrivalStatus = elevators.get(message.getElevatorId()).createStatusMessage();
-				subsystemCommunicationScheduler.sendMessage(arrivalStatus);
-				break;
+				case FLOOR_ARRIVAL_MESSAGE:
+					ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
+					int floorNumber = arrivalMessage.getFloorId();
+					
+					System.out.println("Elevator has reached floor: " + floorNumber);
+					ElevatorStatusMessage arrivalStatus = elevators.get(floorMessage.getElevatorId()).createStatusMessage();
 				
-			default:
-				break;
+					schedulerSubsystemCommunication.sendMessage(arrivalStatus);
+					break;
+					
+				default:
+					break;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
