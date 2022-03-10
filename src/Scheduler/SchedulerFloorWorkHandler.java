@@ -89,6 +89,11 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 		for (int i = 0; i < elevatorJobManagements.length; i++) {
 			ElevatorJobManagement currentElevatorJobManagement = elevatorJobManagements[i];
 
+			// If the current elevator job management is not ready for a job, there is no
+			// reason to compare it with the assumed best elevator
+			if (!currentElevatorJobManagement.isReadyForJob())
+				continue;
+
 			boolean doesCurrentElevatorHaveEqualJobs = currentElevatorJobManagement
 					.getNumberOfPrimaryJobs() == assumedBestElevatorJobManagement.getNumberOfPrimaryJobs();
 			boolean doesCurrentElevatorHaveLessJobs = currentElevatorJobManagement
