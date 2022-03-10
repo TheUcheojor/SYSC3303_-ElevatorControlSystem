@@ -5,6 +5,7 @@ package tests.Scheduler;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -77,6 +78,11 @@ public class SchedulerFloorMessageWorkQueueTest {
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
+	@AfterEach
+	void tearDown() {
+		receivedMessage = null;
+	}
+
 	/**
 	 * Test that the scheduler sends an in-service elevator in the right direction
 	 * to pick up a passenger.
@@ -93,7 +99,7 @@ public class SchedulerFloorMessageWorkQueueTest {
 				try {
 					receivedMessage = elevatorSchedulerCommunication.receiveMessage();
 				} catch (Exception e) {
-					System.out.print("Excpetion occurred: " + e);
+					System.out.print("Exception occurred: " + e);
 				}
 			}
 		}).start();
@@ -119,7 +125,6 @@ public class SchedulerFloorMessageWorkQueueTest {
 		} catch (Exception e) {
 		}
 
-		System.out.println("receivedMessage: " + receivedMessage);
 		assertTrue(receivedMessage instanceof SchedulerElevatorCommand);
 
 		// Check that an MOVE_UP command was sent to the in-service elevator 1

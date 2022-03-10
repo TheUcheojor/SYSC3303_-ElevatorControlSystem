@@ -1,0 +1,166 @@
+/**
+ *
+ */
+package tests.Scheduler;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayDeque;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import ElevatorSubsystem.ElevatorController;
+import Scheduler.ElevatorJobManagement;
+import Scheduler.SchedulerElevatorMessageWorkQueue;
+import common.Direction;
+import common.messages.Message;
+import common.messages.elevator.ElevatorStatusMessage;
+import common.messages.elevator.ElevatorTransportRequest;
+import common.messages.scheduler.ElevatorCommand;
+import common.messages.scheduler.SchedulerElevatorCommand;
+import common.remote_procedure.SubsystemCommunicationRPC;
+import common.remote_procedure.SubsystemComponentType;
+
+/**
+ * This class tests how the scheduler communicates with the Elevator and manages
+ * elevator messages
+ *
+ * @author paulokenne
+ *
+ */
+public class SchedulerElevatorMessageWorkQueueTest {
+	/**
+	 * The scheduler elevator message work queue
+	 */
+	SchedulerElevatorMessageWorkQueue schedulerElevatorMessageWorkQueue;
+
+	/**
+	 * The Scheduler UDP communication between the scheduler and floor
+	 */
+	private SubsystemCommunicationRPC schedulerFloorCommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.FLOOR_SUBSYSTEM);
+
+	/**
+	 * The Scheduler UDP communication between the scheduler and floor
+	 */
+	private SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
+
+	/**
+	 * The Elevator UDP communication between the elevator and scheduler
+	 */
+	private SubsystemCommunicationRPC elevatorSchedulerCommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.ELEVATOR_SUBSYSTEM, SubsystemComponentType.SCHEDULER);
+
+	/**
+	 * The job management for each elevator
+	 */
+	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
+
+	/**
+	 * The received message
+	 */
+	private ArrayDeque<Message> elevatorReceivedMessages = new ArrayDeque<>();
+
+	/**
+	 * Set up fresh environment for each test
+	 *
+	 * @throws java.lang.Exception
+	 */
+	@BeforeEach
+	void setUp() throws Exception {
+
+		for (int i = 0; i < elevatorJobManagements.length; i++) {
+			elevatorJobManagements[i] = new ElevatorJobManagement(i);
+		}
+
+		this.schedulerElevatorMessageWorkQueue = new SchedulerElevatorMessageWorkQueue(schedulerFloorCommunication,
+				schedulerElevatorCommunication, elevatorJobManagements);
+	}
+
+	@AfterEach
+	void tearDown() {
+		elevatorReceivedMessages = null;
+	}
+
+	/**
+	 * Test that the scheduler can drop off passengers
+	 */
+	@Test
+	void testSchedulerCanDropOffPassengers() {
+		int elevatorId = 0;
+		int currentFloorNumber = 2;
+
+		simulateElevatorSubsystemWaitingForCommand();
+
+		// Elevator 0 is ready for a job and is at floor 2
+		elevatorJobManagements[elevatorId].setReadyForJob(true);
+		elevatorJobManagements[elevatorId].setCurrentFloorNumber(currentFloorNumber);
+
+		// We want to drop off a passenger from floor 2 to 0
+		ElevatorTransportRequest elevatorTransportMessage = new ElevatorTransportRequest(0, elevatorId, Direction.DOWN);
+
+		// Let the scheduler work
+		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorTransportMessage);
+		try {
+			Thread.sleep(100);
+		} catch (Exception e) {
+		}
+
+		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
+
+		// Check that an MOVE_DOWN command was sent to the in-service elevator 0
+		SchedulerElevatorCommand receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages
+				.pop();
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.MOVE_DOWN);
+
+		simulateElevatorSubsystemWaitingForCommand();
+
+		// The elevator is at floor 1 and is sending a status message.
+		currentFloorNumber = 1;
+		ElevatorStatusMessage elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN,
+				currentFloorNumber, null);
+
+		// Let the scheduler work
+		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorTransportMessage);
+		try {
+			Thread.sleep(100);
+		} catch (Exception e) {
+		}
+
+		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
+
+		// Check that an MOVE_DOWN command was sent to the in-service elevator 0
+		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.MOVE_DOWN);
+
+		simulateElevatorSubsystemWaitingForCommand();
+
+		// The elevator is at floor 0 and is sending a status message.
+		currentFloorNumber = 0;
+		elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN, currentFloorNumber, null);
+
+	}
+
+	/**
+	 * Simulate the elevator subsystem waiting for a command. Update the
+	 * elevatorReceivedMessage
+	 */
+	private void simulateElevatorSubsystemWaitingForCommand() {
+		(new Thread() {
+			@Override
+			public void run() {
+				try {
+					elevatorReceivedMessages.push(elevatorSchedulerCommunication.receiveMessage());
+				} catch (Exception e) {
+					System.out.print("Exception occurred: " + e);
+				}
+			}
+		}).start();
+	}
+
+}
