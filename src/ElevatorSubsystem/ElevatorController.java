@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ElevatorSubsystem;
 
 import java.util.HashMap;
@@ -11,8 +8,6 @@ import common.exceptions.InvalidSystemConfigurationInputException;
 import common.messages.Message;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
-import common.work_management.ElevatorFloorMessageWorkQueue;
-import common.work_management.ElevatorSchedulerMessageWorkQueue;
 
 /**
  * @author Ryan Fife, Favour
@@ -61,8 +56,8 @@ public class ElevatorController {
 	 * RPC communications channel for the floor
 	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
-
-	public ElevatorController() {
+	
+	public ElevatorController() { 
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -132,5 +127,10 @@ public class ElevatorController {
 				}
 			}
 		}).start();
+	}
+
+	// For running on stand alone system
+	public static void main(String[] args) {
+		ElevatorController controller = new ElevatorController();
 	}
 }

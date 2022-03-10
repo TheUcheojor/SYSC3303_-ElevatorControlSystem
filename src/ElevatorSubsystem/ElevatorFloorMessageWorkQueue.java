@@ -1,9 +1,8 @@
-package common.work_management;
+package ElevatorSubsystem;
 
 import java.util.List;
 import java.util.Map;
 
-import ElevatorSubsystem.ElevatorCar;
 import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
@@ -14,6 +13,7 @@ import common.messages.elevator.ElevatorStatusRequest;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
+import common.work_management.MessageWorkQueue;
 
 public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
