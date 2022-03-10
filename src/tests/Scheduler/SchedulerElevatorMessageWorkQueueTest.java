@@ -96,6 +96,7 @@ public class SchedulerElevatorMessageWorkQueueTest {
 		simulateElevatorSubsystemWaitingForCommand();
 
 		// Elevator 0 is ready for a job and is at floor 2
+		elevatorJobManagements[elevatorId].setElevatorDirection(Direction.DOWN);
 		elevatorJobManagements[elevatorId].setReadyForJob(true);
 		elevatorJobManagements[elevatorId].setCurrentFloorNumber(currentFloorNumber);
 
@@ -125,7 +126,7 @@ public class SchedulerElevatorMessageWorkQueueTest {
 				currentFloorNumber, null);
 
 		// Let the scheduler work
-		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorTransportMessage);
+		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorStatusMessage);
 		try {
 			Thread.sleep(100);
 		} catch (Exception e) {
@@ -144,6 +145,29 @@ public class SchedulerElevatorMessageWorkQueueTest {
 		currentFloorNumber = 0;
 		elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN, currentFloorNumber, null);
 
+		simulateElevatorSubsystemWaitingForCommand();
+		simulateElevatorSubsystemWaitingForCommand();
+
+		// Let the scheduler work
+		schedulerElevatorMessageWorkQueue.enqueueMessage(elevatorStatusMessage);
+		try {
+			Thread.sleep(100);
+		} catch (Exception e) {
+		}
+
+		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
+
+		// Check that a STOP command was sent to the in-service elevator 0
+		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.STOP);
+
+		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
+
+		// Check that an OPEN DOORS command was sent to the in-service elevator 0
+		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.OPEN_DOORS);
 	}
 
 	/**
@@ -155,7 +179,9 @@ public class SchedulerElevatorMessageWorkQueueTest {
 			@Override
 			public void run() {
 				try {
-					elevatorReceivedMessages.push(elevatorSchedulerCommunication.receiveMessage());
+					synchronized (elevatorReceivedMessages) {
+						elevatorReceivedMessages.add(elevatorSchedulerCommunication.receiveMessage());
+					}
 				} catch (Exception e) {
 					System.out.print("Exception occurred: " + e);
 				}
