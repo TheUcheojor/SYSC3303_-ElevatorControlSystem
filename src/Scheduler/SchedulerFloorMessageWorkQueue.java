@@ -57,8 +57,8 @@ public class SchedulerFloorMessageWorkQueue extends SchedulerMessageWorkQueue {
 	 */
 	private void handleElevatorPickUpPassengerRequest(ElevatorJobMessage elevatorFloorJob) {
 
-		// If we do have elevators, there is no point in continuing
-		if (elevatorJobManagements.length != 0) {
+		// If we do NOT have elevators, there is no point in continuing
+		if (elevatorJobManagements.length == 0) {
 			return;
 		}
 		// Considering load balancing, we will assign jobs to the most free and closest
@@ -84,7 +84,7 @@ public class SchedulerFloorMessageWorkQueue extends SchedulerMessageWorkQueue {
 		// If we do not have an in-service elevator, we will discard the request and
 		// provide a log
 		if (assumedBestElevatorJobManagement == null) {
-			System.out.print(
+			System.out.println(
 					"No Elevator is available...Scheduler is ingoring the received Passenger-Pick-Up REQUEST @ Floor "
 							+ elevatorFloorJob.getDestinationFloor());
 			return;
@@ -141,7 +141,6 @@ public class SchedulerFloorMessageWorkQueue extends SchedulerMessageWorkQueue {
 		// If the elevator is not currently running a job, we will update the elevator's
 		// direction and issue the appropriate elevator commands
 		if (!assumedBestElevatorJobManagement.isRunningJob()) {
-
 			assumedBestElevatorJobManagement.setElevatorDirection(elevatorFloorJob.getDirection());
 			executeNextElevatorCommand(assumedBestElevatorJobManagement);
 		}

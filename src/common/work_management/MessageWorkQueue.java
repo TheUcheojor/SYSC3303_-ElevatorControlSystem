@@ -68,7 +68,7 @@ public abstract class MessageWorkQueue {
 
 					while (messageWorkQueue.isEmpty()) {
 						try {
-							wait();
+							messageWorkQueue.wait();
 						} catch (Exception e) {
 							return;
 						}

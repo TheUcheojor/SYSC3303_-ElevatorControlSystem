@@ -96,19 +96,20 @@ public abstract class SchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @param nearestTargetFloor    the nearest target floor
 	 */
 	private void handleElevatorBehavior(ElevatorJobManagement elevatorJobManagement, int nearestTargetFloor) {
-
 		int elevatorId = elevatorJobManagement.getElevatorId();
+
 		try {
 			// Move down if we above the target floor
 			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
 				schedulerElevatorCommunication
-						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
+						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
 
 			}
 			// Move up if we below the target floor
 			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
+				System.out.println("Sending an UP commmand");
 				schedulerElevatorCommunication
-						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
+						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 
 			} else {
 				// If we are at a target floor, take action
