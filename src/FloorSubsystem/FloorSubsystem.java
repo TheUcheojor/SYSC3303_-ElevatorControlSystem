@@ -12,20 +12,20 @@ import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
 import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
-import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.floor.ElevatorFloorRequest;
 import common.messages.scheduler.SchedulerFloorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
+import common.work_management.MessageWorkQueue;
 
 /**
  * This class simulates the FloorSubsystem thread
  *
- * @author Favour, Delight, paulokenne
+ * @author Favour, Delight, paulokenne, Jacob Charpentier
  */
-public class FloorSubsystem implements Runnable {
+public class FloorSubsystem {
 
 	/**
 	 * The number of floors
@@ -60,20 +60,15 @@ public class FloorSubsystem implements Runnable {
 	private ArrayList<SimulationFloorInputData> assignedFloorDataCollection = new ArrayList<>();
 
 	/**
-	 * The floor subsystem transmission message channel.
+	 * Message queue for received elevator messages
 	 */
-	private MessageChannel floorSubsystemTransmissonChannel;
-
+	private FloorElevatorMessageWorkQueue elevatorMessageQueue;
+	
 	/**
-	 * The floor subsystem transmission message channel.
+	 * Message queue for received scheduler messages
 	 */
-	private MessageChannel floorSubsystemReceiverChannel;
-
-	/**
-	 * The elevator subsystem transmission message channel.
-	 */
-	private MessageChannel elevatorSubsystemReceiverChannel;
-
+	private FloorSchedulerMessageWorkQueue schedulerMessageQueue;
+	
 	/**
 	 * Floor to Elevator UDP Communication
 	 */
@@ -91,8 +86,7 @@ public class FloorSubsystem implements Runnable {
 	 * @param floorMessageChannel - The message channel for communicating with the
 	 *                            scheduler
 	 */
-	public FloorSubsystem(String inputFileName, MessageChannel floorSubsystemTransmissonChannel,
-			MessageChannel floorSubsystemReceiverChannel, MessageChannel elevatorSubsystemReceiverChannel) {
+	public FloorSubsystem(String inputFileName) {
 		// Validate that the floor subsystem values are valid
 		try {
 			SystemValidationUtil.validateFloorToFloorDistance(FLOOR_TO_FLOOR_DISTANCE);
@@ -103,14 +97,15 @@ public class FloorSubsystem implements Runnable {
 		}
 
 		this.inputFileName = inputFileName;
-		this.floorSubsystemTransmissonChannel = floorSubsystemTransmissonChannel;
-		this.floorSubsystemReceiverChannel = floorSubsystemReceiverChannel;
-		this.elevatorSubsystemReceiverChannel = elevatorSubsystemReceiverChannel;
 
 		// Add floors to the floor subsystem
 		for (int i = 0; i < floors.length; i++) {
 			floors[i] = new Floor(i);
 		}
+		
+		elevatorMessageQueue = new FloorElevatorMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors);
+		schedulerMessageQueue = new FloorSchedulerMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors, assignedFloorDataCollection);
+				
 	}
 
 	/**
@@ -139,49 +134,51 @@ public class FloorSubsystem implements Runnable {
 		}
 	}
 
+	public static void main(String[] args) {
+		// Only attempt to read file when a file name as been passed
+		String inputFileName = "resources/FloorInputFile.txt";
+		FloorSubsystem subsystem = new FloorSubsystem(inputFileName);
+		subsystem.runMain();
+	}
+	
 	/**
-	 * This is an override of the runnable run method
+	 * This is the Main function
 	 */
-	@Override
-	public void run() {
+	public void runMain() {
 		// Only attempt to read file when a file name as been passed
 		if (!inputFileName.equals(""))
 			readInputFile();
+		
+		// initialize the message receiving threads
+		setUpMessageQueueing(floorElevatorUDP, elevatorMessageQueue);
+		setUpMessageQueueing(floorSchedulerUDP, schedulerMessageQueue);
+		(new Thread() {
+			@Override
+			public void run() {
+				// wait for scheduler messages
+				for(SimulationFloorInputData floorInputData : unassignedFloorDataCollection) {
 
-		while (true) {
+					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(floorInputData.getCurrentFloor(),
+							floorInputData.getFloorDirectionButton());
 
-			/**
-			 * Place input data in the transmission channel if we have data to send and the
-			 * transmission channel is free.
-			 */
-			if (floorSubsystemTransmissonChannel.isEmpty() && !unassignedFloorDataCollection.isEmpty()) {
+					// Updating the floor properties(User interacting with the floor button)
+					int floorId = floorInputData.getCurrentFloor();
+					floors[floorId].pressFloorButton(floorInputData.getFloorDirectionButton());
+					floors[floorId].printFloorStatus();
 
-				SimulationFloorInputData floorInputData = unassignedFloorDataCollection.get(0);
-				unassignedFloorDataCollection.remove(0);
+					// sending the job to the scheduler
+					try {
+						floorSchedulerUDP.sendMessage(elevatorFloorRequest);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
-				ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(floorInputData.getCurrentFloor(),
-						floorInputData.getFloorDirectionButton());
-
-				// Updating the floor properties(User interacting with the floor button)
-				int floorId = floorInputData.getCurrentFloor();
-				floors[floorId].pressFloorButton(floorInputData.getFloorDirectionButton());
-				floors[floorId].printFloorStatus();
-
-				// sending the job to the scheduler
-				floorSubsystemTransmissonChannel.appendMessage(elevatorFloorRequest);
-
-				// Add the floor input data to the assigned floor data collection
-				assignedFloorDataCollection.add(floorInputData);
-
+					// Add the floor input data to the assigned floor data collection
+					assignedFloorDataCollection.add(floorInputData);
+				}
 			}
-
-			// Checking if we have a request message
-			if (!floorSubsystemReceiverChannel.isEmpty()) {
-				handleRequest(floorSubsystemReceiverChannel.popMessage());
-			}
-
-		}
-
+		}).start();
 	}
 
 	/**
@@ -190,128 +187,26 @@ public class FloorSubsystem implements Runnable {
 	public Floor[] getFloors() {
 		return floors;
 	}
-
+	
 	/**
-	 * Handle message accordingly
-	 *
-	 * @param message the message
+	 * The function sets up the message queue
+	 * @param communication
+	 * @param workQueue
 	 */
-	public void handleRequest(Message message) {
-
-		switch (message.getMessageType()) {
-
-		case ELEVATOR_FLOOR_MESSAGE:
-			handleElevatorRequest((FloorElevatorTargetedMessage) message);
-			break;
-
-		case SCHEDULER_FLOOR_COMMAND:
-			handleSchedulerFloorCommand((SchedulerFloorCommand) message);
-			break;
-
-		default:
-			break;
-		}
-	}
-
-	/**
-	 * Handle the elevator request appropriately
-	 *
-	 * @param request the request
-	 */
-	private void handleElevatorRequest(FloorElevatorTargetedMessage request) {
-
-		int floorId = request.getFloorId();
-		int elevatorId = request.getElevatorId();
-
-		// Validate the floor id
-		if (!SystemValidationUtil.isFloorNumberInRange(floorId)) {
-			return;
-		}
-
-		switch (request.getRequestType()) {
-
-		case ELEVATOR_FLOOR_SIGNAL_REQUEST:
-			ElevatorFloorSignalRequestMessage floorSignalRequestMessage = (ElevatorFloorSignalRequestMessage) request;
-
-			floors[floorId].notifyElevatorAtFloorArrival(floorId, elevatorId,
-					floorSignalRequestMessage.getElevatorMotor(), elevatorSubsystemReceiverChannel,
-					floorSignalRequestMessage.isFloorFinalDestination());
-			break;
-
-		case ELEVATOR_LEAVING_FLOOR_MESSAGE:
-			floors[floorId].elevatorLeavingFloor(elevatorId);
-			break;
-
-		default:
-			break;
-
-		}
-	}
-
-	/**
-	 * Handle scheduler floor command
-	 *
-	 * @param command the command
-	 */
-	private void handleSchedulerFloorCommand(SchedulerFloorCommand command) {
-
-		int floorId = command.getFloorId();
-
-		// Validate the floor id
-		if (!SystemValidationUtil.isFloorNumberInRange(floorId)) {
-			return;
-		}
-
-		switch (command.getCommand()) {
-
-		case TURN_OFF_FLOOR_LAMP:
-			floors[floorId].turnOffLampButton(command.getLampButtonDirection());
-
-			ArrayList<Integer> destinationFloors = getFloorPassengerDestinationFloors(floorId,
-					command.getLampButtonDirection());
-			// For now, I will only send the one item in the destination floor collection
-			// for this iteration.
-			// The elevator and scheduler do not support more than one at the moment.
-			//
-			// TODO Send the full collection of destination floors. Requires cooperation
-			// with the elevator and scheduler. Also, the id of the elevator needs to be
-			// sent.
-			// Since we have one elevator, we will hard code the elevator id of 0.
-			int elevatorId = 0;
-			ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloors.get(0),
-					elevatorId, command.getLampButtonDirection());
-			elevatorSubsystemReceiverChannel.appendMessage(elevatorTransportRequest);
-			break;
-
-		default:
-			break;
-		}
-
-	}
-
-	/**
-	 * Given the elevator direction, returns a floor's list of passenger
-	 * destinations (car buttons pressed)
-	 *
-	 * @param floorId           the floor id
-	 * @param elevatorDirection
-	 * @return
-	 */
-	private ArrayList<Integer> getFloorPassengerDestinationFloors(int floorId, Direction elevatorDirection) {
-
-		ArrayList<Integer> destinationFloors = new ArrayList<>();
-
-		assignedFloorDataCollection.forEach(floorData -> {
-			// Check whether the input data is at the required floor and the requested
-			// direction is the same
-			// TODO Check that the floor data direction and elevator direction match. Not
-			// currently supported to work.
-			if (floorData.getCurrentFloor() == floorId) {
-				destinationFloors.add(floorData.getDestinationFloorCarButton());
+	public void setUpMessageQueueing(SubsystemCommunicationRPC communication, MessageWorkQueue workQueue ) {
+		(new Thread() {
+			@Override
+			public void run() {
+				while(true) {
+					try {
+						Message message = communication.receiveMessage();
+						workQueue.enqueueMessage(message);
+					}catch(Exception e) {
+						System.out.println(e);
+						System.exit(1);
+					}
+				}
 			}
-
-		});
-
-		return destinationFloors;
+		}).start();
 	}
 }
