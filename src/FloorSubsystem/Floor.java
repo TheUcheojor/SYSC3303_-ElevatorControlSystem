@@ -3,12 +3,12 @@ package FloorSubsystem;
 import ElevatorSubsystem.ElevatorController;
 import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
-import common.messages.MessageChannel;
+import common.remote_procedure.SubsystemCommunicationRPC;
 
 /**
  * This class stores all the necessary properties of a floor thread
  *
- * @author Favour, Delight, paulokenne
+ * @author Favour, Delight, paulokenne, Jacob
  */
 public class Floor {
 
@@ -70,10 +70,8 @@ public class Floor {
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
 	 */
-	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor,
-			MessageChannel elevatorSubsystemReceiverChannel, boolean isFloorFinalDestination) {
-		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor,
-				elevatorSubsystemReceiverChannel, isFloorFinalDestination);
+	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor, SubsystemCommunicationRPC elevatorUDP, boolean isFloorFinalDestination) {
+		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor, elevatorUDP, isFloorFinalDestination);
 	}
 
 	/**
