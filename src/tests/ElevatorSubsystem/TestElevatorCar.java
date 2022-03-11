@@ -10,6 +10,7 @@ import ElevatorSubsystem.ElevatorCar;
 import ElevatorSubsystem.ElevatorDoor;
 import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
+import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 
 class TestElevatorCar {
