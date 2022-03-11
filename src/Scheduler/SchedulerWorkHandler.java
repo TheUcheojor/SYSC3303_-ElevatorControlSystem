@@ -81,6 +81,8 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			break;
 
 		default:
+			System.out.println("executeNextElevatorCommand NEITHER!");
+
 			break;
 		}
 
@@ -136,6 +138,8 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 						break;
 					}
 				}
+
+				System.out.println("ARRIVED - REQUEST ADDRESSED! - Elevator " + elevatorId);
 
 				// Stop the elevator and open the doors
 				schedulerElevatorCommunication

@@ -187,7 +187,6 @@ public class FloorElevatorComponents {
 					e.printStackTrace();
 				}
 			}
-
 		};
 
 		notifyElevatorThread.start();

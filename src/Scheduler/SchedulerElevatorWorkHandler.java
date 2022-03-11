@@ -55,18 +55,26 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						+ elevatorStatusMessage.getFloorNumber() + ", ED: " + elevatorStatusMessage.getDirection()
 						+ ", EID: " + elevatorId + ", ES:" + elevatorStatusMessage.getErrorState() + " ]\n");
 
-				if (elevatorJobManagements[elevatorId].hasPrimaryJobs()
-						|| elevatorJobManagements[elevatorId].hasSecondaryJobs()) {
+				if (elevatorJobManagements[elevatorId].hasJobs()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 				}
 			}
 			break;
 
 		case ELEVATOR_DROP_PASSENGER_REQUEST:
-			elevatorId = ((ElevatorTransportRequest) message).getElevatorId();
+			ElevatorTransportRequest dropPassengerRequest = ((ElevatorTransportRequest) message);
+			elevatorId = dropPassengerRequest.getElevatorId();
 
 			synchronized (elevatorJobManagements) {
+
+				// If the elevators has no jobs (direction is IDLE), we will update the elevator
+				// direction
+				if (!elevatorJobManagements[elevatorId].hasJobs()) {
+					elevatorJobManagements[elevatorId].setElevatorDirection(dropPassengerRequest.getDirection());
+				}
+
 				elevatorJobManagements[elevatorId].addJob((ElevatorJobMessage) message);
+
 				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 			}
 

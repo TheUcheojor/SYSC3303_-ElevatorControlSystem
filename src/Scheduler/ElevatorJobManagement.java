@@ -174,6 +174,7 @@ public class ElevatorJobManagement {
 		while (elevatorJobsIterator.hasNext()) {
 			ElevatorJobMessage currentelevatorJob = elevatorJobsIterator.next();
 			int jobDestinationFloor = currentelevatorJob.getDestinationFloor();
+			System.out.println("jobDestinationFloor: " + jobDestinationFloor);
 
 			// Find jobs that are in same direction as the elevator. We will
 			// then check that the job destination floor is above than the current
@@ -184,6 +185,8 @@ public class ElevatorJobManagement {
 				largestDestinationFloor = jobDestinationFloor;
 			}
 		}
+
+		System.out.println("elevatorJobs largestDestinationFloor: " + largestDestinationFloor);
 
 		return largestDestinationFloor;
 	}
@@ -284,6 +287,16 @@ public class ElevatorJobManagement {
 	 */
 	public void setCurrentFloorNumber(int currentFloorNumber) {
 		this.currentFloorNumber = currentFloorNumber;
+	}
+
+	/**
+	 * Return whether an elevator has jobs
+	 *
+	 *
+	 * @return true if the elevator has jobs; otherwise, return false
+	 */
+	public boolean hasJobs() {
+		return elevatorDirection != Direction.IDLE;
 	}
 
 	/**
