@@ -27,6 +27,7 @@ import common.remote_procedure.SubsystemComponentType;
  */
 public class TestElevatorFloorMessageWorkQueue {
 	private SubsystemCommunicationRPC schedulerElevatorSubsystemCommunication;
+	private SubsystemCommunicationRPC elevatorSchedulerSubsystemCommunication;
 	private ElevatorFloorMessageWorkQueue workQueue;
 	
 	private int ELEVATOR_ID = 1;
@@ -35,7 +36,6 @@ public class TestElevatorFloorMessageWorkQueue {
 	
 	private Map<Integer, ElevatorCar> elevators;
 	
-	//private ArrayDeque<Message> receivedFloorMessages = new ArrayDeque<>();
 	private ArrayDeque<Message> receivedSchedulerMessages = new ArrayDeque<>();
 
 	@BeforeEach
@@ -45,7 +45,7 @@ public class TestElevatorFloorMessageWorkQueue {
 		new SubsystemCommunicationRPC(SubsystemComponentType.FLOOR_SUBSYSTEM,
 				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
 		
-		new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
+		elevatorSchedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 	 		SubsystemComponentType.SCHEDULER);
 		new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 				SubsystemComponentType.FLOOR_SUBSYSTEM);
@@ -54,7 +54,7 @@ public class TestElevatorFloorMessageWorkQueue {
 		
 		elevators.put(ELEVATOR_ID, new ElevatorCar(ELEVATOR_ID, new ElevatorMotor(ELEVATOR_SPEED), new ElevatorDoor(ELEVATOR_SPEED)));
 		
-		workQueue = new ElevatorFloorMessageWorkQueue(schedulerElevatorSubsystemCommunication, elevators);
+		workQueue = new ElevatorFloorMessageWorkQueue(elevatorSchedulerSubsystemCommunication, elevators);
 		
 		//receivedFloorMessages = new ArrayDeque<>();
 		receivedSchedulerMessages = new ArrayDeque<>();
@@ -66,7 +66,6 @@ public class TestElevatorFloorMessageWorkQueue {
 		workQueue = null;
 		elevators = null;
 		
-		//receivedFloorMessages = null;
 		receivedSchedulerMessages = null;
 	}
 	
@@ -83,7 +82,6 @@ public class TestElevatorFloorMessageWorkQueue {
 		
 			Thread.sleep(1000);
 			
-			//ElevatorFloorArrivalMessage floorMessageRecieved = (ElevatorFloorArrivalMessage) receivedFloorMessages.pop();
 			statusMessage = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
 			assertTrue(statusMessage != null);
 			assertTrue(statusMessage.getMessageType() == MessageType.ELEVATOR_STATUS_MESSAGE);
@@ -93,8 +91,6 @@ public class TestElevatorFloorMessageWorkQueue {
 			e.printStackTrace();
 		}
 	}
-		
-
 	
 	private void simulateSchedulerMessageWaiting() {
 		(new Thread() {
@@ -102,8 +98,7 @@ public class TestElevatorFloorMessageWorkQueue {
 			public void run() {
 				try {
 					synchronized (receivedSchedulerMessages) {
-					
-					receivedSchedulerMessages.add(schedulerElevatorSubsystemCommunication.receiveMessage());
+						receivedSchedulerMessages.add(schedulerElevatorSubsystemCommunication.receiveMessage());
 					}
 				} catch (Exception e) {
 					System.out.print("Exception occurred: " + e);
