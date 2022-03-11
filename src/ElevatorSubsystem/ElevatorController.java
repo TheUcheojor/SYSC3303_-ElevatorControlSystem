@@ -131,6 +131,7 @@ public class ElevatorController {
 		
 		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
 			// send initial status message to scheduler
+			ElevatorCar car = elevators.get(i);
 			ElevatorStatusMessage status = car.createStatusMessage();
 			try {
 				schedulerSubsystemCommunication.sendMessage(status);
