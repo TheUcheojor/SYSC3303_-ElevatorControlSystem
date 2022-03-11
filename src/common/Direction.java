@@ -6,21 +6,28 @@ package common;
 /**
  * This class provides possible elevator directions.
  *
- * @author paulokenne
+ * @author paulokenne, delight
  *
  */
 public enum Direction {
+
 	/**
-	 * The up elevatorDirection.
+	 * The up direction.
 	 */
 	UP,
 
 	/**
-	 * The down elevatorDirection.
+	 * The down direction.
 	 */
 	DOWN,
-	
+
+	/**
+	 * The idle direction indicating that the elevator is not moving and does not
+	 * have jobs
+	 */
 	IDLE,
+
+	// TODO TO BE REMOVED
 	STOPPED
 
 }

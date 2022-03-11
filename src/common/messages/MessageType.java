@@ -47,13 +47,13 @@ public enum MessageType {
 	/**
 	 * A message indicates that the elevator to arrive at a destination floor
 	 */
-	ELEVATOR_TRANSPORT_REQUEST,
+	ELEVATOR_DROP_PASSENGER_REQUEST,
 
 	/**
 	 * A message indicating that the floor passenger requested for an elevator at a
 	 * floor
 	 */
-	ELEVATOR_FLOOR_REQUEST,
+	ELEVATOR_PICK_UP_PASSENGER_REQUEST,
 
 	/**
 	 * A request for testing purposes.
