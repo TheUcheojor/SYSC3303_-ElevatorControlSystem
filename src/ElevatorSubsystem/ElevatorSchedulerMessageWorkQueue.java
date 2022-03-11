@@ -13,14 +13,14 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
 
 public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
-	private SubsystemCommunicationRPC subsystemCommunicationScheduler;
-	private SubsystemCommunicationRPC subsystemCommunicationFloor;
+	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
+	private SubsystemCommunicationRPC floorSubsystemCommunication;
 	
 	private Map<Integer, ElevatorCar> elevators;
 	
-	public ElevatorSchedulerMessageWorkQueue(SubsystemCommunicationRPC subsystemCommunicationScheduler, SubsystemCommunicationRPC subsystemCommunicationFloor, Map<Integer, ElevatorCar> elevators) {
-		this.subsystemCommunicationScheduler = subsystemCommunicationScheduler;
-		this.subsystemCommunicationFloor = subsystemCommunicationFloor;
+	public ElevatorSchedulerMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication, SubsystemCommunicationRPC floorSubsystemCommunication, Map<Integer, ElevatorCar> elevators) {
+		this.schedulerSubsystemCommunication = schedulerSubsystemCommunication;
+		this.floorSubsystemCommunication = floorSubsystemCommunication;
 		this.elevators = elevators;
 	}
 
@@ -31,19 +31,19 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 	
 				case ELEVATOR_STATUS_REQUEST:
 					ElevatorStatusRequest statusRequest = (ElevatorStatusRequest)message;
-					subsystemCommunicationScheduler.sendMessage(elevators.get(statusRequest.getId()).createStatusMessage());
+					schedulerSubsystemCommunication.sendMessage(elevators.get(statusRequest.getId()).createStatusMessage());
 					break;
 					
 				case ELEVATOR_TRANSPORT_REQUEST:
 					ElevatorTransportRequest transportRequest = (ElevatorTransportRequest) message;
-					subsystemCommunicationScheduler.sendMessage(elevators.get(transportRequest.getElevatorId()).createStatusMessage());
+					schedulerSubsystemCommunication.sendMessage(elevators.get(transportRequest.getElevatorId()).createStatusMessage());
 					break;
 					
 				case SCHEDULER_ELEVATOR_COMMAND:
 					SchedulerElevatorCommand schedulerCommand =(SchedulerElevatorCommand) message;
 					handleElevatorCommand(schedulerCommand);
 					ElevatorStatusMessage postCommandStatus = elevators.get(schedulerCommand.getElevatorID()).createStatusMessage();
-					subsystemCommunicationScheduler.sendMessage(postCommandStatus);
+					schedulerSubsystemCommunication.sendMessage(postCommandStatus);
 					break;
 					
 				default:
@@ -91,8 +91,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 					leavingMessage = new ElevatorLeavingFloorMessage(car.getId(), carFloorNumber);
 					comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), carFloorNumber + 1, car.getMotor(), true);
 					
-					subsystemCommunicationFloor.sendMessage(leavingMessage);
-					subsystemCommunicationFloor.sendMessage(comingMessage);
+					floorSubsystemCommunication.sendMessage(leavingMessage);
+					floorSubsystemCommunication.sendMessage(comingMessage);
 					break;
 				case MOVE_DOWN:
 					System.out.println("Elevator door closing\n.");
@@ -101,10 +101,10 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 					car.getMotor().goDown();
 					
 					leavingMessage = new ElevatorLeavingFloorMessage(car.getId(), carFloorNumber);
-					comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), carFloorNumber - 1, car.getMotor(), true);
+//					comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), carFloorNumber - 1, car.getMotor(), true);
 					
-					subsystemCommunicationFloor.sendMessage(leavingMessage);
-					subsystemCommunicationFloor.sendMessage(comingMessage);
+					floorSubsystemCommunication.sendMessage(leavingMessage);
+//					floorSubsystemCommunication.sendMessage(comingMessage);
 				
 					break;
 			}
