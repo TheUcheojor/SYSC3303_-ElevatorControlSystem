@@ -34,11 +34,6 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 					schedulerSubsystemCommunication.sendMessage(elevators.get(statusRequest.getId()).createStatusMessage());
 					break;
 					
-				case ELEVATOR_TRANSPORT_REQUEST:
-					ElevatorTransportRequest transportRequest = (ElevatorTransportRequest) message;
-					schedulerSubsystemCommunication.sendMessage(elevators.get(transportRequest.getElevatorId()).createStatusMessage());
-					break;
-					
 				case SCHEDULER_ELEVATOR_COMMAND:
 					SchedulerElevatorCommand schedulerCommand =(SchedulerElevatorCommand) message;
 					handleElevatorCommand(schedulerCommand);

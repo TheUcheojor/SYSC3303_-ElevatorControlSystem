@@ -129,63 +129,6 @@ public class ElevatorController {
 		}).start();
 	}
 
-	/**
-	 * Elevator message handler. Exterior entities can send various types of request
-	 * or commands to the elevator.
-	 *
-	 * @param message to handle
-	 * @throws Exception if the message doesn't belong to this elevator
-	 */
-	// @PublicForTestOnly
-	public void handleMessage(Message message) {
-
-		switch (message.getMessageType()) {
-
-		case ELEVATOR_STATUS_REQUEST:
-			ElevatorStatusRequest statusRequest = (ElevatorStatusRequest) message;
-			outgoingSchedulerChannel.appendMessage(elevators.get(statusRequest.getId()).createStatusMessage());
-			break;
-
-		case ELEVATOR_DROP_PASSENGER_REQUEST:
-			ElevatorTransportRequest transportRequest = (ElevatorTransportRequest) message;
-			outgoingSchedulerChannel
-					.appendMessage(elevators.get(transportRequest.getElevatorId()).createStatusMessage());
-			break;
-
-		case SCHEDULER_ELEVATOR_COMMAND:
-			SchedulerElevatorCommand schedulerCommand = (SchedulerElevatorCommand) message;
-			handleElevatorCommand(schedulerCommand);
-			ElevatorStatusMessage postCommandStatus = elevators.get(schedulerCommand.getElevatorID())
-					.createStatusMessage();
-			outgoingSchedulerChannel.appendMessage(postCommandStatus);
-			break;
-
-		case ELEVATOR_FLOOR_MESSAGE:
-			handleFloorMessage((FloorElevatorTargetedMessage) message);
-			break;
-
-		default:
-			break;
-
-		}
-	}
-
-	private void handleFloorMessage(FloorElevatorTargetedMessage message) {
-		switch (message.getRequestType()) {
-		case FLOOR_ARRIVAL_MESSAGE:
-			ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
-			floorNumber = arrivalMessage.getFloorId();
-
-			System.out.println("Elevator has reached floor: " + floorNumber);
-			ElevatorStatusMessage arrivalStatus = elevators.get(message.getElevatorId()).createStatusMessage();
-			outgoingSchedulerChannel.appendMessage(arrivalStatus);
-			break;
-
-		default:
-			break;
-		}
-	}
-
 	// For running on stand alone system
 	public static void main(String[] args) {
 		ElevatorController controller = new ElevatorController();
