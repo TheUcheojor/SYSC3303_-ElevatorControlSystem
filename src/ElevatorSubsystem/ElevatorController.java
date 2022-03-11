@@ -69,6 +69,18 @@ public class ElevatorController {
 			// Terminate if the elevation configuration are invalid.
 			System.exit(1);
 		}
+		
+		// initialize elevator cars
+		elevators = new HashMap<Integer, ElevatorCar>();
+		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
+			ElevatorDoor door = new ElevatorDoor(DOOR_SPEED);
+			ElevatorMotor motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
+			int carId = i;
+
+			ElevatorCar car = new ElevatorCar(carId, motor, door);
+
+			elevators.put(carId, car);
+		}
 	
 		// initialize the subsystem communication channels
 		schedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
@@ -117,17 +129,7 @@ public class ElevatorController {
 			}
 		}).start();
 		
-		// initialize elevator cars
-		elevators = new HashMap<Integer, ElevatorCar>();
-		for (int i = 1; i <= NUMBER_OF_ELEVATORS; i++) {
-			ElevatorDoor door = new ElevatorDoor(DOOR_SPEED);
-			ElevatorMotor motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
-			int carId = i;
-
-			ElevatorCar car = new ElevatorCar(carId, motor, door);
-
-			elevators.put(carId, car);
-			
+		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
 			// send initial status message to scheduler
 			ElevatorStatusMessage status = car.createStatusMessage();
 			try {
