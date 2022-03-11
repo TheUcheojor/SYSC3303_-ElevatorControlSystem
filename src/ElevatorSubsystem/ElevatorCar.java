@@ -75,6 +75,10 @@ public class ElevatorCar {
 	public void setErrorState(Exception errorState) {
 		this.errorState = errorState;
 	}
+	
+	public void setFloorNumber(int floorNumber) {
+		this.floorNumber = floorNumber;
+	}
 
 	/**
 	 * Creates a ElevatorStatusMessage message containing all relevant status info

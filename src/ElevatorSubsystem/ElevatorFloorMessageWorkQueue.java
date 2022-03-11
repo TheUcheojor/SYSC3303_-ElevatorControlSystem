@@ -33,10 +33,13 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 				
 				case FLOOR_ARRIVAL_MESSAGE:
 					ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
+					int carId = arrivalMessage.getElevatorId();
 					int floorNumber = arrivalMessage.getFloorId();
+					ElevatorCar car = elevators.get(carId); 
+					car.setFloorNumber(floorNumber);
 					
-					System.out.println("Elevator has reached floor: " + floorNumber);
-					ElevatorStatusMessage arrivalStatus = elevators.get(arrivalMessage.getElevatorId()).createStatusMessage();
+					System.out.println("(ELEVATOR) Elevator " + carId + " has reached floor: " + floorNumber);
+					ElevatorStatusMessage arrivalStatus = car.createStatusMessage();
 				
 					schedulerSubsystemCommunication.sendMessage(arrivalStatus);
 					break;
