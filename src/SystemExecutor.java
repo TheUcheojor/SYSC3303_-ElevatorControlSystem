@@ -1,5 +1,6 @@
 import ElevatorSubsystem.ElevatorController;
 import FloorSubsystem.FloorSubsystem;
+import Scheduler.Scheduler;
 
 /**
  * This class sets up and starts the elevator, floor, and scheduler systems.
@@ -17,9 +18,18 @@ public class SystemExecutor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+
+		// Set up and start the scheduler
+		Scheduler scheduler = new Scheduler();
+		scheduler.runSchedulerProgram();
+
+		// Set up and start the elevator controller
 		ElevatorController elevatorController = new ElevatorController();
 
-		FloorSubsystem floorSubsystem = new FloorSubsystem();
+		// Set up and start the floor subsystem
+		String inputFileName = "resources/FloorInputFile.txt";
+		FloorSubsystem subsystem = new FloorSubsystem(inputFileName);
+		subsystem.runMain();
 	}
 
 }
