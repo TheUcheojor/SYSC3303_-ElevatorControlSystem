@@ -128,7 +128,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 					if (elevatorJob.getMessageType() == MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST) {
 						schedulerFloorCommunication
 								.sendMessage(new SchedulerFloorCommand(FloorCommand.TURN_OFF_FLOOR_LAMP,
-										nearestTargetFloor, elevatorJobManagement.getElevatorDirection()));
+										nearestTargetFloor, elevatorJobManagement.getElevatorDirection(), elevatorId));
 
 						// We break because floor buttons should only be turned off once
 						break;

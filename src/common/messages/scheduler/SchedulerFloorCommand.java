@@ -6,7 +6,7 @@ import common.messages.MessageType;
 
 /*
  * Elevator job requests from floors
- * 
+ *
  * @author Ryan Fife
  */
 
@@ -27,6 +27,13 @@ public class SchedulerFloorCommand extends Message {
 	private Direction lampButtonDirection;
 
 	/**
+	 * An optional field that is set when requested to turned off floor lamps.
+	 *
+	 * Turning off floor lamps indicates that the request elevator has arrived.
+	 */
+	private int elevatorId;
+
+	/**
 	 * The primary constructor
 	 *
 	 * @param floorCommand
@@ -36,6 +43,20 @@ public class SchedulerFloorCommand extends Message {
 		this.floorCommand = floorCommand;
 		this.floorId = floorId;
 		this.lampButtonDirection = lampButtonDirection;
+	}
+
+	/**
+	 * The primary constructor
+	 *
+	 * @param floorCommand
+	 */
+	public SchedulerFloorCommand(FloorCommand floorCommand, int floorId, Direction lampButtonDirection,
+			int elevatorId) {
+		super(MessageType.SCHEDULER_FLOOR_COMMAND);
+		this.floorCommand = floorCommand;
+		this.floorId = floorId;
+		this.lampButtonDirection = lampButtonDirection;
+		this.elevatorId = elevatorId;
 	}
 
 	/**
@@ -65,4 +86,12 @@ public class SchedulerFloorCommand extends Message {
 		return lampButtonDirection;
 	}
 
+	/**
+	 * Get the elevator id.
+	 *
+	 * @return the elevatorId
+	 */
+	public int getElevatorId() {
+		return elevatorId;
+	}
 }
