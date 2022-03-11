@@ -73,11 +73,11 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 		switch (elevatorJobManagement.getElevatorDirection()) {
 
 		case UP:
-			nearestTargetFloor = elevatorJobManagement.getSmallestDestinationFloor();
+			nearestTargetFloor = elevatorJobManagement.getSmallestDestinationFloorAboveCurrentElevatorFloor();
 			break;
 
 		case DOWN:
-			nearestTargetFloor = elevatorJobManagement.getLargestDestinationFloor();
+			nearestTargetFloor = elevatorJobManagement.getLargestDestinationFloorInElevatorDirection();
 			break;
 
 		default:
