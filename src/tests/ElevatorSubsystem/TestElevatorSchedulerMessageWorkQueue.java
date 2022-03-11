@@ -76,23 +76,7 @@ class TestElevatorSchedulerMessageWorkQueue {
 		receivedSchedulerMessages = null;
 	}
 	
-//	@Test
-//	void testWorkQueueCloseDoorsHandler() {
-//		simulateSchedulerMessageWaiting();
-//		
-//		SchedulerElevatorCommand elevatorCommand = new SchedulerElevatorCommand(ElevatorCommand.CLOSE_DOORS, ELEVATOR_ID);
-//		try {
-//			workQueue.enqueueMessage(elevatorCommand);
-//		
-//			Thread.sleep(100);
-//			
-//			ElevatorStatusMessage message3 = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
-//			assertTrue(message3 != null);
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+
 	
 	@Test
 	void testWorkQueueMoveDownHandler() {
