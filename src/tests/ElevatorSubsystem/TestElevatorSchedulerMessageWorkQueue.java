@@ -76,27 +76,27 @@ class TestElevatorSchedulerMessageWorkQueue {
 		receivedSchedulerMessages = null;
 	}
 	
-	@Test
-	void testWorkQueueCloseDoorsHandler() {
-		simulateSchedulerMessageWaiting();
-		
-		SchedulerElevatorCommand elevatorCommand = new SchedulerElevatorCommand(ElevatorCommand.CLOSE_DOORS, ELEVATOR_ID);
-		try {
-			workQueue.enqueueMessage(elevatorCommand);
-		
-			Thread.sleep(100);
-			
-			ElevatorStatusMessage message3 = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
-			assertTrue(message3 != null);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	@Test
+//	void testWorkQueueCloseDoorsHandler() {
+//		simulateSchedulerMessageWaiting();
+//		
+//		SchedulerElevatorCommand elevatorCommand = new SchedulerElevatorCommand(ElevatorCommand.CLOSE_DOORS, ELEVATOR_ID);
+//		try {
+//			workQueue.enqueueMessage(elevatorCommand);
+//		
+//			Thread.sleep(100);
+//			
+//			ElevatorStatusMessage message3 = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
+//			assertTrue(message3 != null);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 	
 	@Test
 	void testWorkQueueMoveDownHandler() {
-//		simulateFloorMessageWaiting();
+		simulateFloorMessageWaiting();
 		simulateFloorMessageWaiting();
 		simulateSchedulerMessageWaiting();
 		
@@ -104,13 +104,14 @@ class TestElevatorSchedulerMessageWorkQueue {
 		try {
 			workQueue.enqueueMessage(elevatorCommand);
 		
-			Thread.sleep(2000);
+			Thread.sleep(100);
 			
 			ElevatorLeavingFloorMessage message1 = (ElevatorLeavingFloorMessage) receivedFloorMessages.pop();
-//			ElevatorFloorSignalRequestMessage message2 = (ElevatorFloorSignalRequestMessage) receivedFloorMessages.pop();
+			ElevatorFloorSignalRequestMessage message2 = (ElevatorFloorSignalRequestMessage) receivedFloorMessages.pop();
 			ElevatorStatusMessage message3 = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
-			assertTrue(message3 != null);
 			assertTrue(message1 != null);
+			assertTrue(message2 != null);
+			assertTrue(message3 != null);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -101,10 +101,10 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 					car.getMotor().goDown();
 					
 					leavingMessage = new ElevatorLeavingFloorMessage(car.getId(), carFloorNumber);
-//					comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), carFloorNumber - 1, car.getMotor(), true);
-					
+					comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), carFloorNumber - 1, car.getMotor(), true);
+
 					floorSubsystemCommunication.sendMessage(leavingMessage);
-//					floorSubsystemCommunication.sendMessage(comingMessage);
+					floorSubsystemCommunication.sendMessage(comingMessage);
 				
 					break;
 			}
