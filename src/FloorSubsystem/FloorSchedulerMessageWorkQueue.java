@@ -78,12 +78,6 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			// For now, I will only send the one item in the destination floor collection
 			// for this iteration.
 			// The elevator and scheduler do not support more than one at the moment.
-			//
-			// TODO Send the full collection of destination floors. Requires cooperation
-			// with the elevator and scheduler. Also, the id of the elevator needs to be
-			// sent.
-			// Since we have one elevator, we will hard code the elevator id of 0.
-
 			int elevatorId = request.getElevatorId();
 
 			for (int destinationFloor : destinationFloors) {
