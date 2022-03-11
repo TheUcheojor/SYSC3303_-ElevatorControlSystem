@@ -21,7 +21,7 @@ import common.messages.MessageType;
  * This class enables communication between the subsystems using remote
  * procedure calls.
  *
- * @author paulokenne, delight
+ * @author paulokenne, delight, Jacob
  *
  */
 public class SubsystemCommunicationRPC {

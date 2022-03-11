@@ -7,12 +7,13 @@ import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
 import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
+import common.remote_procedure.SubsystemCommunicationRPC;
 
 /**
  * This class represents the floor elevator components which include the arrival
  * sensor and elevatorDirection lamp
  *
- * @author paulokenne
+ * @author paulokenne, Jacob
  *
  */
 public class FloorElevatorComponents {
@@ -106,8 +107,7 @@ public class FloorElevatorComponents {
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
 	 */
-	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor,
-			MessageChannel elevatorSubsystemReceiverChannel, boolean isFloorFinalDestination) {
+	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor, SubsystemCommunicationRPC elevatorUDP, boolean isFloorFinalDestination) {
 
 		double topSpeed = elevatorMotor.getTopSpeed();
 		double intialSpeed = elevatorMotor.getCurrentVelocity();
@@ -178,9 +178,13 @@ public class FloorElevatorComponents {
 				// elevator plans to go
 				// TODO Reevaluate the assumption.
 				elevatorArrivedAtFloor(elevatorMotor.getDirection(), floorNumber);
-
-				elevatorSubsystemReceiverChannel.appendMessage(
-						new ElevatorFloorArrivalMessage(elevatorId, floorNumber, newCurrentElevatorSpeed));
+				ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber, newCurrentElevatorSpeed);
+				try {
+					elevatorUDP.sendMessage(notifyMsg);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 		};
