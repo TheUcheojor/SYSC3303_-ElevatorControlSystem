@@ -42,13 +42,9 @@ public class TestElevatorFloorMessageWorkQueue {
 	void setup() {
 		schedulerElevatorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.SCHEDULER,
 				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
-		new SubsystemCommunicationRPC(SubsystemComponentType.FLOOR_SUBSYSTEM,
-				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
 		
 		elevatorSchedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 	 		SubsystemComponentType.SCHEDULER);
-		new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
-				SubsystemComponentType.FLOOR_SUBSYSTEM);
 		
 		elevators = new HashMap<Integer, ElevatorCar>();
 		
