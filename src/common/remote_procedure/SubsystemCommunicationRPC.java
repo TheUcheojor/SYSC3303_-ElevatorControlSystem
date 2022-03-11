@@ -29,7 +29,7 @@ public class SubsystemCommunicationRPC {
 	/**
 	 * The maximum buffer size
 	 */
-	public static final int MAX_BUFFER_SIZE = 1000;
+	public static final int MAX_BUFFER_SIZE = 1200;
 
 	/**
 	 * The receive socket
@@ -201,8 +201,8 @@ public class SubsystemCommunicationRPC {
 			return (Message) objectInputStream.readObject();
 
 		} catch (IOException e) {
-			System.out.println(e);
-			throw new Exception("Cannot create byte array from message!");
+			System.out.println(e + ": " + e.getMessage());
+			throw new Exception("Cannot create byte array from message!\n");
 		}
 	}
 
