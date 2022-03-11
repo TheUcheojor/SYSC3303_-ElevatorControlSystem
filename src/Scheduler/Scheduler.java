@@ -79,7 +79,7 @@ public class Scheduler {
 	 * @param workQueue
 	 */
 	public void setUpMessageQueueing(SubsystemCommunicationRPC communication, MessageWorkQueue workQueue) {
-		new Thread() {
+		(new Thread() {
 			@Override
 			public void run() {
 				while (true) {
@@ -92,6 +92,6 @@ public class Scheduler {
 					}
 				}
 			}
-		};
+		}).start();
 	}
 }
