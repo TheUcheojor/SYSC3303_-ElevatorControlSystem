@@ -7,7 +7,7 @@ import common.messages.MessageType;
 /**
  * This class represents when a passenger requests for an elevator at a floor
  *
- * @author ryanfire, paulokenne
+ * @author ryanfife, paulokenne
  *
  */
 public class ElevatorFloorRequest extends ElevatorJobMessage {
@@ -19,6 +19,6 @@ public class ElevatorFloorRequest extends ElevatorJobMessage {
 	 * @param direction        the direction
 	 */
 	public ElevatorFloorRequest(int destinationFloor, Direction direction) {
-		super(MessageType.ELEVATOR_FLOOR_REQUEST, destinationFloor, direction);
+		super(MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST, destinationFloor, direction);
 	}
 }

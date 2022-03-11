@@ -23,10 +23,6 @@ public abstract class FloorElevatorTargetedMessage extends Message {
 	 */
 	private int elevatorId;
 
-	/**
-	 * The request type
-	 */
-	private ElevatorFloorRequestType requestType;
 
 	/**
 	 * A FloorTargetedElevatorMessage constructor
@@ -35,11 +31,10 @@ public abstract class FloorElevatorTargetedMessage extends Message {
 	 * @param floorId     the floor id
 	 * @param messageType the message type
 	 */
-	public FloorElevatorTargetedMessage(int elevatorId, int floorId, ElevatorFloorRequestType requestType) {
-		super(MessageType.ELEVATOR_FLOOR_MESSAGE);
+	public FloorElevatorTargetedMessage(int elevatorId, int floorId, MessageType requestType) {
+		super(requestType);
 		this.elevatorId = elevatorId;
 		this.floorId = floorId;
-		this.requestType = requestType;
 	}
 
 	/**
@@ -59,12 +54,4 @@ public abstract class FloorElevatorTargetedMessage extends Message {
 	public int getElevatorId() {
 		return elevatorId;
 	}
-
-	/**
-	 * Get the request type
-	 */
-	public ElevatorFloorRequestType getRequestType() {
-		return requestType;
-	}
-
 }

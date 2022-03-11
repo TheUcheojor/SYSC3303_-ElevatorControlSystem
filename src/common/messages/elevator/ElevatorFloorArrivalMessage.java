@@ -4,6 +4,7 @@
 package common.messages.elevator;
 
 import common.messages.FloorElevatorTargetedMessage;
+import common.messages.MessageType;
 
 /**
  * This class represents a message that is sent by the floor to the elevator to
@@ -23,7 +24,7 @@ public class ElevatorFloorArrivalMessage extends FloorElevatorTargetedMessage {
 	 * A ElevatorFloorArrivalMessage constructor.
 	 */
 	public ElevatorFloorArrivalMessage(int elevatorId, int floorId, double newCurrentElevatorSpeed) {
-		super(elevatorId, floorId, ElevatorFloorRequestType.FLOOR_ARRIVAL_MESSAGE);
+		super(elevatorId, floorId, MessageType.FLOOR_ARRIVAL_MESSAGE);
 		this.newCurrentElevatorSpeed = newCurrentElevatorSpeed;
 	}
 

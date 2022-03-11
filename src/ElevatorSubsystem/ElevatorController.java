@@ -35,6 +35,7 @@ public class ElevatorController {
 	/**
 	 * Collection of the elevator cars in this subsystem
 	 */
+
 	private Map<Integer, ElevatorCar> elevators;
 
 	/**
@@ -79,8 +80,7 @@ public class ElevatorController {
 
 			elevators.put(carId, car);
 		}
-		
-		
+	
 		// initialize the subsystem communication channels
 		schedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 				SubsystemComponentType.SCHEDULER);

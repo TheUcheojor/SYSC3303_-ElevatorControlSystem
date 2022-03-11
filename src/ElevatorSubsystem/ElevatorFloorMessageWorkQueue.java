@@ -22,18 +22,23 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 	
 	@Override
 	protected void handleMessage(Message message) {
-		FloorElevatorTargetedMessage floorMessage = (FloorElevatorTargetedMessage) message;
 		try {
-			switch(floorMessage.getRequestType()) {
+			switch(message.getMessageType()) {
 				
 				case FLOOR_ARRIVAL_MESSAGE:
 					ElevatorFloorArrivalMessage arrivalMessage = ((ElevatorFloorArrivalMessage) message);
 					int floorNumber = arrivalMessage.getFloorId();
 					
 					System.out.println("Elevator has reached floor: " + floorNumber);
-					ElevatorStatusMessage arrivalStatus = elevators.get(floorMessage.getElevatorId()).createStatusMessage();
+					ElevatorStatusMessage arrivalStatus = elevators.get(arrivalMessage.getElevatorId()).createStatusMessage();
 				
 					schedulerSubsystemCommunication.sendMessage(arrivalStatus);
+					break;
+					
+				case ELEVATOR_DROP_PASSENGER_REQUEST:
+					ElevatorTransportRequest transportRequest = (ElevatorTransportRequest) message;
+					schedulerSubsystemCommunication.sendMessage(message);
+					schedulerSubsystemCommunication.sendMessage(elevators.get(transportRequest.getElevatorId()).createStatusMessage());
 					break;
 					
 				default:
