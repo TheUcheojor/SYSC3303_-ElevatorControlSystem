@@ -179,10 +179,6 @@ public class ElevatorJobManagement {
 			// then check that the job destination floor is above than the current
 			// largest destination floor. If so, we will replace the current smallest
 			// destination floor.
-			System.out.println("jobDestinationFloor: " + jobDestinationFloor);
-			System.out.println("elevatorDirection: " + elevatorDirection);
-			System.out.println("currentelevatorJob.getDirection(): " + currentelevatorJob.getDirection());
-
 			if (currentelevatorJob.getDirection() == elevatorDirection
 					&& jobDestinationFloor > largestDestinationFloor) {
 				largestDestinationFloor = jobDestinationFloor;
@@ -201,8 +197,6 @@ public class ElevatorJobManagement {
 	 */
 	public int getSmallestDestinationFloorInElevatorDirection() {
 		if (elevatorJobs.isEmpty()) {
-			System.out.println("check");
-
 			return -1;
 		}
 

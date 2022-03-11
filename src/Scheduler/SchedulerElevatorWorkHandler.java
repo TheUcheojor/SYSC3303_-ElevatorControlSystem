@@ -55,7 +55,10 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						+ elevatorStatusMessage.getFloorNumber() + ", ED: " + elevatorStatusMessage.getDirection()
 						+ ", EID: " + elevatorId + ", ES:" + elevatorStatusMessage.getErrorState() + " ]\n");
 
-				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+				if (elevatorJobManagements[elevatorId].hasPrimaryJobs()
+						|| elevatorJobManagements[elevatorId].hasSecondaryJobs()) {
+					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+				}
 			}
 			break;
 

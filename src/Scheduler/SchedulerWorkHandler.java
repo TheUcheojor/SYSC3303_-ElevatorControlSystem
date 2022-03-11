@@ -106,13 +106,15 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 		try {
 			// Move down if we above the target floor
 			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
+				System.out.println("(SCHEDULER) Sending a DOWN commmand to Elevator(id = " + elevatorId + ") ");
+
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
 
 			}
 			// Move up if we below the target floor
 			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
-				System.out.println("Sending an UP commmand");
+				System.out.println("(SCHEDULER) Sending an UP commmand to Elevator(id = " + elevatorId + ") ");
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 
