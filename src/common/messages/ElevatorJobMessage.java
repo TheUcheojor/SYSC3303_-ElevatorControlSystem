@@ -1,5 +1,7 @@
 package common.messages;
 
+import java.util.Objects;
+
 import common.Direction;
 
 /**
@@ -49,4 +51,22 @@ public abstract class ElevatorJobMessage extends Message {
 	public Direction getDirection() {
 		return direction;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(destinationFloor, direction);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElevatorJobMessage other = (ElevatorJobMessage) obj;
+		return destinationFloor == other.destinationFloor && direction == other.direction;
+	}
+
 }
