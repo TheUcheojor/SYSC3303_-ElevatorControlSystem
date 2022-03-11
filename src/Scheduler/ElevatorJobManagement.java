@@ -199,7 +199,7 @@ public class ElevatorJobManagement {
 	 * @return the smallest floor destination floor
 	 *
 	 */
-	public int getSmallestDestinationFloorAboveCurrentElevatorFloor() {
+	public int getSmallestDestinationFloorInElevatorDirection() {
 		if (elevatorJobs.isEmpty()) {
 			System.out.println("check");
 
