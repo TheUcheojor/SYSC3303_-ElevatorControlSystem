@@ -52,7 +52,6 @@ public class TestElevatorFloorMessageWorkQueue {
 		
 		workQueue = new ElevatorFloorMessageWorkQueue(elevatorSchedulerSubsystemCommunication, elevators);
 		
-		//receivedFloorMessages = new ArrayDeque<>();
 		receivedSchedulerMessages = new ArrayDeque<>();
 	}
 	
@@ -83,7 +82,6 @@ public class TestElevatorFloorMessageWorkQueue {
 			assertTrue(statusMessage.getMessageType() == MessageType.ELEVATOR_STATUS_MESSAGE);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
