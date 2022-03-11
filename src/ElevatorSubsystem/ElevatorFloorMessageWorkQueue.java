@@ -45,12 +45,11 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 					break;
 					
 				case ELEVATOR_DROP_PASSENGER_REQUEST:
-					ElevatorTransportRequest transportRequest = (ElevatorTransportRequest) message;
 					schedulerSubsystemCommunication.sendMessage(message);
-					schedulerSubsystemCommunication.sendMessage(elevators.get(transportRequest.getElevatorId()).createStatusMessage());
 					break;
 					
 				default:
+					System.out.println("(ELEVATOR) received improper message from FLOOR of type: " + message.getMessageType());
 					break;
 			}
 		} catch (Exception e) {

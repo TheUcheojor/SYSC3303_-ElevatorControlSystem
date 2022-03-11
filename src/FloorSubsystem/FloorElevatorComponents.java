@@ -165,14 +165,14 @@ public class FloorElevatorComponents {
 			@Override
 			public void run() {
 				try {
-					System.out.println("\nThe evelator sensor for floor " + floorNumber + " is waiting for "
+					System.out.println("\nEvelator sensor for floor " + floorNumber + " is waiting for "
 							+ totalTimeInMilliSeconds + "ms.");
 					Thread.sleep(totalTimeInMilliSeconds);
 				} catch (InterruptedException e) {
 					System.out.println(e);
 				}
 
-				System.out.println("\nThe evelator has reached the floor " + floorNumber);
+				System.out.println("\nElevator has reached the floor " + floorNumber);
 
 				// For now, we will assume that the motor's elevatorDirection is where the
 				// elevator plans to go
