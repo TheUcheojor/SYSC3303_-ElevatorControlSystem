@@ -75,7 +75,7 @@ public class TestElevatorFloorMessageWorkQueue {
 		try {
 			workQueue.enqueueMessage(floorMessage);
 		
-			Thread.sleep(1000);
+			Thread.sleep(100);
 			
 			statusMessage = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
 			assertTrue(statusMessage != null);

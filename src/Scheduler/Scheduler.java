@@ -52,6 +52,12 @@ public class Scheduler {
 		for (int i = 0; i < elevatorJobManagements.length; i++) {
 			elevatorJobManagements[i] = new ElevatorJobManagement(i);
 		}
+
+		this.schedulerElevatorWorkHandler = new SchedulerElevatorWorkHandler(schedulerFloorCommunication,
+				schedulerElevatorCommunication, elevatorJobManagements);
+
+		this.schedulerFloorWorkhandler = new SchedulerFloorWorkHandler(schedulerFloorCommunication,
+				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
 	/**
