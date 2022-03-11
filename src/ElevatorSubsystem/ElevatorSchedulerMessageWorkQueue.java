@@ -44,8 +44,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 				case SCHEDULER_ELEVATOR_COMMAND:
 					SchedulerElevatorCommand schedulerCommand =(SchedulerElevatorCommand) message;
 					handleElevatorCommand(schedulerCommand);
-					ElevatorStatusMessage postCommandStatus = elevators.get(schedulerCommand.getElevatorID()).createStatusMessage();
-					schedulerSubsystemCommunication.sendMessage(postCommandStatus);
+//					ElevatorStatusMessage postCommandStatus = elevators.get(schedulerCommand.getElevatorID()).createStatusMessage();
+//					schedulerSubsystemCommunication.sendMessage(postCommandStatus);
 					break;
 					
 				default:
