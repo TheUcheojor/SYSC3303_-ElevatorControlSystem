@@ -2,14 +2,17 @@ package ElevatorSubsystem;
 
 import java.util.Map;
 
-import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
-
+/**
+ * This class handles the communication between the elevator and floor subsystem
+ * @author Ryan Fife
+ *
+ */
 public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
 
@@ -21,6 +24,9 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 	}
 	
 	@Override
+	/**
+	 * This method handles messages received from the floor subsystem
+	 */
 	protected void handleMessage(Message message) {
 		try {
 			switch(message.getMessageType()) {
