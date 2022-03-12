@@ -6,16 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import common.Direction;
 import common.SimulationFloorInputData;
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
-import common.messages.FloorElevatorTargetedMessage;
 import common.messages.Message;
-import common.messages.elevator.ElevatorFloorSignalRequestMessage;
-import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.floor.ElevatorFloorRequest;
-import common.messages.scheduler.SchedulerFloorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 import common.work_management.MessageWorkQueue;
@@ -63,22 +58,24 @@ public class FloorSubsystem {
 	 * Message queue for received elevator messages
 	 */
 	private FloorElevatorMessageWorkQueue elevatorMessageQueue;
-	
+
 	/**
 	 * Message queue for received scheduler messages
 	 */
 	private FloorSchedulerMessageWorkQueue schedulerMessageQueue;
-	
+
 	/**
 	 * Floor to Elevator UDP Communication
 	 */
-	private SubsystemCommunicationRPC floorElevatorUDP = new SubsystemCommunicationRPC(SubsystemComponentType.FLOOR_SUBSYSTEM, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
-	
+	private SubsystemCommunicationRPC floorElevatorUDP = new SubsystemCommunicationRPC(
+			SubsystemComponentType.FLOOR_SUBSYSTEM, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
+
 	/**
 	 * Floor to Scheduler UDP Communication
 	 */
-	private SubsystemCommunicationRPC floorSchedulerUDP = new SubsystemCommunicationRPC(SubsystemComponentType.FLOOR_SUBSYSTEM, SubsystemComponentType.SCHEDULER);
-	
+	private SubsystemCommunicationRPC floorSchedulerUDP = new SubsystemCommunicationRPC(
+			SubsystemComponentType.FLOOR_SUBSYSTEM, SubsystemComponentType.SCHEDULER);
+
 	/**
 	 * This is the default constructor of the class
 	 *
@@ -102,10 +99,11 @@ public class FloorSubsystem {
 		for (int i = 0; i < floors.length; i++) {
 			floors[i] = new Floor(i);
 		}
-		
+
 		elevatorMessageQueue = new FloorElevatorMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors);
-		schedulerMessageQueue = new FloorSchedulerMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors, assignedFloorDataCollection);
-				
+		schedulerMessageQueue = new FloorSchedulerMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors,
+				assignedFloorDataCollection);
+
 	}
 
 	/**
@@ -126,8 +124,10 @@ public class FloorSubsystem {
 		String input = "";
 
 		try {
+			int id = 0;
 			while ((input = bufferedReader.readLine()) != null) {
-				unassignedFloorDataCollection.add(new SimulationFloorInputData(input));
+				unassignedFloorDataCollection.add(new SimulationFloorInputData(id, input));
+				id++;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -140,7 +140,7 @@ public class FloorSubsystem {
 		FloorSubsystem subsystem = new FloorSubsystem(inputFileName);
 		subsystem.runMain();
 	}
-	
+
 	/**
 	 * This is the Main function
 	 */
@@ -148,7 +148,7 @@ public class FloorSubsystem {
 		// Only attempt to read file when a file name as been passed
 		if (!inputFileName.equals(""))
 			readInputFile();
-		
+
 		// initialize the message receiving threads
 		setUpMessageQueueing(floorElevatorUDP, elevatorMessageQueue);
 		setUpMessageQueueing(floorSchedulerUDP, schedulerMessageQueue);
@@ -156,10 +156,11 @@ public class FloorSubsystem {
 			@Override
 			public void run() {
 				// wait for scheduler messages
-				for(SimulationFloorInputData floorInputData : unassignedFloorDataCollection) {
+				for (SimulationFloorInputData floorInputData : unassignedFloorDataCollection) {
 
-					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(floorInputData.getCurrentFloor(),
-							floorInputData.getFloorDirectionButton());
+					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(
+							floorInputData.getCurrentFloor(), floorInputData.getFloorDirectionButton(),
+							floorInputData.getInputDataId());
 
 					// Updating the floor properties(User interacting with the floor button)
 					int floorId = floorInputData.getCurrentFloor();
@@ -187,21 +188,22 @@ public class FloorSubsystem {
 	public Floor[] getFloors() {
 		return floors;
 	}
-	
+
 	/**
 	 * The function sets up the message queue
+	 *
 	 * @param communication
 	 * @param workQueue
 	 */
-	public void setUpMessageQueueing(SubsystemCommunicationRPC communication, MessageWorkQueue workQueue ) {
+	private void setUpMessageQueueing(SubsystemCommunicationRPC communication, MessageWorkQueue workQueue) {
 		(new Thread() {
 			@Override
 			public void run() {
-				while(true) {
+				while (true) {
 					try {
 						Message message = communication.receiveMessage();
 						workQueue.enqueueMessage(message);
-					}catch(Exception e) {
+					} catch (Exception e) {
 						System.out.println(e);
 						System.exit(1);
 					}
