@@ -9,6 +9,7 @@ import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.MessageType;
+import common.messages.floor.ElevatorFloorRequest;
 import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.FloorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
@@ -126,15 +127,20 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 
 				// If we have one ELEVATOR_PICK_UP_PASSENGER_REQUEST, we turn off the
 				// corresponding floor lamps.
+				// TODO we need to decouple turning off the floor lamp and sending the elevator
+				// which car buttons were pressed
 				boolean expectingElevatorButtonPress = false;
 				for (ElevatorJobMessage elevatorJob : jobsAtTargetFloor) {
 					if (elevatorJob.getMessageType() == MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST) {
+
+						ElevatorFloorRequest elevatorFloorRequestJob = (ElevatorFloorRequest) elevatorJob;
+
 						schedulerFloorCommunication
 								.sendMessage(new SchedulerFloorCommand(FloorCommand.TURN_OFF_FLOOR_LAMP,
-										nearestTargetFloor, elevatorJob.getDirection(), elevatorId));
+										nearestTargetFloor, elevatorFloorRequestJob.getDirection(), elevatorId,
+										elevatorFloorRequestJob.getInputDataId()));
+
 						expectingElevatorButtonPress = true;
-						// We break because floor buttons should only be turned off once
-						break;
 					}
 				}
 
