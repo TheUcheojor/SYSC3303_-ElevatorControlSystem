@@ -41,10 +41,14 @@ Running any Java application begins with executing the static main(String[] args
 This application is no different.
 
 	INSTRUCTIONS FOR ECLIPSE USERS
+	RUN AS SINGLE PROGRAM
 	1.	Import the project to your workspace. On a MacBook, you navigate as shown: 
 		i.	File -> Import -> General -> Existing Projects into Workspace
 	2.	Follow the import wizard instructions and import the project to your workspace
 	3.	Select the SystemExecutor class and run the program by clicking the play button on the top menu.
+	
+	RUN AS MULTIPLE PROGRAMS
+	*todo
 
 
 --------------------------------------------------------
