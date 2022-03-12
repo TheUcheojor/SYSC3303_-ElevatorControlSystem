@@ -84,7 +84,7 @@ public class Scheduler {
 	 * @param communication
 	 * @param workQueue
 	 */
-	public void setUpMessageQueueing(SubsystemCommunicationRPC communication, MessageWorkQueue workQueue) {
+	private void setUpMessageQueueing(SubsystemCommunicationRPC communication, MessageWorkQueue workQueue) {
 		(new Thread() {
 			@Override
 			public void run() {

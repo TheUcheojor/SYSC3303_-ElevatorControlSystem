@@ -10,10 +10,11 @@ import common.messages.elevator.ElevatorStatusRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
+
 /**
- * This class handles the elevator to scheduler interaction 
- * @author Ryan Fife, favour
- *
+ * This class serves the elevator related requests received from the scheduler subsystem.
+ * 
+ * @author Ryan Fife
  */
 public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
@@ -27,11 +28,11 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 		this.elevators = elevators;
 	}
 
-	@Override
 	/**
 	 * This method handles the messages communicated between the elevator and scheduler subsystem
 	 * @param - The message to be handled
 	 */
+	@Override
 	protected void handleMessage(Message message) {
 		try {
 			switch (message.getMessageType()) {
@@ -57,7 +58,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 	/**
 	 * This method handles elevator commands
 	 * 
-	 * @param command - The command recieved from the scheduler
+	 * @param command - The command received from the scheduler
 	 */
 	private void handleElevatorCommand(SchedulerElevatorCommand command) {
 		ElevatorLeavingFloorMessage leavingMessage;

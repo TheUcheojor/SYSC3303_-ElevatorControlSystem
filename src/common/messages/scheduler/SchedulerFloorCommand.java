@@ -27,16 +27,27 @@ public class SchedulerFloorCommand extends Message {
 	private Direction lampButtonDirection;
 
 	/**
-	 * An optional field that is set when requested to turned off floor lamps.
+	 * An optional field , elevator id, that is set when requested to turned off
+	 * floor lamps.
 	 *
 	 * Turning off floor lamps indicates that the request elevator has arrived.
 	 */
 	private int elevatorId;
 
 	/**
+	 * An optional field, input data id, that is set when requested to turned off
+	 * floor lamps.
+	 *
+	 * Turning off floor lamps indicates that the request elevator has arrived.
+	 */
+	private int inputDataId;
+
+	/**
 	 * The primary constructor
 	 *
-	 * @param floorCommand
+	 * @param floorCommand        the floor command
+	 * @param floorId             the floor id
+	 * @param lampButtonDirection the lamp button direction
 	 */
 	public SchedulerFloorCommand(FloorCommand floorCommand, int floorId, Direction lampButtonDirection) {
 		super(MessageType.SCHEDULER_FLOOR_COMMAND);
@@ -50,13 +61,14 @@ public class SchedulerFloorCommand extends Message {
 	 *
 	 * @param floorCommand
 	 */
-	public SchedulerFloorCommand(FloorCommand floorCommand, int floorId, Direction lampButtonDirection,
-			int elevatorId) {
+	public SchedulerFloorCommand(FloorCommand floorCommand, int floorId, Direction lampButtonDirection, int elevatorId,
+			int inputDataId) {
 		super(MessageType.SCHEDULER_FLOOR_COMMAND);
 		this.floorCommand = floorCommand;
 		this.floorId = floorId;
 		this.lampButtonDirection = lampButtonDirection;
 		this.elevatorId = elevatorId;
+		this.inputDataId = inputDataId;
 	}
 
 	/**
@@ -93,5 +105,14 @@ public class SchedulerFloorCommand extends Message {
 	 */
 	public int getElevatorId() {
 		return elevatorId;
+	}
+
+	/**
+	 * Get the input data id.
+	 *
+	 * @return the input data id
+	 */
+	public int getInputDataId() {
+		return inputDataId;
 	}
 }

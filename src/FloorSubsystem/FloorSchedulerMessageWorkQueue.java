@@ -5,7 +5,6 @@ package FloorSubsystem;
 
 import java.util.ArrayList;
 
-import common.Direction;
 import common.SimulationFloorInputData;
 import common.SystemValidationUtil;
 import common.messages.Message;
@@ -45,20 +44,14 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @param elevatorDirection
 	 * @return
 	 */
-	private ArrayList<Integer> getFloorPassengerDestinationFloors(int floorId, Direction elevatorDirection) {
-
-		ArrayList<Integer> destinationFloors = new ArrayList<>();
-
-		assignedFloorDataCollection.forEach(floorData -> {
-			// Check whether the input data is at the required floor and the requested
-			// direction is the same
-			if (floorData.getCurrentFloor() == floorId && floorData.getFloorDirectionButton() == elevatorDirection) {
-				destinationFloors.add(floorData.getDestinationFloorCarButton());
+	private int getFloorPassengerDestinationFloor(int inputDataId) {
+		for (SimulationFloorInputData floorData : assignedFloorDataCollection) {
+			if (floorData.getInputDataId() == inputDataId) {
+				return floorData.getDestinationFloorCarButton();
 			}
+		}
 
-		});
-
-		return destinationFloors;
+		return -1;
 	}
 
 	/**
@@ -82,26 +75,19 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		case TURN_OFF_FLOOR_LAMP:
 			floors[floorId].turnOffLampButton(request.getLampButtonDirection());
 
-			ArrayList<Integer> destinationFloors = getFloorPassengerDestinationFloors(floorId,
-					request.getLampButtonDirection());
-			// For now, I will only send the one item in the destination floor collection
-			// for this iteration.
-			// The elevator and scheduler do not support more than one at the moment.
+			int destinationFloor = getFloorPassengerDestinationFloor(request.getInputDataId());
 			int elevatorId = request.getElevatorId();
 
-			for (int destinationFloor : destinationFloors) {
-				ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloor,
-						elevatorId, request.getLampButtonDirection());
-				try {
-					elevatorSubsystemCommunication.sendMessage(elevatorTransportRequest);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloor,
+					elevatorId, request.getLampButtonDirection());
+			try {
+				elevatorSubsystemCommunication.sendMessage(elevatorTransportRequest);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
 			break;
-
 		default:
 			break;
 		}

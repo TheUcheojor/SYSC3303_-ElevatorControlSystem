@@ -16,12 +16,6 @@ import common.messages.ElevatorJobMessage;
  *
  */
 public class ElevatorJobManagement {
-
-	/**
-	 * The max job that a elevator can manage
-	 */
-	public static int ELEVATOR_JOB_THRESHOLD = 5;
-
 	/**
 	 * The elevator's jobs
 	 */
@@ -97,17 +91,6 @@ public class ElevatorJobManagement {
 	 */
 	public boolean isReadyForJob() {
 		return readyForJob;
-	}
-
-	/**
-	 * Return a flag indicating whether the elevator is at or greater than the job
-	 * Threshold
-	 *
-	 * @return true if the elevator is at or greater than the job Threshold;
-	 *         otherwise, return false
-	 */
-	public boolean isAtElevatorJobThreshold() {
-		return elevatorJobs.size() >= ELEVATOR_JOB_THRESHOLD;
 	}
 
 	/**

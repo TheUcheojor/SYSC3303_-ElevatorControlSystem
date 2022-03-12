@@ -164,7 +164,7 @@ public class FloorElevatorComponents {
 			@Override
 			public void run() {
 				try {
-					System.out.println("\n(FLOOR_SUBSYSTEM) Evelator (id = " + elevatorId + ") sensor for floor "
+					System.out.println("\n(FLOOR_SUBSYSTEM) Elevator (id = " + elevatorId + ") sensor for floor "
 							+ floorNumber + " is waiting for " + totalTimeInMilliSeconds + "ms.\n");
 					Thread.sleep(totalTimeInMilliSeconds);
 				} catch (InterruptedException e) {

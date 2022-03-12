@@ -30,6 +30,11 @@ public class SimulationFloorInputData {
 	private Integer currentFloor;
 
 	/**
+	 * The input data id.
+	 */
+	private Integer inputDataId;
+
+	/**
 	 * The elevator elevatorDirection that the passenger wishes to go to reach his
 	 * or her destination
 	 */
@@ -43,13 +48,15 @@ public class SimulationFloorInputData {
 	/**
 	 * Constructor.
 	 *
+	 * @param inputDataId               the floor input data
 	 * @param arrivalTime               the arrival time
 	 * @param currentFloor              the current floor
 	 * @param floorDirectionButton      the floor elevatorDirection
 	 * @param destinationFloorCarButton the target floor
 	 */
-	public SimulationFloorInputData(String arrivalTime, Integer currentFloor, Direction floorDirectionButton,
-			Integer destinationFloorCarButton) {
+	public SimulationFloorInputData(Integer inputDataId, String arrivalTime, Integer currentFloor,
+			Direction floorDirectionButton, Integer destinationFloorCarButton) {
+		this.inputDataId = inputDataId;
 		this.arrivalTime = arrivalTime;
 		this.currentFloor = currentFloor;
 		this.floorDirectionButton = floorDirectionButton;
@@ -62,8 +69,9 @@ public class SimulationFloorInputData {
 	 * @param dataString the data line string with formating: "Time Floor
 	 *                   FloorButton CarButton"
 	 */
-	public SimulationFloorInputData(String dataString) throws InvalidParameterException {
+	public SimulationFloorInputData(Integer inputDataId, String dataString) throws InvalidParameterException {
 
+		this.inputDataId = inputDataId;
 		try {
 			// Remove leading and trailing spaces
 			dataString = dataString.strip();
@@ -125,6 +133,15 @@ public class SimulationFloorInputData {
 	 */
 	public Integer getDestinationFloorCarButton() {
 		return destinationFloorCarButton;
+	}
+
+	/**
+	 * Gets the input data id
+	 *
+	 * @return the inputDataId
+	 */
+	public Integer getInputDataId() {
+		return inputDataId;
 	}
 
 }
