@@ -80,8 +80,6 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			// The elevator and scheduler do not support more than one at the moment.
 			int elevatorId = request.getElevatorId();
 
-			System.out.println("TURN_OFF_FLOOR_LAMP");
-
 			for (int destinationFloor : destinationFloors) {
 				ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloor,
 						elevatorId, request.getLampButtonDirection());

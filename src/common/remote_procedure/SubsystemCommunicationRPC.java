@@ -29,7 +29,7 @@ public class SubsystemCommunicationRPC {
 	/**
 	 * The maximum buffer size
 	 */
-	public static final int MAX_BUFFER_SIZE = 1200;
+	public static final int MAX_BUFFER_SIZE = 2000;
 
 	/**
 	 * The receive socket

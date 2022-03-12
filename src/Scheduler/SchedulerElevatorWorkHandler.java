@@ -46,16 +46,19 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				// should proceed like normal.
 				elevatorJobManagements[elevatorId].setErrorState(elevatorStatusMessage.getErrorState());
 				if (elevatorStatusMessage.getErrorState() != null) {
+					System.out.println(
+							"(SCHEDULER) Elevator(id = " + elevatorId + ") has an error. Shutting down elevator...");
 					elevatorJobManagements[elevatorId].setReadyForJob(false);
 				} else {
 					elevatorJobManagements[elevatorId].setReadyForJob(true);
 				}
 
-				System.out.println("Scheduler set internal elevator status: [EF: "
+				System.out.println("(SCHEDULER) Received Elevator status: [EF: "
 						+ elevatorStatusMessage.getFloorNumber() + ", ED: " + elevatorStatusMessage.getDirection()
 						+ ", EID: " + elevatorId + ", ES:" + elevatorStatusMessage.getErrorState() + " ]\n");
 
-				if (elevatorJobManagements[elevatorId].hasJobs()) {
+				if (elevatorJobManagements[elevatorId].isReadyForJob()
+						&& elevatorJobManagements[elevatorId].hasJobs()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 				}
 			}
@@ -74,6 +77,15 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				}
 
 				elevatorJobManagements[elevatorId].addJob((ElevatorJobMessage) message);
+
+				System.out.println("\n(SCHEDULER) Assigning DROP_OFF_PASSENGER Job (Direction = "
+						+ dropPassengerRequest.getDirection() + " @ floor = "
+						+ dropPassengerRequest.getDestinationFloor() + ") to Elevator (id = "
+						+ elevatorJobManagements[elevatorId].getElevatorId() + ")");
+
+				System.out.println("(SCHEDULER) Elevator Management Status: [EF: "
+						+ elevatorJobManagements[elevatorId].getCurrentFloorNumber() + ", ED: "
+						+ elevatorJobManagements[elevatorId].getElevatorDirection() + ", EID: " + elevatorId + " ]\n");
 
 				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 			}

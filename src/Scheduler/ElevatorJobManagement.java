@@ -35,7 +35,7 @@ public class ElevatorJobManagement {
 	private int currentFloorNumber = 0;
 
 	/**
-	 * The direction the elevator its plans to travel to drop off the passenger
+	 * The direction the elevator plans to travel to drop off the passenger
 	 */
 	private Direction elevatorDirection = Direction.IDLE;
 
@@ -174,7 +174,6 @@ public class ElevatorJobManagement {
 		while (elevatorJobsIterator.hasNext()) {
 			ElevatorJobMessage currentelevatorJob = elevatorJobsIterator.next();
 			int jobDestinationFloor = currentelevatorJob.getDestinationFloor();
-			System.out.println("jobDestinationFloor: " + jobDestinationFloor);
 
 			// Find jobs that are in same direction as the elevator. We will
 			// then check that the job destination floor is above than the current
@@ -185,9 +184,6 @@ public class ElevatorJobManagement {
 				largestDestinationFloor = jobDestinationFloor;
 			}
 		}
-
-		System.out.println("elevatorJobs largestDestinationFloor: " + largestDestinationFloor);
-
 		return largestDestinationFloor;
 	}
 
@@ -224,28 +220,14 @@ public class ElevatorJobManagement {
 	}
 
 	/**
-	 * Get the primary jobs at a given floor number. Primary Jobs are jobs that are
-	 * in the same direction as the elevator
+	 * Get the jobs at a given floor number.
 	 *
 	 * @param floorNumber the floor number
 	 * @param direction   the direction of the job
 	 *
 	 * @return the jobs at a given floor number
 	 */
-	public ArrayList<ElevatorJobMessage> getPrimaryJobsAtFloorNumber(int floorNumber) {
-		return getJobsAtFloorNumberAndDirection(floorNumber, elevatorDirection);
-	}
-
-	/**
-	 * Get the jobs at a given floor number and direction
-	 *
-	 * @param floorNumber the floor number
-	 * @param direction   the direction of the job
-	 *
-	 * @return the jobs at a given floor number
-	 */
-	public ArrayList<ElevatorJobMessage> getJobsAtFloorNumberAndDirection(int floorNumber, Direction direction) {
-
+	public ArrayList<ElevatorJobMessage> getPrimaryJobsAtFloor(int floorNumber) {
 		ArrayList<ElevatorJobMessage> jobsAtFloorNumber = new ArrayList<>();
 
 		Iterator<ElevatorJobMessage> elevatorJobsIterator = elevatorJobs.iterator();
@@ -253,8 +235,7 @@ public class ElevatorJobManagement {
 		while (elevatorJobsIterator.hasNext()) {
 			ElevatorJobMessage currentelevatorJob = elevatorJobsIterator.next();
 
-			if (currentelevatorJob.getDestinationFloor() == floorNumber
-					&& currentelevatorJob.getDirection() == direction) {
+			if (currentelevatorJob.getDestinationFloor() == floorNumber) {
 				jobsAtFloorNumber.add(currentelevatorJob);
 			}
 		}
@@ -370,6 +351,15 @@ public class ElevatorJobManagement {
 	public int getNumberOfPrimaryJobs() {
 		return (int) elevatorJobs.stream().filter(elevatorJobs -> elevatorJobs.getDirection() == elevatorDirection)
 				.count();
+	}
+
+	/**
+	 * Return the number of jobs
+	 *
+	 * @return the number of primary jobs
+	 */
+	public int getNumberOfJobs() {
+		return elevatorJobs.size();
 	}
 
 }

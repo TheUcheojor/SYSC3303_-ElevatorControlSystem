@@ -36,7 +36,7 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 			ElevatorJobMessage job = (ElevatorJobMessage) message;
-			System.out.println("Scheduler received floor request: go to floor " + job.getDestinationFloor() + "\n");
+			System.out.println("\nScheduler received floor request: go to floor " + job.getDestinationFloor() + "\n");
 			handleElevatorPickUpPassengerRequest(job);
 			break;
 
@@ -98,9 +98,9 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 					continue;
 
 				boolean doesCurrentElevatorHaveEqualJobs = currentElevatorJobManagement
-						.getNumberOfPrimaryJobs() == assumedBestElevatorJobManagement.getNumberOfPrimaryJobs();
+						.getNumberOfJobs() == assumedBestElevatorJobManagement.getNumberOfJobs();
 				boolean doesCurrentElevatorHaveLessJobs = currentElevatorJobManagement
-						.getNumberOfPrimaryJobs() <= assumedBestElevatorJobManagement.getNumberOfPrimaryJobs();
+						.getNumberOfJobs() < assumedBestElevatorJobManagement.getNumberOfJobs();
 
 				boolean isCurrentElevatorInValidDirection = !currentElevatorJobManagement.isRunningJob()
 						|| currentElevatorJobManagement.getElevatorDirection() == elevatorFloorJob.getDirection();
@@ -117,7 +117,6 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 				// current elevator is, we will change the assumed best elevator
 				if (!isAssumedBestElevatorInValidDirection && isCurrentElevatorInValidDirection) {
 					assumedBestElevatorJobManagement = currentElevatorJobManagement;
-
 				}
 
 				// If we both elevators have valid directions, we change the assumed best
@@ -140,6 +139,10 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 			}
 
 			assumedBestElevatorJobManagement.addJob(elevatorFloorJob);
+
+			System.out.println("\n(SCHEDULER) Assigning PICK_UP_PASSENGER Job (Direction = "
+					+ elevatorFloorJob.getDirection() + " @ floor = " + elevatorFloorJob.getDestinationFloor()
+					+ ") to Elevator (id = " + assumedBestElevatorJobManagement.getElevatorId() + ")\n");
 
 			// If the elevator is not currently running a job, we will update the elevator's
 			// direction and issue the appropriate elevator commands
