@@ -46,24 +46,47 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				// should proceed like normal.
 				elevatorJobManagements[elevatorId].setErrorState(elevatorStatusMessage.getErrorState());
 				if (elevatorStatusMessage.getErrorState() != null) {
+					System.out.println(
+							"(SCHEDULER) Elevator(id = " + elevatorId + ") has an error. Shutting down elevator...");
 					elevatorJobManagements[elevatorId].setReadyForJob(false);
 				} else {
 					elevatorJobManagements[elevatorId].setReadyForJob(true);
 				}
 
-				System.out.println("Scheduler set internal elevator status: [EF: "
+				System.out.println("(SCHEDULER) Received Elevator status: [EF: "
 						+ elevatorStatusMessage.getFloorNumber() + ", ED: " + elevatorStatusMessage.getDirection()
 						+ ", EID: " + elevatorId + ", ES:" + elevatorStatusMessage.getErrorState() + " ]\n");
 
-				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+				if (elevatorJobManagements[elevatorId].isReadyForJob()
+						&& elevatorJobManagements[elevatorId].hasJobs()) {
+					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+				}
 			}
 			break;
 
 		case ELEVATOR_DROP_PASSENGER_REQUEST:
-			elevatorId = ((ElevatorTransportRequest) message).getElevatorId();
+			ElevatorTransportRequest dropPassengerRequest = ((ElevatorTransportRequest) message);
+			elevatorId = dropPassengerRequest.getElevatorId();
 
 			synchronized (elevatorJobManagements) {
+
+				// If the elevators has no jobs (direction is IDLE), we will update the elevator
+				// direction
+				if (!elevatorJobManagements[elevatorId].hasJobs()) {
+					elevatorJobManagements[elevatorId].setElevatorDirection(dropPassengerRequest.getDirection());
+				}
+
 				elevatorJobManagements[elevatorId].addJob((ElevatorJobMessage) message);
+
+				System.out.println("\n(SCHEDULER) Assigning DROP_OFF_PASSENGER Job (Direction = "
+						+ dropPassengerRequest.getDirection() + " @ floor = "
+						+ dropPassengerRequest.getDestinationFloor() + ") to Elevator (id = "
+						+ elevatorJobManagements[elevatorId].getElevatorId() + ")");
+
+				System.out.println("(SCHEDULER) Elevator Management Status: [EF: "
+						+ elevatorJobManagements[elevatorId].getCurrentFloorNumber() + ", ED: "
+						+ elevatorJobManagements[elevatorId].getElevatorDirection() + ", EID: " + elevatorId + " ]\n");
+
 				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 			}
 

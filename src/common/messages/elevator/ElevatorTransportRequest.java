@@ -1,5 +1,7 @@
 package common.messages.elevator;
 
+import java.util.Objects;
+
 import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.MessageType;
@@ -37,5 +39,25 @@ public class ElevatorTransportRequest extends ElevatorJobMessage {
 	 */
 	public int getElevatorId() {
 		return elevatorId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(elevatorId);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElevatorTransportRequest other = (ElevatorTransportRequest) obj;
+		return elevatorId == other.elevatorId;
 	}
 }

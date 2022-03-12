@@ -31,7 +31,5 @@ public enum ElevatorCommand {
 	/**
 	 * The move down elevator command.
 	 */
-	MOVE_DOWN,
-
-
+	MOVE_DOWN
 }

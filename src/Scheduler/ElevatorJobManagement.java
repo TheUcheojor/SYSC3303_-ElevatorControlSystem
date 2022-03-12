@@ -1,7 +1,11 @@
 package Scheduler;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
+import FloorSubsystem.FloorSubsystem;
 import common.Direction;
 import common.messages.ElevatorJobMessage;
 
@@ -21,7 +25,7 @@ public class ElevatorJobManagement {
 	/**
 	 * The elevator's jobs
 	 */
-	private ArrayList<ElevatorJobMessage> elevatorJobs = new ArrayList<>();
+	private Set<ElevatorJobMessage> elevatorJobs = new HashSet<>();
 
 	/**
 	 * The elevator's current floor
@@ -31,7 +35,7 @@ public class ElevatorJobManagement {
 	private int currentFloorNumber = 0;
 
 	/**
-	 * The direction the elevator its plans to travel to drop off the passenger
+	 * The direction the elevator plans to travel to drop off the passenger
 	 */
 	private Direction elevatorDirection = Direction.IDLE;
 
@@ -65,10 +69,7 @@ public class ElevatorJobManagement {
 	 * @param elevatorJob the elevator job
 	 */
 	public void addJob(ElevatorJobMessage elevatorJob) {
-
-		if (elevatorJob.getDirection() == elevatorDirection || elevatorDirection == Direction.IDLE) {
-			elevatorJobs.add(elevatorJob);
-		}
+		elevatorJobs.add(elevatorJob);
 	}
 
 	/**
@@ -155,77 +156,87 @@ public class ElevatorJobManagement {
 	}
 
 	/**
-	 * Get the largest floor destination floor
+	 * Get the largest floor destination floor below the current elevator floor. The
+	 * job must be going in the same direction as the elevator.
 	 *
 	 * @return the largest floor destination floor
 	 *
 	 */
-	public int getLargestDestinationFloor() {
+	public int getLargestDestinationFloorInElevatorDirection() {
 		if (elevatorJobs.isEmpty()) {
 			return -1;
 		}
 
-		int largestDestinationFloor = elevatorJobs.get(0).getDestinationFloor();
+		int largestDestinationFloor = -1;
 
-		for (int i = 0; i < elevatorJobs.size(); i++) {
-			if (elevatorJobs.get(i).getDestinationFloor() > largestDestinationFloor) {
-				largestDestinationFloor = elevatorJobs.get(i).getDestinationFloor();
+		Iterator<ElevatorJobMessage> elevatorJobsIterator = elevatorJobs.iterator();
+
+		while (elevatorJobsIterator.hasNext()) {
+			ElevatorJobMessage currentelevatorJob = elevatorJobsIterator.next();
+			int jobDestinationFloor = currentelevatorJob.getDestinationFloor();
+
+			// Find jobs that are in same direction as the elevator. We will
+			// then check that the job destination floor is above than the current
+			// largest destination floor. If so, we will replace the current smallest
+			// destination floor.
+			if (currentelevatorJob.getDirection() == elevatorDirection
+					&& jobDestinationFloor > largestDestinationFloor) {
+				largestDestinationFloor = jobDestinationFloor;
 			}
 		}
 		return largestDestinationFloor;
 	}
 
 	/**
-	 * Get the smallest floor destination floor
+	 * Get the smallest job floor destination above the current elevator floor. The
+	 * job must be going in the same direction as the elevator.
 	 *
 	 * @return the smallest floor destination floor
 	 *
 	 */
-	public int getSmallestDestinationFloor() {
+	public int getSmallestDestinationFloorInElevatorDirection() {
 		if (elevatorJobs.isEmpty()) {
 			return -1;
 		}
 
-		int smallestDestinationFloor = elevatorJobs.get(0).getDestinationFloor();
+		int smallestDestinationFloor = FloorSubsystem.NUMBER_OF_FLOORS;
 
-		for (int i = 0; i < elevatorJobs.size(); i++) {
-			if (elevatorJobs.get(i).getDestinationFloor() < smallestDestinationFloor) {
-				smallestDestinationFloor = elevatorJobs.get(i).getDestinationFloor();
+		Iterator<ElevatorJobMessage> elevatorJobsIterator = elevatorJobs.iterator();
+		while (elevatorJobsIterator.hasNext()) {
+			ElevatorJobMessage currentelevatorJob = elevatorJobsIterator.next();
+			int jobDestinationFloor = currentelevatorJob.getDestinationFloor();
+
+			// Find jobs that are in same direction as the elevator. We will
+			// then check that the job destination floor is smaller than the current
+			// smallest destination floor. If so, we will replace the current smallest
+			// destination floor.
+			if (currentelevatorJob.getDirection() == elevatorDirection
+					&& jobDestinationFloor < smallestDestinationFloor) {
+				smallestDestinationFloor = jobDestinationFloor;
 			}
 		}
+
 		return smallestDestinationFloor;
-
 	}
 
 	/**
-	 * Get the primary jobs at a given floor number. Primary Jobs are jobs that are
-	 * in the same direction as the elevator
+	 * Get the jobs at a given floor number.
 	 *
 	 * @param floorNumber the floor number
 	 * @param direction   the direction of the job
 	 *
 	 * @return the jobs at a given floor number
 	 */
-	public ArrayList<ElevatorJobMessage> getPrimaryJobsAtFloorNumber(int floorNumber) {
-		return getJobsAtFloorNumberAndDirection(floorNumber, elevatorDirection);
-	}
-
-	/**
-	 * Get the jobs at a given floor number and direction
-	 *
-	 * @param floorNumber the floor number
-	 * @param direction   the direction of the job
-	 *
-	 * @return the jobs at a given floor number
-	 */
-	public ArrayList<ElevatorJobMessage> getJobsAtFloorNumberAndDirection(int floorNumber, Direction direction) {
-
+	public ArrayList<ElevatorJobMessage> getPrimaryJobsAtFloor(int floorNumber) {
 		ArrayList<ElevatorJobMessage> jobsAtFloorNumber = new ArrayList<>();
 
-		for (int i = 0; i < elevatorJobs.size(); i++) {
-			if (elevatorJobs.get(i).getDestinationFloor() == floorNumber
-					&& elevatorJobs.get(i).getDirection() == direction) {
-				jobsAtFloorNumber.add(elevatorJobs.get(i));
+		Iterator<ElevatorJobMessage> elevatorJobsIterator = elevatorJobs.iterator();
+
+		while (elevatorJobsIterator.hasNext()) {
+			ElevatorJobMessage currentelevatorJob = elevatorJobsIterator.next();
+
+			if (currentelevatorJob.getDestinationFloor() == floorNumber) {
+				jobsAtFloorNumber.add(currentelevatorJob);
 			}
 		}
 
@@ -257,6 +268,16 @@ public class ElevatorJobManagement {
 	 */
 	public void setCurrentFloorNumber(int currentFloorNumber) {
 		this.currentFloorNumber = currentFloorNumber;
+	}
+
+	/**
+	 * Return whether an elevator has jobs
+	 *
+	 *
+	 * @return true if the elevator has jobs; otherwise, return false
+	 */
+	public boolean hasJobs() {
+		return elevatorDirection != Direction.IDLE;
 	}
 
 	/**
@@ -330,6 +351,15 @@ public class ElevatorJobManagement {
 	public int getNumberOfPrimaryJobs() {
 		return (int) elevatorJobs.stream().filter(elevatorJobs -> elevatorJobs.getDirection() == elevatorDirection)
 				.count();
+	}
+
+	/**
+	 * Return the number of jobs
+	 *
+	 * @return the number of primary jobs
+	 */
+	public int getNumberOfJobs() {
+		return elevatorJobs.size();
 	}
 
 }

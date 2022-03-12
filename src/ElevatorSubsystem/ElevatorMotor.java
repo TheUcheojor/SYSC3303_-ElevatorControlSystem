@@ -1,5 +1,7 @@
 package ElevatorSubsystem;
 
+import java.io.Serializable;
+
 import common.Direction;
 
 /**
@@ -9,7 +11,12 @@ import common.Direction;
  *
  */
 
-public class ElevatorMotor {
+public class ElevatorMotor implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The top speed of the elevator

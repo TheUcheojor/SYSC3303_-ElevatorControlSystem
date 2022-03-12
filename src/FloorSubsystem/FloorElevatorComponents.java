@@ -5,7 +5,6 @@ package FloorSubsystem;
 
 import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
-import common.messages.MessageChannel;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 
@@ -40,7 +39,6 @@ public class FloorElevatorComponents {
 	 */
 	public FloorElevatorComponents(int elevatorId) {
 		this.elevatorId = elevatorId;
-		System.out.println("this.elevatorId " + this.elevatorId);
 	}
 
 	/**
@@ -107,7 +105,8 @@ public class FloorElevatorComponents {
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
 	 */
-	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor, SubsystemCommunicationRPC elevatorUDP, boolean isFloorFinalDestination) {
+	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor,
+			SubsystemCommunicationRPC elevatorUDP, boolean isFloorFinalDestination) {
 
 		double topSpeed = elevatorMotor.getTopSpeed();
 		double intialSpeed = elevatorMotor.getCurrentVelocity();
@@ -165,20 +164,22 @@ public class FloorElevatorComponents {
 			@Override
 			public void run() {
 				try {
-					System.out.println("\nThe evelator sensor for floor " + floorNumber + " is waiting for "
-							+ totalTimeInMilliSeconds + "ms.");
+					System.out.println("\n(FLOOR_SUBSYSTEM) Evelator (id = " + elevatorId + ") sensor for floor "
+							+ floorNumber + " is waiting for " + totalTimeInMilliSeconds + "ms.\n");
 					Thread.sleep(totalTimeInMilliSeconds);
 				} catch (InterruptedException e) {
 					System.out.println(e);
 				}
 
-				System.out.println("\nThe evelator has reached the floor " + floorNumber);
+				System.out.println("\n(FLOOR_SUBSYSTEM) Elevator(id = " + elevatorId + ") has reached the floor "
+						+ floorNumber + "\n");
 
 				// For now, we will assume that the motor's elevatorDirection is where the
 				// elevator plans to go
 				// TODO Reevaluate the assumption.
 				elevatorArrivedAtFloor(elevatorMotor.getDirection(), floorNumber);
-				ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber, newCurrentElevatorSpeed);
+				ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber,
+						newCurrentElevatorSpeed);
 				try {
 					elevatorUDP.sendMessage(notifyMsg);
 				} catch (Exception e) {
@@ -186,7 +187,6 @@ public class FloorElevatorComponents {
 					e.printStackTrace();
 				}
 			}
-
 		};
 
 		notifyElevatorThread.start();

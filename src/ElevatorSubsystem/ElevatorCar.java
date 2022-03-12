@@ -1,31 +1,44 @@
 package ElevatorSubsystem;
 
-import common.SystemValidationUtil;
-import common.exceptions.InvalidSystemConfigurationInputException;
-import common.messages.FloorElevatorTargetedMessage;
-import common.messages.Message;
-import common.messages.MessageChannel;
-import common.messages.elevator.ElevatorFloorArrivalMessage;
-import common.messages.elevator.ElevatorFloorSignalRequestMessage;
-import common.messages.elevator.ElevatorLeavingFloorMessage;
 import common.messages.elevator.ElevatorStatusMessage;
-import common.messages.elevator.ElevatorTransportRequest;
-import common.messages.scheduler.SchedulerElevatorCommand;
 
 
 /**
- * Entity representing an elevator car, contains composite subcomponents for
+ * Entity representing an elevator car, composed of subcomponents for
  * major functionality.
  *
  * @author Ryan Fife, paulokenne, Favour
  *
  */
 public class ElevatorCar {
+	/*
+	 * elevator Id
+	 */
 	private int id;
+	
+	/*
+	 * flag for if the elevator is in service (able to take jobs) or not
+	 */
 	private boolean inService;
+	
+	/*
+	 * elevator motor
+	 */
 	private ElevatorMotor motor;
+	
+	/*
+	 * elevator door
+	 */
 	private ElevatorDoor door;
+	
+	/*
+	 * elevators current floor
+	 */
 	private int floorNumber = 0;
+	
+	/*
+	 * if the elevator is in an error state, this defines it
+	 */
 	private Exception errorState;
 
 	public ElevatorCar(int id, ElevatorMotor motor, ElevatorDoor door) {
@@ -50,6 +63,10 @@ public class ElevatorCar {
 	public boolean getInService() {
 		return inService;
 	}
+	
+	public int getFloorNumber() {
+		return floorNumber;
+	}
 
 	public void setInService(boolean service) {
 		inService = service;
@@ -57,6 +74,10 @@ public class ElevatorCar {
 	
 	public void setErrorState(Exception errorState) {
 		this.errorState = errorState;
+	}
+	
+	public void setFloorNumber(int floorNumber) {
+		this.floorNumber = floorNumber;
 	}
 
 	/**

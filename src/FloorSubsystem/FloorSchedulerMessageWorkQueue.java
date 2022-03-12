@@ -15,26 +15,28 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
 
 /**
- * This class represents the floor scheduler message Work Queue. Scheduler messages
- * added to the queue will be handled by a worker.
+ * This class represents the floor scheduler message Work Queue. Scheduler
+ * messages added to the queue will be handled by a worker.
  *
  * @author Jacob
  *
  */
 public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
-	
+
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
 	private SubsystemCommunicationRPC elevatorSubsystemCommunication;
 	private Floor[] floors;
 	private ArrayList<SimulationFloorInputData> assignedFloorDataCollection;
 
-	public FloorSchedulerMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication, SubsystemCommunicationRPC elevatorSubsystemCommunication, Floor[] floors, ArrayList<SimulationFloorInputData> assignedFloorDataCollection) {
+	public FloorSchedulerMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication,
+			SubsystemCommunicationRPC elevatorSubsystemCommunication, Floor[] floors,
+			ArrayList<SimulationFloorInputData> assignedFloorDataCollection) {
 		this.schedulerSubsystemCommunication = schedulerSubsystemCommunication;
 		this.elevatorSubsystemCommunication = elevatorSubsystemCommunication;
 		this.floors = floors;
 		this.assignedFloorDataCollection = assignedFloorDataCollection;
 	}
-	
+
 	/**
 	 * Given the elevator direction, returns a floor's list of passenger
 	 * destinations (car buttons pressed)
@@ -58,7 +60,7 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
 		return destinationFloors;
 	}
-	
+
 	/**
 	 * Handle message method, receives a message and calls the corresponding switch case. Overrides MessageWorkQueue handleMessage method.
 	 * 
@@ -85,20 +87,19 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			// For now, I will only send the one item in the destination floor collection
 			// for this iteration.
 			// The elevator and scheduler do not support more than one at the moment.
-			//
-			// TODO Send the full collection of destination floors. Requires cooperation
-			// with the elevator and scheduler. Also, the id of the elevator needs to be
-			// sent.
-			// Since we have one elevator, we will hard code the elevator id of 0.
-			int elevatorId = 0;
-			ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloors.get(0),
-					elevatorId, request.getLampButtonDirection());
-			try {
-				elevatorSubsystemCommunication.sendMessage(elevatorTransportRequest);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			int elevatorId = request.getElevatorId();
+
+			for (int destinationFloor : destinationFloors) {
+				ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloor,
+						elevatorId, request.getLampButtonDirection());
+				try {
+					elevatorSubsystemCommunication.sendMessage(elevatorTransportRequest);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+
 			break;
 
 		default:

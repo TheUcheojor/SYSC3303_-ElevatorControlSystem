@@ -7,7 +7,7 @@ import common.messages.MessageType;
 /**
  * This class represents when a passenger requests for an elevator at a floor
  *
- * @author ryanfire, paulokenne
+ * @author ryanfife, paulokenne
  *
  */
 public class ElevatorFloorRequest extends ElevatorJobMessage {

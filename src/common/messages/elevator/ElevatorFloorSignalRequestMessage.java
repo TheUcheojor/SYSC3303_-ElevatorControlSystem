@@ -5,6 +5,7 @@ package common.messages.elevator;
 
 import ElevatorSubsystem.ElevatorMotor;
 import common.messages.FloorElevatorTargetedMessage;
+import common.messages.MessageType;
 
 /**
  * This class represents a request that sent to the floor that indicates the
@@ -30,7 +31,7 @@ public class ElevatorFloorSignalRequestMessage extends FloorElevatorTargetedMess
 	 */
 	public ElevatorFloorSignalRequestMessage(int elevatorId, int floorId, ElevatorMotor elevatorMotor,
 			boolean isFloorFinalDestination) {
-		super(elevatorId, floorId, ElevatorFloorRequestType.ELEVATOR_FLOOR_SIGNAL_REQUEST);
+		super(elevatorId, floorId, MessageType.ELEVATOR_FLOOR_SIGNAL_REQUEST);
 		this.isFloorFinalDestination = isFloorFinalDestination;
 		this.elevatorMotor = elevatorMotor;
 	}

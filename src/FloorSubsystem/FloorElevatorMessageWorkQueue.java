@@ -11,14 +11,14 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
 
 /**
- * This class represents the floor elevator message Work Queue. Elevator messages
- * added to the queue will be handled by a worker.
+ * This class represents the floor elevator message Work Queue. Elevator
+ * messages added to the queue will be handled by a worker.
  *
  * @author Jacob
  *
  */
 public class FloorElevatorMessageWorkQueue extends MessageWorkQueue {
-	
+
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
 	private SubsystemCommunicationRPC elevatorSubsystemCommunication;
 	private Floor[] floors;
@@ -30,7 +30,9 @@ public class FloorElevatorMessageWorkQueue extends MessageWorkQueue {
 	 * @param elevatorSubsystemCommunication the UDP system for floor to/from elevator
 	 * @param floors			The list of all floors
 	 */
-	public FloorElevatorMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication, SubsystemCommunicationRPC elevatorSubsystemCommunication, Floor[] floors) {
+	public FloorElevatorMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication,
+			SubsystemCommunicationRPC elevatorSubsystemCommunication, Floor[] floors) {
+
 		this.schedulerSubsystemCommunication = schedulerSubsystemCommunication;
 		this.elevatorSubsystemCommunication = elevatorSubsystemCommunication;
 		this.floors = floors;
@@ -46,7 +48,7 @@ public class FloorElevatorMessageWorkQueue extends MessageWorkQueue {
 		
 		// As this is the FloorElevator work queue, the only message is a FloorElevatorTargetedMessage
 		FloorElevatorTargetedMessage request = (FloorElevatorTargetedMessage) message;
-		
+
 		int floorId = request.getFloorId();
 		int elevatorId = request.getElevatorId();
 
@@ -56,7 +58,7 @@ public class FloorElevatorMessageWorkQueue extends MessageWorkQueue {
 		}
 
 		// Handle the request with the appropriate case
-		switch (request.getRequestType()) {
+		switch (request.getMessageType()) {
 
 		case ELEVATOR_FLOOR_SIGNAL_REQUEST:
 			ElevatorFloorSignalRequestMessage floorSignalRequestMessage = (ElevatorFloorSignalRequestMessage) request;
