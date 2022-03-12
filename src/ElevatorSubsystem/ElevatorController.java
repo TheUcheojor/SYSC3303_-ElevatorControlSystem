@@ -11,6 +11,9 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 
 /**
+ * Controller class that instantiates the required entities for managing the elevator entity behaviour.
+ * Additionally, the controller is the central hub for receiving elevator related messages from other subsystems.
+ * 
  * @author Ryan Fife, Favour
  *
  */

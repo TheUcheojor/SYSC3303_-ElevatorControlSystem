@@ -4,18 +4,23 @@ Team members: Ryan Fife, Paul Okenne, Jacob Charpentier, Favour Olotu, Delight O
 System Overview:
 The purpose of this program is to simulate a real-time server-client communication. The system is comprised of three
 subsystems: a central scheduler, the floor controller, and elevator controller. Inter-system communication utilizes 
-a defined message schema over UDP allowing each subsystem to be independantly deployed.
+a defined message schema over UDP allowing each subsystem to be independently deployed.
 
 Primary Classes:
 
-ElevatorController - This class manages inter-subsystem elevator communications and manages the elevator cars.
+ElevatorController - This class manages inter-subsystem elevator communications and manages the elevator cars. 
 
-Floor - This class is controlled by the FloorSubsystem. It handles job requests and holds the properties 
-of the floor ie. floor number, floor buttons and floor lamps. 
+ElevatorCar - The elevator car entities, containing a motor and door.
 
 FloorSubsystem- This class manages sending and receiving of job requests from and to the Scheduler.
 
+Floor - This class is controlled by the FloorSubsystem. It handles job requests and holds the properties 
+of the floor ie. floor number, floor buttons and floor lamps.
+
 Scheduler - This class manages the communication between the Elevator and the Floor sub systems.
+
+SubsystemCommunicationRPC - Class for managing inter subsystem communication. In this iteration we use a RDP schema
+over UDP.
 
 System Flow:
 

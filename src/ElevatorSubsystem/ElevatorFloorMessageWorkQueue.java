@@ -8,10 +8,11 @@ import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
+
 /**
- * This class handles the communication between the elevator and floor subsystem
+ * This class serves the elevator related requests received from the floor subsystem.
+ * 
  * @author Ryan Fife
- *
  */
 public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
@@ -23,10 +24,10 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 		this.elevators = elevators;
 	}
 	
-	@Override
 	/**
 	 * This method handles messages received from the floor subsystem
 	 */
+	@Override
 	protected void handleMessage(Message message) {
 		try {
 			switch(message.getMessageType()) {
