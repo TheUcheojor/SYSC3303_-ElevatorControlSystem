@@ -115,7 +115,7 @@ public class SchedulerFloorWorkHandlerTest {
 		(new Thread() {
 			@Override
 			public void run() {
-				ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(2, Direction.DOWN);
+				ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(2, Direction.DOWN, 0);
 				schedulerFloorWorkHandler.enqueueMessage(elevatorFloorRequest);
 			}
 		}).start();
