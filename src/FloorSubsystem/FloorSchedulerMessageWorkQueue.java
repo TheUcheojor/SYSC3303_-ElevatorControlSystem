@@ -1,3 +1,6 @@
+/**
+ *
+ */
 package FloorSubsystem;
 
 import java.util.ArrayList;
@@ -58,6 +61,11 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		return destinationFloors;
 	}
 
+	/**
+	 * Handle message method, receives a message and calls the corresponding switch case. Overrides MessageWorkQueue handleMessage method.
+	 * 
+	 * @param message the message to be handled
+	 */
 	@Override
 	protected void handleMessage(Message message) {
 		SchedulerFloorCommand request = (SchedulerFloorCommand) message;
@@ -68,6 +76,7 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			return;
 		}
 
+		// Handle the given command with the appropriate case
 		switch (request.getCommand()) {
 
 		case TURN_OFF_FLOOR_LAMP:
