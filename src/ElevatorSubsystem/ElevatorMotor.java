@@ -14,6 +14,11 @@ import common.Direction;
 public class ElevatorMotor implements Serializable {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The top speed of the elevator
 	 */
 	private double topSpeed;

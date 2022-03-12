@@ -39,7 +39,6 @@ public class FloorElevatorComponents {
 	 */
 	public FloorElevatorComponents(int elevatorId) {
 		this.elevatorId = elevatorId;
-		System.out.println("this.elevatorId " + this.elevatorId);
 	}
 
 	/**
@@ -165,14 +164,15 @@ public class FloorElevatorComponents {
 			@Override
 			public void run() {
 				try {
-					System.out.println("\nThe evelator sensor for floor " + floorNumber + " is waiting for "
-							+ totalTimeInMilliSeconds + "ms.");
+					System.out.println("\n(FLOOR_SUBSYSTEM) Evelator (id = " + elevatorId + ") sensor for floor "
+							+ floorNumber + " is waiting for " + totalTimeInMilliSeconds + "ms.\n");
 					Thread.sleep(totalTimeInMilliSeconds);
 				} catch (InterruptedException e) {
 					System.out.println(e);
 				}
 
-				System.out.println("\nThe evelator has reached the floor " + floorNumber);
+				System.out.println("\n(FLOOR_SUBSYSTEM) Elevator(id = " + elevatorId + ") has reached the floor "
+						+ floorNumber + "\n");
 
 				// For now, we will assume that the motor's elevatorDirection is where the
 				// elevator plans to go
@@ -187,7 +187,6 @@ public class FloorElevatorComponents {
 					e.printStackTrace();
 				}
 			}
-
 		};
 
 		notifyElevatorThread.start();

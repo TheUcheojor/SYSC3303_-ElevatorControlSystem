@@ -22,7 +22,11 @@ import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
-
+/**
+ * This is a test class for the elevator message work queue
+ * @author Ryan Fife
+ *
+ */
 class TestElevatorSchedulerMessageWorkQueue {
 	private SubsystemCommunicationRPC schedulerElevatorSubsystemCommunication;
 	private SubsystemCommunicationRPC floorElevatorSubsystemCommunication;

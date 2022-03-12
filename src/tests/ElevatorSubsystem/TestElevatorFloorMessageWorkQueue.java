@@ -52,7 +52,6 @@ public class TestElevatorFloorMessageWorkQueue {
 		
 		workQueue = new ElevatorFloorMessageWorkQueue(elevatorSchedulerSubsystemCommunication, elevators);
 		
-		//receivedFloorMessages = new ArrayDeque<>();
 		receivedSchedulerMessages = new ArrayDeque<>();
 	}
 	
@@ -76,14 +75,13 @@ public class TestElevatorFloorMessageWorkQueue {
 		try {
 			workQueue.enqueueMessage(floorMessage);
 		
-			Thread.sleep(1000);
+			Thread.sleep(100);
 			
 			statusMessage = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
 			assertTrue(statusMessage != null);
 			assertTrue(statusMessage.getMessageType() == MessageType.ELEVATOR_STATUS_MESSAGE);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

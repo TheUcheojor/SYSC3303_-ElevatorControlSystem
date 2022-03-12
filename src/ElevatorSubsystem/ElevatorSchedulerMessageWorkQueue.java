@@ -7,11 +7,14 @@ import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorStatusRequest;
-import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
-
+/**
+ * This class handles the elevator to scheduler interaction 
+ * @author Ryan Fife, favour
+ *
+ */
 public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
@@ -25,6 +28,10 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 	}
 
 	@Override
+	/**
+	 * This method handles the messages communicated between the elevator and scheduler subsystem
+	 * @param - The message to be handled
+	 */
 	protected void handleMessage(Message message) {
 		try {
 			switch (message.getMessageType()) {
@@ -37,8 +44,6 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 				case SCHEDULER_ELEVATOR_COMMAND:
 					SchedulerElevatorCommand schedulerCommand =(SchedulerElevatorCommand) message;
 					handleElevatorCommand(schedulerCommand);
-					ElevatorStatusMessage postCommandStatus = elevators.get(schedulerCommand.getElevatorID()).createStatusMessage();
-					schedulerSubsystemCommunication.sendMessage(postCommandStatus);
 					break;
 					
 				default:
@@ -49,6 +54,11 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 		}
 	}
 	
+	/**
+	 * This method handles elevator commands
+	 * 
+	 * @param command - The command recieved from the scheduler
+	 */
 	private void handleElevatorCommand(SchedulerElevatorCommand command) {
 		ElevatorLeavingFloorMessage leavingMessage;
 		ElevatorFloorSignalRequestMessage comingMessage;

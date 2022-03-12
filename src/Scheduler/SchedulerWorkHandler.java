@@ -106,13 +106,15 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 		try {
 			// Move down if we above the target floor
 			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
+				System.out.println("\n(SCHEDULER) Sending a DOWN commmand to Elevator(id = " + elevatorId + ") ");
+
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
 
 			}
 			// Move up if we below the target floor
 			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
-				System.out.println("Sending an UP commmand");
+				System.out.println("\n(SCHEDULER) Sending an UP commmand to Elevator(id = " + elevatorId + ") ");
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 
@@ -120,20 +122,28 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 				// If we are at a target floor, take action
 				// Find all the jobs at this floor and address them appropriately
 				ArrayList<ElevatorJobMessage> jobsAtTargetFloor = elevatorJobManagement
-						.getPrimaryJobsAtFloorNumber(nearestTargetFloor);
+						.getPrimaryJobsAtFloor(nearestTargetFloor);
 
 				// If we have one ELEVATOR_PICK_UP_PASSENGER_REQUEST, we turn off the
 				// corresponding floor lamps.
+				boolean expectingElevatorButtonPress = false;
 				for (ElevatorJobMessage elevatorJob : jobsAtTargetFloor) {
 					if (elevatorJob.getMessageType() == MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST) {
 						schedulerFloorCommunication
 								.sendMessage(new SchedulerFloorCommand(FloorCommand.TURN_OFF_FLOOR_LAMP,
-										nearestTargetFloor, elevatorJobManagement.getElevatorDirection(), elevatorId));
-
+										nearestTargetFloor, elevatorJob.getDirection(), elevatorId));
+						expectingElevatorButtonPress = true;
 						// We break because floor buttons should only be turned off once
 						break;
 					}
 				}
+
+				String addressedJobMessage = "(SCHEDULER) Elevator (id = " + elevatorId + ") has addressed: ";
+				for (ElevatorJobMessage job : jobsAtTargetFloor) {
+					addressedJobMessage += "(" + job.getMessageType() + " job - " + job.getDirection() + " @ floor = "
+							+ job.getDestinationFloor() + "),";
+				}
+				System.out.println("\n" + addressedJobMessage + "\n");
 
 				// Stop the elevator and open the doors
 				schedulerElevatorCommunication
@@ -150,7 +160,9 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 				// the elevator direction to be the opposite of what it currently is.
 				if (!elevatorJobManagement.hasPrimaryJobs()) {
 
-					if (elevatorJobManagement.hasSecondaryJobs()) {
+					// An elevator button press is a potential primary job and hence, we will not
+					// load secondary jobs if we expect one.
+					if (!expectingElevatorButtonPress && elevatorJobManagement.hasSecondaryJobs()) {
 						elevatorJobManagement.loadSecondaryJobs();
 
 						// We start focusing on address the other jobs
