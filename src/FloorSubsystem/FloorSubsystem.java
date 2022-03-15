@@ -43,16 +43,9 @@ public class FloorSubsystem {
 	private String inputFileName;
 
 	/**
-	 * Collection of the simulation input objects that have not been sent to the
-	 * scheduler. Therefore, they are unassigned.
+	 * Collection of the simulation input objects.
 	 */
-	private ArrayList<SimulationFloorInputData> unassignedFloorDataCollection = new ArrayList<>();
-
-	/**
-	 * Collection of the simulation input objects that have been sent to the
-	 * scheduler. Therefore, they are assigned.
-	 */
-	private ArrayList<SimulationFloorInputData> assignedFloorDataCollection = new ArrayList<>();
+	private ArrayList<SimulationFloorInputData> floorDataCollection = new ArrayList<>();
 
 	/**
 	 * Message queue for received elevator messages
@@ -102,7 +95,7 @@ public class FloorSubsystem {
 
 		elevatorMessageQueue = new FloorElevatorMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors);
 		schedulerMessageQueue = new FloorSchedulerMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors,
-				assignedFloorDataCollection);
+				floorDataCollection);
 
 	}
 
@@ -126,7 +119,7 @@ public class FloorSubsystem {
 		try {
 			int id = 0;
 			while ((input = bufferedReader.readLine()) != null) {
-				unassignedFloorDataCollection.add(new SimulationFloorInputData(id, input));
+				floorDataCollection.add(new SimulationFloorInputData(id, input));
 				id++;
 			}
 		} catch (IOException e) {
@@ -156,7 +149,7 @@ public class FloorSubsystem {
 			@Override
 			public void run() {
 				// wait for scheduler messages
-				for (SimulationFloorInputData floorInputData : unassignedFloorDataCollection) {
+				for (SimulationFloorInputData floorInputData : floorDataCollection) {
 
 					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(
 							floorInputData.getCurrentFloor(), floorInputData.getFloorDirectionButton(),
@@ -174,9 +167,6 @@ public class FloorSubsystem {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
-					// Add the floor input data to the assigned floor data collection
-					assignedFloorDataCollection.add(floorInputData);
 				}
 			}
 		}).start();
