@@ -25,7 +25,7 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
 	private SubsystemCommunicationRPC elevatorSubsystemCommunication;
 	private Floor[] floors;
-	private ArrayList<SimulationFloorInputData> assignedFloorDataCollection;
+	private ArrayList<SimulationFloorInputData> floorDataCollection;
 
 	public FloorSchedulerMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication,
 			SubsystemCommunicationRPC elevatorSubsystemCommunication, Floor[] floors,
@@ -33,7 +33,7 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		this.schedulerSubsystemCommunication = schedulerSubsystemCommunication;
 		this.elevatorSubsystemCommunication = elevatorSubsystemCommunication;
 		this.floors = floors;
-		this.assignedFloorDataCollection = assignedFloorDataCollection;
+		this.floorDataCollection = assignedFloorDataCollection;
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @return
 	 */
 	private int getFloorPassengerDestinationFloor(int inputDataId) {
-		for (SimulationFloorInputData floorData : assignedFloorDataCollection) {
+		for (SimulationFloorInputData floorData : floorDataCollection) {
 			if (floorData.getInputDataId() == inputDataId) {
 				return floorData.getDestinationFloorCarButton();
 			}
