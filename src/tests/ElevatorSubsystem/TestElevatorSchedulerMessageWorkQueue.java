@@ -86,7 +86,6 @@ class TestElevatorSchedulerMessageWorkQueue {
 	void testWorkQueueMoveDownHandler() {
 		simulateFloorMessageWaiting();
 		simulateFloorMessageWaiting();
-		simulateSchedulerMessageWaiting();
 		
 		SchedulerElevatorCommand elevatorCommand = new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, ELEVATOR_ID);
 		try {
@@ -96,10 +95,8 @@ class TestElevatorSchedulerMessageWorkQueue {
 			
 			ElevatorLeavingFloorMessage message1 = (ElevatorLeavingFloorMessage) receivedFloorMessages.pop();
 			ElevatorFloorSignalRequestMessage message2 = (ElevatorFloorSignalRequestMessage) receivedFloorMessages.pop();
-			ElevatorStatusMessage message3 = (ElevatorStatusMessage) receivedSchedulerMessages.pop();
 			assertTrue(message1 != null);
 			assertTrue(message2 != null);
-			assertTrue(message3 != null);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -120,20 +117,4 @@ class TestElevatorSchedulerMessageWorkQueue {
 			}
 		}).start();
 	}
-	
-	private void simulateSchedulerMessageWaiting() {
-		(new Thread() {
-			@Override
-			public void run() {
-				try {
-					synchronized (receivedSchedulerMessages) {
-						receivedSchedulerMessages.add(schedulerElevatorSubsystemCommunication.receiveMessage());
-					}
-				} catch (Exception e) {
-					System.out.print("Exception occurred: " + e);
-				}
-			}
-		}).start();
-	}
-
 }
