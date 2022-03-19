@@ -4,8 +4,10 @@
 package Scheduler;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import common.Direction;
+import common.LoggerWrapper;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.MessageType;
@@ -20,10 +22,11 @@ import common.work_management.MessageWorkQueue;
 /**
  * * This class represents the scheduler's work queue handler.
  *
- * @author paulokenne
+ * @author paulokenne, ryanfife
  *
  */
 public abstract class SchedulerWorkHandler extends MessageWorkQueue {
+	private Logger logger = LoggerWrapper.getLogger();
 
 	/**
 	 * The job management for each elevator
@@ -89,7 +92,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			handleElevatorBehavior(elevatorJobManagement, nearestTargetFloor);
 		} else {
 			// This should never happen...If it ever occurs, we need to know
-			System.out.println("Invalid Nearest Target Floor! Some thing is wrong...");
+			logger.severe("Invalid Nearest Target Floor! Some thing is wrong...");
 		}
 
 	}
@@ -107,7 +110,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 		try {
 			// Move down if we above the target floor
 			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
-				System.out.println("\n(SCHEDULER) Sending a DOWN commmand to Elevator(id = " + elevatorId + ") ");
+				logger.fine("(SCHEDULER) Sending a DOWN command to Elevator " + elevatorId);
 
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
@@ -115,7 +118,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			}
 			// Move up if we below the target floor
 			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
-				System.out.println("\n(SCHEDULER) Sending an UP commmand to Elevator(id = " + elevatorId + ") ");
+				logger.fine("(SCHEDULER) Sending an UP command to Elevator " + elevatorId);
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 
@@ -144,12 +147,12 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 					}
 				}
 
-				String addressedJobMessage = "(SCHEDULER) Elevator (id = " + elevatorId + ") has addressed: ";
+				String addressedJobMessage = "(SCHEDULER) Elevator " + elevatorId + " has addressed: ";
 				for (ElevatorJobMessage job : jobsAtTargetFloor) {
 					addressedJobMessage += "(" + job.getMessageType() + " job - " + job.getDirection() + " @ floor = "
-							+ job.getDestinationFloor() + "),";
+							+ job.getDestinationFloor() + ")";
 				}
-				System.out.println("\n" + addressedJobMessage + "\n");
+				logger.fine(addressedJobMessage);
 
 				// Stop the elevator and open the doors
 				schedulerElevatorCommunication
@@ -181,7 +184,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			}
 
 		} catch (Exception e) {
-			System.out.println("Error occurred in handleElevatorBehavior: " + e);
+			logger.severe("Error occurred in handleElevatorBehavior: " + e);
 		}
 	}
 

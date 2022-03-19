@@ -3,8 +3,11 @@
  */
 package FloorSubsystem;
 
+import java.util.logging.Logger;
+
 import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
+import common.LoggerWrapper;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 
@@ -16,6 +19,8 @@ import common.remote_procedure.SubsystemCommunicationRPC;
  *
  */
 public class FloorElevatorComponents {
+
+	private Logger logger = LoggerWrapper.getLogger();
 
 	/**
 	 * The elevator id
@@ -164,15 +169,15 @@ public class FloorElevatorComponents {
 			@Override
 			public void run() {
 				try {
-					System.out.println("\n(FLOOR_SUBSYSTEM) Elevator (id = " + elevatorId + ") sensor for floor "
-							+ floorNumber + " is waiting for " + totalTimeInMilliSeconds + "ms.\n");
+					logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " sensor for floor "
+							+ floorNumber + " is waiting for " + totalTimeInMilliSeconds + "ms.");
 					Thread.sleep(totalTimeInMilliSeconds);
 				} catch (InterruptedException e) {
 					System.out.println(e);
 				}
 
-				System.out.println("\n(FLOOR_SUBSYSTEM) Elevator(id = " + elevatorId + ") has reached the floor "
-						+ floorNumber + "\n");
+				logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " has reached the floor "
+						+ floorNumber);
 
 				// For now, we will assume that the motor's elevatorDirection is where the
 				// elevator plans to go

@@ -1,7 +1,9 @@
 package ElevatorSubsystem;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
+import common.LoggerWrapper;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
@@ -19,6 +21,7 @@ import common.work_management.MessageWorkQueue;
 public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
+	private Logger logger = LoggerWrapper.getLogger();
 	
 	private Map<Integer, ElevatorCar> elevators;
 	
@@ -70,28 +73,28 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 			switch(command.getCommand()) {
 				case STOP:
 					if(!car.getDoor().isOpen()) {
-						System.out.println("Elevator stopping\n");
+						logger.fine("(ELEVATOR) Elevator " + car.getId() + " stopping");
 						car.getMotor().turnOff();
 					}else {
 						car.setErrorState(new Exception("Attempted to stop while doors open"));
 					}
 					break;
 				case CLOSE_DOORS:
-					System.out.println("Elevator door closing\n");
+					logger.fine("(ELEVATOR) Elevator " + car.getId() + " door closing");
 					car.getDoor().closeDoor();
 					break;
 				case OPEN_DOORS:
 					if(!car.getMotor().getIsRunning()) {
-						System.out.println("Elevator door opening\n");
+						logger.fine("(ELEVATOR) Elevator " + car.getId() + " door opening");
 						car.getDoor().openDoor();
 					}else {
 						car.setErrorState(new Exception("Attempted to open doors while motor running"));
 					}
 					break;
 				case MOVE_UP:
-					System.out.println("Elevator door closing\n");
+					logger.fine("(ELEVATOR) Elevator " + car.getId() +  " door closing");
 					car.getDoor().closeDoor();
-					System.out.println("Elevator moving up\n");
+					logger.fine("(ELEVATOR) Elevator " + car.getId() + " moving up");
 					car.getMotor().goUp();
 					
 					leavingMessage = new ElevatorLeavingFloorMessage(car.getId(), carFloorNumber);
@@ -101,9 +104,9 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 					floorSubsystemCommunication.sendMessage(comingMessage);
 					break;
 				case MOVE_DOWN:
-					System.out.println("Elevator door closing\n");
+					logger.fine("(ELEVATOR) Elevator " + car.getId() + " door closing");
 					car.getDoor().closeDoor();
-					System.out.println("Elevator moving down\n");
+					logger.fine("(ELEVATOR) Elevator " + car.getId() + " moving down");
 					car.getMotor().goDown();
 					
 					leavingMessage = new ElevatorLeavingFloorMessage(car.getId(), carFloorNumber);

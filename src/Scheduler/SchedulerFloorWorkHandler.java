@@ -3,6 +3,9 @@
  */
 package Scheduler;
 
+import java.util.logging.Logger;
+
+import common.LoggerWrapper;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -15,6 +18,7 @@ import common.remote_procedure.SubsystemCommunicationRPC;
  *
  */
 public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
+	private Logger logger = LoggerWrapper.getLogger();
 
 	/**
 	 * The SchedulerFloorMessageWorkQueue constructor
@@ -36,7 +40,7 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 			ElevatorJobMessage job = (ElevatorJobMessage) message;
-			System.out.println("\nScheduler received floor request: go to floor " + job.getDestinationFloor() + "\n");
+			logger.info("(SCHEDULER) Received floor request: go to floor " + job.getDestinationFloor());
 			handleElevatorPickUpPassengerRequest(job);
 			break;
 
@@ -82,7 +86,7 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 			// If we do not have an in-service elevator, we will discard the request and
 			// provide a log
 			if (assumedBestElevatorJobManagement == null) {
-				System.out.println(
+				logger.fine(
 						"No Elevator is available...Scheduler is ingoring the received Passenger-Pick-Up REQUEST @ Floor "
 								+ elevatorFloorJob.getDestinationFloor());
 				return;
@@ -140,9 +144,9 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 
 			assumedBestElevatorJobManagement.addJob(elevatorFloorJob);
 
-			System.out.println("\n(SCHEDULER) Assigning PICK_UP_PASSENGER Job (Direction = "
+			logger.fine("(SCHEDULER) Assigning PICK_UP_PASSENGER Job (Direction = "
 					+ elevatorFloorJob.getDirection() + " @ floor = " + elevatorFloorJob.getDestinationFloor()
-					+ ") to Elevator (id = " + assumedBestElevatorJobManagement.getElevatorId() + ")\n");
+					+ ") to Elevator " + assumedBestElevatorJobManagement.getElevatorId());
 
 			// If the elevator is not currently running a job, we will update the elevator's
 			// direction and issue the appropriate elevator commands

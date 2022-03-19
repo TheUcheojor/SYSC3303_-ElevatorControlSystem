@@ -1,11 +1,12 @@
 package ElevatorSubsystem;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
+import common.LoggerWrapper;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
 import common.messages.elevator.ElevatorStatusMessage;
-import common.messages.elevator.ElevatorTransportRequest;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
 
@@ -16,6 +17,7 @@ import common.work_management.MessageWorkQueue;
  */
 public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
+	private Logger logger = LoggerWrapper.getLogger();
 
 	private Map<Integer, ElevatorCar> elevators;
 
@@ -39,7 +41,7 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 					ElevatorCar car = elevators.get(carId); 
 					car.setFloorNumber(floorNumber);
 					
-					System.out.println("(ELEVATOR) Elevator " + carId + " has reached floor: " + floorNumber);
+					logger.info("(ELEVATOR) Elevator " + carId + " has reached floor: " + floorNumber);
 					ElevatorStatusMessage arrivalStatus = car.createStatusMessage();
 				
 					schedulerSubsystemCommunication.sendMessage(arrivalStatus);
@@ -50,7 +52,7 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 					break;
 					
 				default:
-					System.out.println("(ELEVATOR) received improper message from FLOOR of type: " + message.getMessageType());
+					logger.fine("(ELEVATOR) received improper message from FLOOR of type: " + message.getMessageType());
 					break;
 			}
 		} catch (Exception e) {
