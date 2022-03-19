@@ -3,6 +3,9 @@
  */
 package Scheduler;
 
+import java.util.logging.Logger;
+
+import common.LoggerWrapper;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
@@ -14,6 +17,7 @@ import common.remote_procedure.SubsystemCommunicationRPC;
  *
  */
 public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
+	private Logger logger = LoggerWrapper.getLogger();
 
 	/**
 	 * The SchedulerFloorMessageWorkQueue constructor
@@ -46,16 +50,15 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				// should proceed like normal.
 				elevatorJobManagements[elevatorId].setErrorState(elevatorStatusMessage.getErrorState());
 				if (elevatorStatusMessage.getErrorState() != null) {
-					System.out.println(
-							"(SCHEDULER) Elevator(id = " + elevatorId + ") has an error. Shutting down elevator...");
+					logger.severe("(SCHEDULER) Elevator " + elevatorId + " has an error. Shutting down elevator...");
 					elevatorJobManagements[elevatorId].setReadyForJob(false);
 				} else {
 					elevatorJobManagements[elevatorId].setReadyForJob(true);
 				}
 
-				System.out.println("(SCHEDULER) Received Elevator status: [EF: "
-						+ elevatorStatusMessage.getFloorNumber() + ", ED: " + elevatorStatusMessage.getDirection()
-						+ ", EID: " + elevatorId + ", ES:" + elevatorStatusMessage.getErrorState() + " ]\n");
+				logger.fine("(SCHEDULER) Received Elevator status: [ID: " + elevatorId + ", F: "
+						+ elevatorStatusMessage.getFloorNumber() + ", D: " + elevatorStatusMessage.getDirection()
+						+ ", ErrorState: " + elevatorStatusMessage.getErrorState() + " ]");
 
 				if (elevatorJobManagements[elevatorId].isReadyForJob()
 						&& elevatorJobManagements[elevatorId].hasJobs()) {
@@ -78,14 +81,14 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 				elevatorJobManagements[elevatorId].addJob((ElevatorJobMessage) message);
 
-				System.out.println("\n(SCHEDULER) Assigning DROP_OFF_PASSENGER Job (Direction = "
+				logger.info("(SCHEDULER) Assigning DROP_OFF_PASSENGER Job (Direction = "
 						+ dropPassengerRequest.getDirection() + " @ floor = "
-						+ dropPassengerRequest.getDestinationFloor() + ") to Elevator (id = "
-						+ elevatorJobManagements[elevatorId].getElevatorId() + ")");
+						+ dropPassengerRequest.getDestinationFloor() + ") to Elevator "
+						+ elevatorJobManagements[elevatorId].getElevatorId());
 
-				System.out.println("(SCHEDULER) Elevator Management Status: [EF: "
-						+ elevatorJobManagements[elevatorId].getCurrentFloorNumber() + ", ED: "
-						+ elevatorJobManagements[elevatorId].getElevatorDirection() + ", EID: " + elevatorId + " ]\n");
+				logger.fine("(SCHEDULER) Elevator Management Status: [ID: " + elevatorId +", F: "
+						+ elevatorJobManagements[elevatorId].getCurrentFloorNumber() + ", D: "
+						+ elevatorJobManagements[elevatorId].getElevatorDirection() + "]");
 
 				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 			}
