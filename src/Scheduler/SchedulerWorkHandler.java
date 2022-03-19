@@ -110,7 +110,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 		try {
 			// Move down if we above the target floor
 			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
-				logger.fine("(SCHEDULER) Sending a DOWN commmand to Elevator " + elevatorId);
+				logger.fine("(SCHEDULER) Sending a DOWN command to Elevator " + elevatorId);
 
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
@@ -118,7 +118,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			}
 			// Move up if we below the target floor
 			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
-				logger.fine("(SCHEDULER) Sending an UP commmand to Elevator " + elevatorId);
+				logger.fine("(SCHEDULER) Sending an UP command to Elevator " + elevatorId);
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 
