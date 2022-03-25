@@ -11,9 +11,10 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 
 /**
- * Controller class that instantiates the required entities for managing the elevator entity behaviour.
- * Additionally, the controller is the central hub for receiving elevator related messages from other subsystems.
- * 
+ * Controller class that instantiates the required entities for managing the
+ * elevator entity behaviour. Additionally, the controller is the central hub
+ * for receiving elevator related messages from other subsystems.
+ *
  * @author Ryan Fife, Favour
  *
  */
@@ -46,7 +47,7 @@ public class ElevatorController {
 	 * Message queue for received floor messages
 	 */
 	private ElevatorFloorMessageWorkQueue floorMessageQueue;
-	
+
 	/**
 	 * Message queue for received scheduler messages
 	 */
@@ -56,13 +57,13 @@ public class ElevatorController {
 	 * RPC communications channel for the scheduler
 	 */
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
-	
+
 	/**
 	 * RPC communications channel for the floor
 	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
-	
-	public ElevatorController() { 
+
+	public ElevatorController() {
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -72,7 +73,7 @@ public class ElevatorController {
 			// Terminate if the elevation configuration are invalid.
 			System.exit(1);
 		}
-		
+
 		// initialize elevator cars
 		elevators = new HashMap<Integer, ElevatorCar>();
 		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
@@ -84,7 +85,7 @@ public class ElevatorController {
 
 			elevators.put(carId, car);
 		}
-	
+
 		// initialize the subsystem communication channels
 		schedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 				SubsystemComponentType.SCHEDULER);
@@ -92,17 +93,16 @@ public class ElevatorController {
 				SubsystemComponentType.FLOOR_SUBSYSTEM);
 
 		// initialize the message queues
-		floorMessageQueue = new ElevatorFloorMessageWorkQueue(schedulerSubsystemCommunication,
-				elevators);
+		floorMessageQueue = new ElevatorFloorMessageWorkQueue(schedulerSubsystemCommunication, elevators);
 		schedulerMessageQueue = new ElevatorSchedulerMessageWorkQueue(schedulerSubsystemCommunication,
 				floorSubsystemCommunication, elevators);
-		
+
 		// initialize the message receiving threads
 		(new Thread() {
 			@Override
 			public void run() {
 				// wait for floor messages
-				while(true) {
+				while (true) {
 					Message message;
 					try {
 						message = floorSubsystemCommunication.receiveMessage();
@@ -114,12 +114,12 @@ public class ElevatorController {
 				}
 			}
 		}).start();
-		
+
 		(new Thread() {
 			@Override
 			public void run() {
 				// wait for scheduler messages
-				while(true) {
+				while (true) {
 					Message message;
 					try {
 						message = schedulerSubsystemCommunication.receiveMessage();
@@ -131,7 +131,7 @@ public class ElevatorController {
 				}
 			}
 		}).start();
-		
+
 		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
 			// send initial status message to scheduler
 			ElevatorCar car = elevators.get(i);
@@ -149,4 +149,5 @@ public class ElevatorController {
 	public static void main(String[] args) {
 		ElevatorController controller = new ElevatorController();
 	}
+
 }
