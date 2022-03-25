@@ -24,7 +24,7 @@ import common.remote_procedure.SubsystemComponentType;
 
 /**
  * This is a test for the elevator/floor message communication
- * @author Favour
+ * @author Favour, delightoluwayemi
  */
 public class TestElevatorFloorMessageWorkQueue {
 	private static SubsystemCommunicationRPC schedulerElevatorSubsystemCommunication;

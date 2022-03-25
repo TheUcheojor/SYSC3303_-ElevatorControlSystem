@@ -25,7 +25,7 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 /**
  * This is a test class for the elevator message work queue
- * @author Ryan Fife
+ * @author Ryan Fife, delightoluwayemi
  *
  */
 class TestElevatorSchedulerMessageWorkQueue {
