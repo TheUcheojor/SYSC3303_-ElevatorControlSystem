@@ -6,7 +6,7 @@ package tests.Scheduler;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.ElevatorController;
@@ -33,49 +33,49 @@ public class SchedulerFloorWorkHandlerTest {
 	/**
 	 * The scheduler floor message work handler
 	 */
-	SchedulerFloorWorkHandler schedulerFloorWorkHandler;
+	private static SchedulerFloorWorkHandler schedulerFloorWorkHandler;
 
 	/**
 	 * The Scheduler UDP communication between the scheduler and floor
 	 */
-	private SubsystemCommunicationRPC schedulerFloorCommunication = new SubsystemCommunicationRPC(
+	private static SubsystemCommunicationRPC schedulerFloorCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.FLOOR_SUBSYSTEM);
 
 	/**
 	 * The Scheduler UDP communication between the scheduler and floor
 	 */
-	private SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
+	private static SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
 
 	/**
 	 * The Elevator UDP communication between the elevator and scheduler
 	 */
-	private SubsystemCommunicationRPC elevatorSchedulerCommunication = new SubsystemCommunicationRPC(
+	private static SubsystemCommunicationRPC elevatorSchedulerCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.ELEVATOR_SUBSYSTEM, SubsystemComponentType.SCHEDULER);
 
 	/**
 	 * The job management for each elevator
 	 */
-	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
+	private static ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
 
 	/**
 	 * The received message
 	 */
-	private Message receivedMessage = null;
+	private static Message receivedMessage = null;
 
 	/**
 	 * Set up fresh environment for each test
 	 *
 	 * @throws java.lang.Exception
 	 */
-	@BeforeEach
-	void setUp() throws Exception {
+	@BeforeAll
+	static void setUp() throws Exception {
 
 		for (int i = 0; i < elevatorJobManagements.length; i++) {
 			elevatorJobManagements[i] = new ElevatorJobManagement(i);
 		}
 
-		this.schedulerFloorWorkHandler = new SchedulerFloorWorkHandler(schedulerFloorCommunication,
+		schedulerFloorWorkHandler = new SchedulerFloorWorkHandler(schedulerFloorCommunication,
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
@@ -136,7 +136,8 @@ public class SchedulerFloorWorkHandlerTest {
 	}
 
 	/**
-	 * Test that the scheduler handles the stuck on floor fault from the floor subsystem
+	 * Test that the scheduler handles the stuck on floor fault from the floor
+	 * subsystem
 	 *
 	 */
 	@Test
@@ -167,7 +168,7 @@ public class SchedulerFloorWorkHandlerTest {
 		(new Thread() {
 			@Override
 			public void run() {
-				ElevatorNotArrived elevatorFloorRequest = new ElevatorNotArrived(floorNumber,elevatorId);
+				ElevatorNotArrived elevatorFloorRequest = new ElevatorNotArrived(floorNumber, elevatorId);
 				schedulerFloorWorkHandler.enqueueMessage(elevatorFloorRequest);
 			}
 		}).start();
@@ -177,7 +178,7 @@ public class SchedulerFloorWorkHandlerTest {
 		} catch (Exception e) {
 		}
 
-		assertTrue(receivedMessage !=  null);
+		assertTrue(receivedMessage != null);
 		assertTrue(receivedMessage instanceof SchedulerElevatorCommand);
 
 		// Check that a shutdown command was sent to the in-service elevator 1
