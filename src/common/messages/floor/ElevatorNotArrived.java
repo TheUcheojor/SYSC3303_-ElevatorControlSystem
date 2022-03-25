@@ -5,6 +5,12 @@ import common.Direction;
 import common.messages.Message;
 import common.messages.MessageType;
 
+/**
+ * A message depicting that an elevator was never arrived at a floor.
+ * 
+ * @author Ryan Fife
+ *
+ */
 public class ElevatorNotArrived extends Message {
 	private int floorNumber;
 	private int elevatorId;
