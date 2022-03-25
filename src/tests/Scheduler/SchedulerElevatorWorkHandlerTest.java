@@ -105,7 +105,8 @@ public class SchedulerElevatorWorkHandlerTest {
 		elevatorJobManagements[elevatorId].setCurrentFloorNumber(currentFloorNumber);
 
 		// We want to drop off a passenger from floor 2 to 0
-		ElevatorTransportRequest elevatorTransportMessage = new ElevatorTransportRequest(0, elevatorId, Direction.DOWN);
+		ElevatorTransportRequest elevatorTransportMessage = new ElevatorTransportRequest(0, elevatorId, Direction.DOWN,
+				null, null);
 
 		// Let the scheduler work
 		schedulerElevatorWorkHandler.enqueueMessage(elevatorTransportMessage);
@@ -193,5 +194,4 @@ public class SchedulerElevatorWorkHandlerTest {
 		}).start();
 	}
 
-	
 }
