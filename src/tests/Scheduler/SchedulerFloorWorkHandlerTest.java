@@ -15,6 +15,7 @@ import Scheduler.SchedulerFloorWorkHandler;
 import common.Direction;
 import common.messages.Message;
 import common.messages.floor.ElevatorFloorRequest;
+import common.messages.floor.ElevatorNotArrived;
 import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -134,4 +135,55 @@ public class SchedulerFloorWorkHandlerTest {
 
 	}
 
+	/**
+	 * Test that the scheduler handles the stuck on floor fault from the floor subsystem
+	 *
+	 */
+	@Test
+	void testSchedulerHandleFault() {
+
+		// This thread simulates an elevator subsystem which is waiting for a message
+		// from the scheduler.
+		(new Thread() {
+			@Override
+			public void run() {
+				try {
+					receivedMessage = elevatorSchedulerCommunication.receiveMessage();
+				} catch (Exception e) {
+					System.out.print("Exception occurred: " + e);
+				}
+			}
+		}).start();
+
+		// Since elevators start at the ground floor 0, we expect the elevator to
+		// receive a go up command
+		int elevatorId = 1;
+		int floorNumber = 1;
+
+		// By default all elevators are not ready for jobs so we will make a elevator
+		// (id = 1) ready
+		elevatorJobManagements[elevatorId].setReadyForJob(true);
+
+		(new Thread() {
+			@Override
+			public void run() {
+				ElevatorNotArrived elevatorFloorRequest = new ElevatorNotArrived(floorNumber,elevatorId);
+				schedulerFloorWorkHandler.enqueueMessage(elevatorFloorRequest);
+			}
+		}).start();
+
+		try {
+			Thread.sleep(100);
+		} catch (Exception e) {
+		}
+
+		assertTrue(receivedMessage !=  null);
+		assertTrue(receivedMessage instanceof SchedulerElevatorCommand);
+
+		// Check that a shutdown command was sent to the in-service elevator 1
+		SchedulerElevatorCommand receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) receivedMessage;
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.SHUT_DOWN);
+
+	}
 }
