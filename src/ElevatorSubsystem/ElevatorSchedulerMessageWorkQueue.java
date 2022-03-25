@@ -116,6 +116,16 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 					floorSubsystemCommunication.sendMessage(comingMessage);
 				
 					break;
+					
+				case SHUT_DOWN:
+					car.setInService(false);
+					car.setErrorState(new Exception());
+					break;
+					
+				case RESTART:
+					car.setInService(true);
+					car.setErrorState(null);
+					break;
 			}
 		}catch(Exception e) {
 			e.printStackTrace();

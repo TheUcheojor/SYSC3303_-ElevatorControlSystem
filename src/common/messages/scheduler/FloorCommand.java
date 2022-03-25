@@ -4,5 +4,6 @@ public enum FloorCommand {
 	/**
 	 * Turn off floor direction button lamp command
 	 */
-	TURN_OFF_FLOOR_LAMP
+	TURN_OFF_FLOOR_LAMP,
+	PRODUCE_STUCK_FAULT_WITH_ELEVATOR
 }

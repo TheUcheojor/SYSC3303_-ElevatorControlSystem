@@ -6,6 +6,8 @@ package common;
 import java.security.InvalidParameterException;
 import java.util.Date;
 
+import FloorSubsystem.FloorInputFault;
+
 /**
  * This class stores the properties of a given simulation floor input.
  *
@@ -44,6 +46,9 @@ public class SimulationFloorInputData {
 	 * The floor that the passenger wishes to go to.
 	 **/
 	private Integer destinationFloorCarButton;
+	
+	private FloorInputFault fault = null;
+	private Integer faultFloor = -1;
 
 	/**
 	 * Constructor.
@@ -55,12 +60,14 @@ public class SimulationFloorInputData {
 	 * @param destinationFloorCarButton the target floor
 	 */
 	public SimulationFloorInputData(Integer inputDataId, String arrivalTime, Integer currentFloor,
-			Direction floorDirectionButton, Integer destinationFloorCarButton) {
+			Direction floorDirectionButton, Integer destinationFloorCarButton, FloorInputFault fault, Integer faultFloor) {
 		this.inputDataId = inputDataId;
 		this.arrivalTime = arrivalTime;
 		this.currentFloor = currentFloor;
 		this.floorDirectionButton = floorDirectionButton;
 		this.destinationFloorCarButton = destinationFloorCarButton;
+		this.fault = fault;
+		this.faultFloor = faultFloor;
 	}
 
 	/**
@@ -85,10 +92,20 @@ public class SimulationFloorInputData {
 			this.currentFloor = Integer.parseInt(data[1]);
 			this.floorDirectionButton = Direction.valueOf(data[2]);
 			this.destinationFloorCarButton = Integer.parseInt(data[3]);
+			
+			if(data.length > 4) {
+				this.fault = FloorInputFault.valueOf(data[4]);
+				this.faultFloor = Integer.parseInt(data[5]);
+				if(!SystemValidationUtil.isFloorNumberInRange(faultFloor)
+					) {
+				throw new InvalidParameterException();
+				}
+			}
 
 			// Validate the current floor and destination floor inputs are valid.
 			if (!SystemValidationUtil.isFloorNumberInRange(currentFloor)
-					|| !SystemValidationUtil.isFloorNumberInRange(destinationFloorCarButton)) {
+					|| !SystemValidationUtil.isFloorNumberInRange(destinationFloorCarButton)) 
+			{
 				throw new InvalidParameterException();
 			}
 
@@ -106,6 +123,20 @@ public class SimulationFloorInputData {
 	 */
 	public String getArrivalTime() {
 		return arrivalTime;
+	}
+
+	/**
+	 * @return the fault
+	 */
+	public synchronized FloorInputFault getFault() {
+		return fault;
+	}
+
+	/**
+	 * @return the faultFloor
+	 */
+	public synchronized Integer getFaultFloor() {
+		return faultFloor;
 	}
 
 	/**
