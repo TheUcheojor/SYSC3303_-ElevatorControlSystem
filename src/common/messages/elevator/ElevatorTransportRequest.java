@@ -2,6 +2,8 @@ package common.messages.elevator;
 
 import java.util.Objects;
 
+import ElevatorSubsystem.ElevatorAutoFixing;
+import FloorSubsystem.FloorInputFault;
 import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.MessageType;
@@ -21,15 +23,30 @@ public class ElevatorTransportRequest extends ElevatorJobMessage {
 	private int elevatorId;
 
 	/**
+	 * A floor fault
+	 */
+	private FloorInputFault floorFault;
+
+	/**
+	 * The elevator auto fixing
+	 */
+	private ElevatorAutoFixing autoFixing;
+
+	/**
 	 * A ElevatorTransportRequest constructor
 	 *
 	 * @param destinationFloor the destination floor
 	 * @param elevatorId       the elevator id
 	 * @param direction        the direction
+	 * @param floorFault       the floor fault
+	 * @param auto             fixing the auto fixing mode
 	 */
-	public ElevatorTransportRequest(int destinationFloor, int elevatorId, Direction direction) {
+	public ElevatorTransportRequest(int destinationFloor, int elevatorId, Direction direction,
+			FloorInputFault floorFault, ElevatorAutoFixing autoFixing) {
 		super(MessageType.ELEVATOR_DROP_PASSENGER_REQUEST, destinationFloor, direction);
 		this.elevatorId = elevatorId;
+		this.floorFault = floorFault;
+		this.autoFixing = autoFixing;
 	}
 
 	/**
@@ -39,6 +56,20 @@ public class ElevatorTransportRequest extends ElevatorJobMessage {
 	 */
 	public int getElevatorId() {
 		return elevatorId;
+	}
+
+	/**
+	 * @return the floorFault
+	 */
+	public FloorInputFault getFloorFault() {
+		return floorFault;
+	}
+
+	/**
+	 * @return the autoFixing
+	 */
+	public ElevatorAutoFixing getAutoFixing() {
+		return autoFixing;
 	}
 
 	@Override
