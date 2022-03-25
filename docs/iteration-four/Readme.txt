@@ -96,7 +96,6 @@ PROJECT INPUT FORMATING
 		the elevator will shut down and notify the scheduler.
 
 ASSIGNED SUBSYSTEM FOR THIS ITERATION
-
 	FloorFaults + Logging: Ryan
 	Floor test refactor: Jake
 	
