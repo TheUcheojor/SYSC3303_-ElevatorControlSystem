@@ -1,40 +1,38 @@
 Elevator System Control Simulator Iteration #3
 Team members: Ryan Fife, Paul Okenne, Jacob Charpentier, Favour Olotu, Delight Oluwayemi
 
-System Overview:
-The purpose of this program is to simulate a real-time server-client communication. The system is comprised of three
-subsystems: a central scheduler, the floor controller, and elevator controller. Inter-system communication utilizes 
-a defined message schema over UDP allowing each subsystem to be independently deployed.
+SYSTEM OVERIEW
+	The purpose of this program is to simulate a real-time server-client communication. The system is comprised of three
+	subsystems: a central scheduler, the floor controller, and elevator controller. Inter-system communication utilizes 
+	a defined message schema over UDP allowing each subsystem to be independently deployed.
 
-Primary Classes:
+PRIMARY CLASSES
+	ElevatorController - This class manages inter-subsystem elevator communications and manages the elevator cars. 
+	
+	ElevatorCar - The elevator car entities, containing a motor and door.
+	
+	FloorSubsystem- This class manages sending and receiving of job requests from and to the Scheduler.
+	
+	Floor - This class is controlled by the FloorSubsystem. It handles job requests and holds the properties 
+	of the floor ie. floor number, floor buttons and floor lamps.
+	
+	Scheduler - This class manages the communication between the Elevator and the Floor sub systems.
+	
+	SubsystemCommunicationRPC - Class for managing inter subsystem communication. In this iteration we use a RDP schema
+	over UDP.
 
-ElevatorController - This class manages inter-subsystem elevator communications and manages the elevator cars. 
-
-ElevatorCar - The elevator car entities, containing a motor and door.
-
-FloorSubsystem- This class manages sending and receiving of job requests from and to the Scheduler.
-
-Floor - This class is controlled by the FloorSubsystem. It handles job requests and holds the properties 
-of the floor ie. floor number, floor buttons and floor lamps.
-
-Scheduler - This class manages the communication between the Elevator and the Floor sub systems.
-
-SubsystemCommunicationRPC - Class for managing inter subsystem communication. In this iteration we use a RDP schema
-over UDP.
-
-System Flow:
-
-** All communication between subsystems is done over UDP 
-
-1. Floor Subsystem determines if there is a valid input data (user presses a button)
-2. input data is sent to Scheduler
-3. Scheduler starts serving the request received by floor, starts moving elevator
-4. Elevator moves towards requested floor, notifying scheduler of each floor it passes
-5. Scheduler stops Elevator at desired floor
-6. Scheduler notifies floor subsystem
-6. Floor subsystem sends the elevator button press to the elevator subsystem
-7. Elevator sends the request to the scheduler
-8. Repeat steps 3 -> 5 
+SYSTEM FLOW:
+	** All communication between subsystems is done over UDP 
+	
+	1. Floor Subsystem determines if there is a valid input data (user presses a button)
+	2. input data is sent to Scheduler
+	3. Scheduler starts serving the request received by floor, starts moving elevator
+	4. Elevator moves towards requested floor, notifying scheduler of each floor it passes
+	5. Scheduler stops Elevator at desired floor
+	6. Scheduler notifies floor subsystem
+	6. Floor subsystem sends the elevator button press to the elevator subsystem
+	7. Elevator sends the request to the scheduler
+	8. Repeat steps 3 -> 5 
 
 HOW TO RUN THE PROGRAM
 Running any Java application begins with executing the static main(String[] args) function.
@@ -66,36 +64,45 @@ This application is no different.
 	10. 	Run the program by clicking the play button on the top menu on each computer.
 
 
---------------------------------------------------------
-How to configure floor input file requests
+PROJECT INPUT FORMATING
 
-arguments |    1    |    2    |    3    |    4    |5(Optional)    |6(Optional)                  |
--------------------------------------------------------------------------------------------------
-Type      | Date    | Integer |Direction| Integer |FloorInputFault|Integer or ElevatorAutoFixing|
--------------------------------------------------------------------------------------------------
+	Floor input file requests
+	
+	arguments |    1    |    2    |    3    |    4    |5(Optional)    |6(Optional)                  |
+	-------------------------------------------------------------------------------------------------
+	Type      | Date    | Integer |Direction| Integer |FloorInputFault|Integer or ElevatorAutoFixing|
+	-------------------------------------------------------------------------------------------------
+	
+	(EX) Normal command:      14:05:15.0 2 DOWN 1
+	
+		Normal floor input commands only use the four three arguments. A normal command specifies
+		the time of the request, the floor which the passenger is at, and the passengers request (arg 3 & 4).
+		In the normal command example above, a request to go down to floor 1 at time 14:05:15.0, on floor 2 is made.
+		
+	(EX) Floor fault command: 14:05:15.0 2 DOWN 1 STUCK_AT_FLOOR_FAULT 2
+	
+		FloorFault executes the above behavior but as soon as the floor approaches floor 2 (arg 6) the elevator 
+		will get stuck, and shut down.
+	
+	(EX) Door fault command:  14:05:15.0 2 DOWN 1 DOOR_STUCK_OPEN_FAULT AUTO_FIXING_SUCCESS
+	
+		FloorFault executes the normal behavior but when the passenger enters and pushes elevator button at floor 2, the door 
+		will not close. The AUTO_FIXING_SUCCESS flag indicates that the elevator will handle the fault successfully.
+		
+	(EX) Door fault command:  14:05:15.0 2 DOWN 1 DOOR_STUCK_OPEN_FAULT AUTO_FIXING_FAILURE
+	
+		FloorFault executes the normal behavior but when the passenger enters and pushes elevator button at floor 2 , the door 
+		will not close. The AUTO_FIXING_FAILURE flag indicates that the elevator will exhaust its retry attempts. As a result,
+		the elevator will shut down and notify the scheduler.
 
-(EX) Normal command:      14:05:15.0 2 DOWN 1
+ASSIGNED SUBSYSTEM FOR THIS ITERATION
 
-Normal floor input commands only use the four three arguments. A normal command specifies
-the time of the request, the floor which the passenger is at, and the passengers request (arg 3 & 4).
-In the normal command example above, a request to go down to floor 1 at time 14:05:15.0, on floor 2 is made.
-
-(EX) Floor fault command: 14:05:15.0 2 DOWN 1 STUCK_AT_FLOOR_FAULT 2
-
-FloorFault executes the above behavior but as soon as the floor approaches floor 2 (arg 6) the elevator 
-will get stuck, and shut down.
-
-(EX) Door fault command:  14:05:15.0 2 DOWN 1 DOOR_STUCK AUTO_FIXING_SUCCESS
-
-(TODO fill door fault command explanation)
-
----------------------------------------------------------
-
-Assigned subsystem for this iteration
-
-FloorFaults + Logging: Ryan
-Floor test refactor: Jake
-
-Each team member is expected to contribute to the UML diagrams, implementation code, and testing for their assigned subsystem this week.
-
---------------------------------------------------------
+	FloorFaults + Logging: Ryan
+	Floor test refactor: Jake
+	
+	Elevator Subsystem (ElevatorDoorStuckOpen Fault): Paul
+	
+	Scheduler: Favour, Delight
+	
+	Each team member is expected to contribute to the UML diagrams, implementation code, and testing for their assigned subsystem 
+	this week.
