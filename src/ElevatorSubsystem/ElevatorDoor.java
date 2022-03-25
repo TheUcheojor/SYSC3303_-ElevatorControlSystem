@@ -1,42 +1,92 @@
 package ElevatorSubsystem;
 
+/**
+ * This class represents the elevator door
+ *
+ * @author paulokenne, ryanfife, favourolotu
+ *
+ */
 public class ElevatorDoor {
-	// door open/close speed in milliseconds
-	private double doorSpeed;
+
+	/**
+	 * The door open/close time in milliseconds
+	 */
+	private double doorOpenCloseTime;
+
+	/**
+	 * A flag that indicates if the door is open
+	 */
 	private boolean isOpen = false;
-	
-	public ElevatorDoor(double doorSpeed) {
-		this.doorSpeed = doorSpeed;
+
+	/**
+	 * A ElevatorDoor constructor
+	 *
+	 * @param doorOpenCloseTime the door open/close time
+	 */
+	public ElevatorDoor(double doorOpenCloseTime) {
+		this.doorOpenCloseTime = doorOpenCloseTime;
 	}
-	
+
+	/**
+	 * Return a flag indicating if the door is open
+	 *
+	 * @return true if open and false otherwise
+	 */
 	public boolean isOpen() {
 		return isOpen;
 	}
-	
+
+	/**
+	 * Open the elevator door
+	 */
 	public void openDoor() {
-		if(!this.isOpen) {
+		if (!this.isOpen) {
 			try {
-				Thread.sleep((long) this.doorSpeed);
+				Thread.sleep((long) this.doorOpenCloseTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			isOpen = true;
 		}
 	}
-	
-	public void closeDoor() {
-		if(this.isOpen) {
+
+	/**
+	 * Close the elevator door with an error override
+	 *
+	 * @return true if successful and false otherwise
+	 */
+	public boolean closeDoor() {
+		if (this.isOpen) {
 			try {
-				Thread.sleep((long) this.doorSpeed);
+				Thread.sleep((long) this.doorOpenCloseTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			isOpen = false;
+
 		}
+
+		return true;
 	}
-	
-	public double getDoorSpeed() {
-		return this.doorSpeed;
+
+	/**
+	 * Close the elevator door with an error override
+	 *
+	 * @param errorOverride the error override
+	 * @return true if successful and false otherwise
+	 */
+	public boolean closeDoor(boolean errorOverride) {
+		closeDoor();
+		return (errorOverride) ? false : true;
 	}
-	
+
+	/**
+	 * Return the door open close time
+	 *
+	 * @return the door open close time
+	 */
+	public double getDoorOpenCloseTime() {
+		return this.doorOpenCloseTime;
+	}
+
 }
