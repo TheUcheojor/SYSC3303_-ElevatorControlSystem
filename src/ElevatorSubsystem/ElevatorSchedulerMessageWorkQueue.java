@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import common.LoggerWrapper;
+import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
@@ -76,7 +77,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 						logger.fine("(ELEVATOR) Elevator " + car.getId() + " stopping");
 						car.getMotor().turnOff();
 					}else {
-						car.setErrorState(new Exception("Attempted to stop while doors open"));
+						car.setErrorState(new ElevatorStateException(null,"Attempted to stop while doors open"));
 					}
 					break;
 				case CLOSE_DOORS:
@@ -88,7 +89,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 						logger.fine("(ELEVATOR) Elevator " + car.getId() + " door opening");
 						car.getDoor().openDoor();
 					}else {
-						car.setErrorState(new Exception("Attempted to open doors while motor running"));
+						car.setErrorState(new ElevatorStateException(null,"Attempted to open doors while motor running"));
 					}
 					break;
 				case MOVE_UP:
@@ -115,6 +116,16 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue{
 					floorSubsystemCommunication.sendMessage(leavingMessage);
 					floorSubsystemCommunication.sendMessage(comingMessage);
 				
+					break;
+					
+				case SHUT_DOWN:
+					car.setInService(false);
+					car.setErrorState(command.getException());
+					break;
+					
+				case RESTART:
+					car.setInService(true);
+					car.setErrorState(null);
 					break;
 			}
 		}catch(Exception e) {

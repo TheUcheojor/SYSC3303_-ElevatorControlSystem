@@ -1,6 +1,9 @@
+import java.util.logging.Logger;
+
 import ElevatorSubsystem.ElevatorController;
 import FloorSubsystem.FloorSubsystem;
 import Scheduler.Scheduler;
+import common.LoggerWrapper;
 
 /**
  * This class sets up and starts the elevator, floor, and scheduler systems.
@@ -11,6 +14,7 @@ import Scheduler.Scheduler;
  *
  */
 public class SystemExecutor {
+	private static Logger logger = LoggerWrapper.getLogger();
 
 	/**
 	 * Set up and start the application
@@ -24,6 +28,7 @@ public class SystemExecutor {
 		scheduler.runSchedulerProgram();
 
 		// Set up and start the elevator controller
+		logger.info("(SYSTEM) all elevators starting at floor 0");
 		ElevatorController elevatorController = new ElevatorController();
 
 		// Set up and start the floor subsystem

@@ -49,12 +49,6 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				// requests. Once manual actions have be taken on the elevator, the elevator
 				// should proceed like normal.
 				elevatorJobManagements[elevatorId].setErrorState(elevatorStatusMessage.getErrorState());
-				if (elevatorStatusMessage.getErrorState() != null) {
-					logger.severe("(SCHEDULER) Elevator " + elevatorId + " has an error. Shutting down elevator...");
-					elevatorJobManagements[elevatorId].setReadyForJob(false);
-				} else {
-					elevatorJobManagements[elevatorId].setReadyForJob(true);
-				}
 
 				logger.fine("(SCHEDULER) Received Elevator status: [ID: " + elevatorId + ", F: "
 						+ elevatorStatusMessage.getFloorNumber() + ", D: " + elevatorStatusMessage.getDirection()
@@ -81,9 +75,8 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 				elevatorJobManagements[elevatorId].addJob((ElevatorJobMessage) message);
 
-				logger.info("(SCHEDULER) Assigning DROP_OFF_PASSENGER Job (Direction = "
-						+ dropPassengerRequest.getDirection() + " @ floor = "
-						+ dropPassengerRequest.getDestinationFloor() + ") to Elevator "
+				logger.info("(SCHEDULER) Assigning DROP_OFF_PASSENGER @ floor = "
+						+ dropPassengerRequest.getDestinationFloor() + " to Elevator "
 						+ elevatorJobManagements[elevatorId].getElevatorId());
 
 				logger.fine("(SCHEDULER) Elevator Management Status: [ID: " + elevatorId +", F: "

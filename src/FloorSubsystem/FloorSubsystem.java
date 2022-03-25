@@ -18,9 +18,15 @@ import common.work_management.MessageWorkQueue;
 /**
  * This class simulates the FloorSubsystem thread
  *
- * @author Favour, Delight, paulokenne, Jacob Charpentier
+ * @author Favour, Delight, paulokenne, Jacob Charpentier, Ryan Fife
  */
 public class FloorSubsystem {
+
+	/**
+	 * Delay between sending requests from the floor input file to the scheduler.
+	 * For more real life simulation purposes.
+	 */
+	private static final int SIMULATED_INPUT_DELAY_MS = 10000;
 
 	/**
 	 * The number of floors
@@ -152,17 +158,20 @@ public class FloorSubsystem {
 				for (SimulationFloorInputData floorInputData : floorDataCollection) {
 
 					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(
-							floorInputData.getCurrentFloor(), floorInputData.getFloorDirectionButton(),
-							floorInputData.getInputDataId());
+							floorInputData.getCurrentFloor(),
+							floorInputData.getFloorDirectionButton(),
+							floorInputData.getInputDataId(),
+							floorInputData.getFault(),
+							floorInputData.getFaultFloor());
 
 					// Updating the floor properties(User interacting with the floor button)
 					int floorId = floorInputData.getCurrentFloor();
 					floors[floorId].pressFloorButton(floorInputData.getFloorDirectionButton());
-					floors[floorId].printFloorStatus();
 
 					// sending the job to the scheduler
 					try {
 						floorSchedulerUDP.sendMessage(elevatorFloorRequest);
+						Thread.sleep(SIMULATED_INPUT_DELAY_MS);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

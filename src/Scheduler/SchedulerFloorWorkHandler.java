@@ -5,9 +5,17 @@ package Scheduler;
 
 import java.util.logging.Logger;
 
+import FloorSubsystem.FloorInputFault;
 import common.LoggerWrapper;
+import common.exceptions.ElevatorStateException;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
+import common.messages.floor.ElevatorFloorRequest;
+import common.messages.floor.ElevatorNotArrived;
+import common.messages.scheduler.ElevatorCommand;
+import common.messages.scheduler.FloorCommand;
+import common.messages.scheduler.SchedulerElevatorCommand;
+import common.messages.scheduler.SchedulerFloorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 
 /**
@@ -40,9 +48,24 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 			ElevatorJobMessage job = (ElevatorJobMessage) message;
-			logger.info("(SCHEDULER) Received floor request: go to floor " + job.getDestinationFloor());
+			logger.info("(SCHEDULER) ->>> Pickup passenger at floor " + job.getDestinationFloor());
 			handleElevatorPickUpPassengerRequest(job);
 			break;
+			
+		case STUCK_AT_FLOOR_FAULT:
+			ElevatorNotArrived stuckMessage = (ElevatorNotArrived) message;
+			logger.severe("(SCHEDULER) Floor " + stuckMessage.getFloorNumber() + " never received elevator " + stuckMessage.getElevatorId() + 
+					", elevator must be stuck");
+			logger.info("(SCHEDULER) Shutting down elevator " + stuckMessage.getElevatorId());
+			
+			try {
+				ElevatorStateException exception = new ElevatorStateException(FloorInputFault.STUCK_AT_FLOOR_FAULT, stuckMessage.getFloorNumber(), "Elevator is stuck");
+				elevatorJobManagements[stuckMessage.getElevatorId()].setErrorState(exception);
+				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.SHUT_DOWN, stuckMessage.getElevatorId()));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.severe(e.toString());
+			}
 
 		default:
 			break;
@@ -143,6 +166,20 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 			}
 
 			assumedBestElevatorJobManagement.addJob(elevatorFloorJob);
+			ElevatorFloorRequest floorRequest = (ElevatorFloorRequest) elevatorFloorJob;
+			
+			try {
+				// if we want to produce a elevator stuck fault, inform floor what elevator to stop
+				if(floorRequest.getFault() == FloorInputFault.STUCK_AT_FLOOR_FAULT && floorRequest.getFaultFloorNumber() >= 0) {
+					schedulerFloorCommunication.sendMessage(
+							new SchedulerFloorCommand(FloorCommand.PRODUCE_STUCK_FAULT_WITH_ELEVATOR,
+									floorRequest.getFaultFloorNumber(),
+									assumedBestElevatorJobManagement.getElevatorId()));
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.severe(e.toString());
+			}
 
 			logger.fine("(SCHEDULER) Assigning PICK_UP_PASSENGER Job (Direction = "
 					+ elevatorFloorJob.getDirection() + " @ floor = " + elevatorFloorJob.getDestinationFloor()

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import FloorSubsystem.FloorSubsystem;
 import common.Direction;
+import common.LoggerWrapper;
 import common.messages.ElevatorJobMessage;
 
 /**
@@ -16,6 +18,7 @@ import common.messages.ElevatorJobMessage;
  *
  */
 public class ElevatorJobManagement {
+	private Logger logger = LoggerWrapper.getLogger();
 	/**
 	 * The elevator's jobs
 	 */
@@ -135,6 +138,12 @@ public class ElevatorJobManagement {
 	 * @param errorState the error state to set
 	 */
 	public void setErrorState(Exception errorState) {
+		if(errorState != null) {
+			logger.fine("(SCHEDULER) Elevator " + elevatorId + " has an error. No longer assigning jobs to this elevator...");
+			this.readyForJob = false;
+		} else {
+			this.readyForJob = true;
+		}
 		this.errorState = errorState;
 	}
 

@@ -9,6 +9,7 @@ import ElevatorSubsystem.ElevatorMotor;
 import common.Direction;
 import common.LoggerWrapper;
 import common.messages.elevator.ElevatorFloorArrivalMessage;
+import common.messages.floor.ElevatorNotArrived;
 import common.remote_procedure.SubsystemCommunicationRPC;
 
 /**
@@ -107,14 +108,21 @@ public class FloorElevatorComponents {
 	 * @param elevatorMotor                    the elevator motor
 	 * @param elevatorSubsystemReceiverChannel the elevator subsystem receiver
 	 *                                         channel
+	 *                                         
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
+	 *                                         
+	 * @param produceFloorFault				   An optional param for simulating elevators stuck between floors                                       
 	 */
-	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor,
-			SubsystemCommunicationRPC elevatorUDP, boolean isFloorFinalDestination) {
+	public void notifyElevatorAtFloorArrival(int floorNumber,
+			ElevatorMotor elevatorMotor,
+			SubsystemCommunicationRPC elevatorUDP,
+			SubsystemCommunicationRPC schedulerUDP,
+			boolean isFloorFinalDestination,
+			boolean produceFloorFault) {
 
 		double topSpeed = elevatorMotor.getTopSpeed();
-		double intialSpeed = elevatorMotor.getCurrentVelocity();
+		double initialSpeed = elevatorMotor.getCurrentVelocity();
 		double finalSpeed = 0;
 
 		double acceleration = elevatorMotor.getAcceleration();
@@ -123,14 +131,14 @@ public class FloorElevatorComponents {
 		double newCurrentElevatorSpeed;
 
 		// Find the time it needs to get to the maximum speed
-		double timeToAccelerateToTopSpeed = (topSpeed - intialSpeed) / acceleration;
+		double timeToAccelerateToTopSpeed = (topSpeed - initialSpeed) / acceleration;
 
 		// Find the distance traveled as the elevator accelerates to the top speed.
-		double distanceTraveledWhenAccelerating = (Math.pow(topSpeed, 2) - Math.pow(intialSpeed, 2))
+		double distanceTraveledWhenAccelerating = (Math.pow(topSpeed, 2) - Math.pow(initialSpeed, 2))
 				/ (2 * acceleration);
 
 		// Find the time spent when accelerating to top speed.
-		double timeTravelledWhenAccelerating = (topSpeed - intialSpeed) / acceleration;
+		double timeTravelledWhenAccelerating = (topSpeed - initialSpeed) / acceleration;
 
 		// Check if the current floor is the destination floor
 		if (isFloorFinalDestination) {
@@ -182,11 +190,18 @@ public class FloorElevatorComponents {
 				// For now, we will assume that the motor's elevatorDirection is where the
 				// elevator plans to go
 				// TODO Reevaluate the assumption.
-				elevatorArrivedAtFloor(elevatorMotor.getDirection(), floorNumber);
-				ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber,
-						newCurrentElevatorSpeed);
 				try {
-					elevatorUDP.sendMessage(notifyMsg);
+					if(produceFloorFault) {
+						ElevatorNotArrived brokenMsg = new ElevatorNotArrived(floorNumber, elevatorId);
+						
+						schedulerUDP.sendMessage(brokenMsg);
+					} else {
+						elevatorArrivedAtFloor(elevatorMotor.getDirection(), floorNumber);
+						ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber,
+								newCurrentElevatorSpeed);
+						
+						elevatorUDP.sendMessage(notifyMsg);
+					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
