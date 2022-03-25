@@ -1,5 +1,6 @@
 package common.messages.floor;
 
+import FloorSubsystem.FloorInputFault;
 import common.Direction;
 import common.messages.ElevatorJobMessage;
 import common.messages.MessageType;
@@ -16,6 +17,8 @@ public class ElevatorFloorRequest extends ElevatorJobMessage {
 	 * The input data id
 	 */
 	int inputDataId;
+	FloorInputFault fault = null;
+	int faultFloorNumber = -1;
 
 	/**
 	 * A ElevatorFloorRequest constructor
@@ -29,6 +32,13 @@ public class ElevatorFloorRequest extends ElevatorJobMessage {
 		this.inputDataId = inputDataId;
 	}
 
+	public ElevatorFloorRequest(int destinationFloor, Direction direction, int inputDataId, FloorInputFault fault, int faultFloorNumber) {
+		super(MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST, destinationFloor, direction);
+		this.inputDataId = inputDataId;
+		this.fault = fault;
+		this.faultFloorNumber = faultFloorNumber;
+	}
+	
 	/**
 	 * Get the input data id
 	 *
@@ -37,4 +47,20 @@ public class ElevatorFloorRequest extends ElevatorJobMessage {
 	public int getInputDataId() {
 		return inputDataId;
 	}
+
+	/**
+	 * @return the fault
+	 */
+	public synchronized FloorInputFault getFault() {
+		return fault;
+	}
+
+	/**
+	 * @return the faultFloorNumber
+	 */
+	public synchronized int getFaultFloorNumber() {
+		return faultFloorNumber;
+	}
+	
+	
 }

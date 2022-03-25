@@ -65,7 +65,7 @@ public class FloorElevatorMessageWorkQueue extends MessageWorkQueue {
 
 			// Call request to notify that the elevator has arrived
 			floors[floorId].notifyElevatorAtFloorArrival(floorId, elevatorId,
-					floorSignalRequestMessage.getElevatorMotor(), elevatorSubsystemCommunication,
+					floorSignalRequestMessage.getElevatorMotor(), elevatorSubsystemCommunication, schedulerSubsystemCommunication,
 					floorSignalRequestMessage.isFloorFinalDestination());
 			break;
 

@@ -152,8 +152,11 @@ public class FloorSubsystem {
 				for (SimulationFloorInputData floorInputData : floorDataCollection) {
 
 					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(
-							floorInputData.getCurrentFloor(), floorInputData.getFloorDirectionButton(),
-							floorInputData.getInputDataId());
+							floorInputData.getCurrentFloor(),
+							floorInputData.getFloorDirectionButton(),
+							floorInputData.getInputDataId(),
+							floorInputData.getFault(),
+							floorInputData.getFaultFloor());
 
 					// Updating the floor properties(User interacting with the floor button)
 					int floorId = floorInputData.getCurrentFloor();

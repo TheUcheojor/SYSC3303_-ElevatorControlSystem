@@ -88,6 +88,11 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			}
 
 			break;
+			
+		case PRODUCE_STUCK_FAULT_WITH_ELEVATOR:
+			floors[floorId].setElevatorIdToFault(request.getElevatorId());
+			break;
+			
 		default:
 			break;
 		}

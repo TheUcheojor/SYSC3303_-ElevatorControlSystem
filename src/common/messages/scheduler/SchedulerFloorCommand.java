@@ -70,6 +70,13 @@ public class SchedulerFloorCommand extends Message {
 		this.elevatorId = elevatorId;
 		this.inputDataId = inputDataId;
 	}
+	
+	public SchedulerFloorCommand(FloorCommand floorCommand, int floorId, int elevatorId) {
+		super(MessageType.SCHEDULER_FLOOR_COMMAND);
+		this.floorCommand = floorCommand;
+		this.floorId = floorId;
+		this.elevatorId = elevatorId;
+	}
 
 	/**
 	 * This method returns the scheduler command

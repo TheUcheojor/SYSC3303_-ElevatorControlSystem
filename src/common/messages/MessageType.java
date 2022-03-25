@@ -79,5 +79,7 @@ public enum MessageType {
 	/**
 	 * A message that indicates that the sent message was received
 	 */
-	ACKNOWLEDGEMENT_RESPONSE
+	ACKNOWLEDGEMENT_RESPONSE,
+
+	STUCK_AT_FLOOR_FAULT
 }
