@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayDeque;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.ElevatorController;
@@ -27,37 +27,37 @@ import common.remote_procedure.SubsystemComponentType;
  * This class tests how the scheduler communicates with the Elevator and manages
  * elevator messages
  *
- * @author paulokenne
+ * @author paulokenne Favour Olotu
  *
  */
 public class SchedulerElevatorWorkHandlerTest {
 	/**
 	 * The scheduler elevator message work handler
 	 */
-	SchedulerElevatorWorkHandler schedulerElevatorWorkHandler;
+	private static SchedulerElevatorWorkHandler schedulerElevatorWorkHandler;
 
 	/**
 	 * The Scheduler UDP communication between the scheduler and floor
 	 */
-	private SubsystemCommunicationRPC schedulerFloorCommunication = new SubsystemCommunicationRPC(
+	private static SubsystemCommunicationRPC schedulerFloorCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.FLOOR_SUBSYSTEM);
 
 	/**
 	 * The Scheduler UDP communication between the scheduler and floor
 	 */
-	private SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
+	private static SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
 
 	/**
 	 * The Elevator UDP communication between the elevator and scheduler
 	 */
-	private SubsystemCommunicationRPC elevatorSchedulerCommunication = new SubsystemCommunicationRPC(
+	private static SubsystemCommunicationRPC elevatorSchedulerCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.ELEVATOR_SUBSYSTEM, SubsystemComponentType.SCHEDULER);
 
 	/**
 	 * The job management for each elevator
 	 */
-	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
+	private static ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
 
 	/**
 	 * The received message
@@ -69,20 +69,20 @@ public class SchedulerElevatorWorkHandlerTest {
 	 *
 	 * @throws java.lang.Exception
 	 */
-	@BeforeEach
-	void setUp() throws Exception {
+	@BeforeAll
+	static void setUp() throws Exception {
 
 		for (int i = 0; i < elevatorJobManagements.length; i++) {
 			elevatorJobManagements[i] = new ElevatorJobManagement(i);
 		}
 
-		this.schedulerElevatorWorkHandler = new SchedulerElevatorWorkHandler(schedulerFloorCommunication,
+		schedulerElevatorWorkHandler = new SchedulerElevatorWorkHandler(schedulerFloorCommunication,
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
 	@AfterEach
 	void tearDown() {
-		elevatorReceivedMessages = null;
+		elevatorReceivedMessages = new ArrayDeque<>();
 	}
 
 	/**
@@ -193,4 +193,5 @@ public class SchedulerElevatorWorkHandlerTest {
 		}).start();
 	}
 
+	
 }
