@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,20 +27,20 @@ import common.remote_procedure.SubsystemComponentType;
  * @author Favour
  */
 public class TestElevatorFloorMessageWorkQueue {
-	private SubsystemCommunicationRPC schedulerElevatorSubsystemCommunication;
-	private SubsystemCommunicationRPC elevatorSchedulerSubsystemCommunication;
-	private ElevatorFloorMessageWorkQueue workQueue;
+	private static SubsystemCommunicationRPC schedulerElevatorSubsystemCommunication;
+	private static SubsystemCommunicationRPC elevatorSchedulerSubsystemCommunication;
+	private static ElevatorFloorMessageWorkQueue workQueue;
 	
-	private int ELEVATOR_ID = 1;
-	private int ELEVATOR_SPEED = 1000; 
-	private int FLOOR_ID = 2;
+	private static int ELEVATOR_ID = 1;
+	private static int ELEVATOR_SPEED = 1000; 
+	private static int FLOOR_ID = 2;
 	
-	private Map<Integer, ElevatorCar> elevators;
+	private static Map<Integer, ElevatorCar> elevators;
 	
-	private ArrayDeque<Message> receivedSchedulerMessages = new ArrayDeque<>();
+	private static ArrayDeque<Message> receivedSchedulerMessages = new ArrayDeque<>();
 
-	@BeforeEach
-	void setup() {
+	@BeforeAll
+	static void setup() {
 		schedulerElevatorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.SCHEDULER,
 				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
 		

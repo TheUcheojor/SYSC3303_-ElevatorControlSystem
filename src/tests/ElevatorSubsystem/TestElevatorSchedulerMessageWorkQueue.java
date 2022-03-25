@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,23 +29,23 @@ import common.remote_procedure.SubsystemComponentType;
  *
  */
 class TestElevatorSchedulerMessageWorkQueue {
-	private SubsystemCommunicationRPC schedulerElevatorSubsystemCommunication;
-	private SubsystemCommunicationRPC floorElevatorSubsystemCommunication;
-	private SubsystemCommunicationRPC elevatorSchedulerSubsystemCommunication;
-	private SubsystemCommunicationRPC elevatorFloorSubsystemCommunication;
+	private static SubsystemCommunicationRPC schedulerElevatorSubsystemCommunication;
+	private static SubsystemCommunicationRPC floorElevatorSubsystemCommunication;
+	private static SubsystemCommunicationRPC elevatorSchedulerSubsystemCommunication;
+	private static SubsystemCommunicationRPC elevatorFloorSubsystemCommunication;
 	
-	private ElevatorSchedulerMessageWorkQueue workQueue;
+	private static ElevatorSchedulerMessageWorkQueue workQueue;
 	
-	private int ELEVATOR_ID = 1;
-	private int ELEVATOR_SPEED = 1000;
+	private static int ELEVATOR_ID = 1;
+	private static int ELEVATOR_SPEED = 1000;
 	
-	private Map<Integer, ElevatorCar> elevators;
+	private static Map<Integer, ElevatorCar> elevators;
 	
 	private ArrayDeque<Message> receivedFloorMessages = new ArrayDeque<>();
 	private ArrayDeque<Message> receivedSchedulerMessages = new ArrayDeque<>();
 
-	@BeforeEach
-	void setup() {
+	@BeforeAll
+	static void setup() {
 		schedulerElevatorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.SCHEDULER,
 				SubsystemComponentType.ELEVATOR_SUBSYSTEM);
 		floorElevatorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.FLOOR_SUBSYSTEM,
@@ -61,25 +62,16 @@ class TestElevatorSchedulerMessageWorkQueue {
 		
 		workQueue = new ElevatorSchedulerMessageWorkQueue(elevatorSchedulerSubsystemCommunication, elevatorFloorSubsystemCommunication, elevators);
 		
+	}
+	
+
+	@AfterEach
+	void tearDown() {
+		
 		receivedFloorMessages = new ArrayDeque<>();
 		receivedSchedulerMessages = new ArrayDeque<>();
 	}
-	
-	@AfterEach
-	void tearDown() {
-		schedulerElevatorSubsystemCommunication = null;
-		floorElevatorSubsystemCommunication = null;
-		
-		elevatorSchedulerSubsystemCommunication = null;
-		elevatorFloorSubsystemCommunication = null;
-		
-		workQueue = null;
-		elevators = null;
-		
-		receivedFloorMessages = null;
-		receivedSchedulerMessages = null;
-	}
-	
+
 
 	
 	@Test
@@ -91,7 +83,7 @@ class TestElevatorSchedulerMessageWorkQueue {
 		try {
 			workQueue.enqueueMessage(elevatorCommand);
 		
-			Thread.sleep(100);
+			Thread.sleep(1000);
 			
 			ElevatorLeavingFloorMessage message1 = (ElevatorLeavingFloorMessage) receivedFloorMessages.pop();
 			ElevatorFloorSignalRequestMessage message2 = (ElevatorFloorSignalRequestMessage) receivedFloorMessages.pop();
