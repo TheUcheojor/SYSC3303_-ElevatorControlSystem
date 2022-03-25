@@ -27,7 +27,7 @@ import common.remote_procedure.SubsystemComponentType;
  * This class tests how the scheduler communicates with the Elevator and manages
  * elevator messages
  *
- * @author paulokenne
+ * @author paulokenne Favour Olotu
  *
  */
 public class SchedulerElevatorWorkHandlerTest {
@@ -82,7 +82,7 @@ public class SchedulerElevatorWorkHandlerTest {
 
 	@AfterEach
 	void tearDown() {
-		elevatorReceivedMessages = null;
+		elevatorReceivedMessages = new ArrayDeque<>();
 	}
 
 	/**
@@ -193,4 +193,5 @@ public class SchedulerElevatorWorkHandlerTest {
 		}).start();
 	}
 
+	
 }
