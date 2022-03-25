@@ -1,5 +1,6 @@
 package common.messages.scheduler;
 
+import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.MessageType;
 /**
@@ -23,10 +24,19 @@ public class SchedulerElevatorCommand extends Message{
 	 * 
 	 * @param schedulerCommands
 	 */
+	private ElevatorStateException elevatorException;
+	
 	public SchedulerElevatorCommand(ElevatorCommand elevatorCommand, int elevatorID) {
 		super(MessageType.SCHEDULER_ELEVATOR_COMMAND);
 		this.elevatorCommand = elevatorCommand;
 		this.elevatorID = elevatorID;
+	}
+	
+	public SchedulerElevatorCommand(ElevatorCommand elevatorCommand, int elevatorID, ElevatorStateException exception) {
+		super(MessageType.SCHEDULER_ELEVATOR_COMMAND);
+		this.elevatorCommand = elevatorCommand;
+		this.elevatorID = elevatorID;
+		this.elevatorException = exception;
 	}
 
 	/**
@@ -44,6 +54,10 @@ public class SchedulerElevatorCommand extends Message{
 	 */
 	public int getElevatorID() {
 		return elevatorID;
+	}
+
+	public ElevatorStateException getException() {
+		return elevatorException;
 	}
 	
 	

@@ -161,11 +161,11 @@ public class FloorSubsystem {
 					// Updating the floor properties(User interacting with the floor button)
 					int floorId = floorInputData.getCurrentFloor();
 					floors[floorId].pressFloorButton(floorInputData.getFloorDirectionButton());
-					floors[floorId].printFloorStatus();
 
 					// sending the job to the scheduler
 					try {
 						floorSchedulerUDP.sendMessage(elevatorFloorRequest);
+						Thread.sleep(10000);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

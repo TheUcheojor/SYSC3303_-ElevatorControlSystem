@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import FloorSubsystem.FloorInputFault;
 import common.LoggerWrapper;
+import common.exceptions.ElevatorStateException;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.floor.ElevatorFloorRequest;
@@ -47,7 +48,7 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 			ElevatorJobMessage job = (ElevatorJobMessage) message;
-			logger.info("(SCHEDULER) Received floor request: go to floor " + job.getDestinationFloor());
+			logger.info("(SCHEDULER) ->>> Pickup passenger at floor " + job.getDestinationFloor());
 			handleElevatorPickUpPassengerRequest(job);
 			break;
 			
@@ -58,6 +59,8 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 			logger.info("(SCHEDULER) Shutting down elevator " + stuckMessage.getElevatorId());
 			
 			try {
+				ElevatorStateException exception = new ElevatorStateException(FloorInputFault.STUCK_AT_FLOOR_FAULT, stuckMessage.getFloorNumber(), "Elevator is stuck");
+				elevatorJobManagements[stuckMessage.getElevatorId()].setErrorState(exception);
 				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.SHUT_DOWN, stuckMessage.getElevatorId()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
