@@ -138,8 +138,9 @@ public class ElevatorJobManagement {
 	 * @param errorState the error state to set
 	 */
 	public void setErrorState(Exception errorState) {
-		if(errorState != null) {
-			logger.fine("(SCHEDULER) Elevator " + elevatorId + " has an error. No longer assigning jobs to this elevator...");
+		if (errorState != null) {
+			logger.fine("(SCHEDULER) Elevator " + elevatorId
+					+ " has an error. No longer assigning jobs to this elevator...");
 			this.readyForJob = false;
 		} else {
 			this.readyForJob = true;

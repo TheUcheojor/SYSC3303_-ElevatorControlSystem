@@ -57,7 +57,6 @@ public class FloorElevatorComponents {
 		setArrivalSensorState(true);
 		directionLamp.setFloorNumber(floorNumber);
 		directionLamp.setElevatorDirection(elevatorDirection);
-
 	}
 
 	/**
@@ -108,18 +107,16 @@ public class FloorElevatorComponents {
 	 * @param elevatorMotor                    the elevator motor
 	 * @param elevatorSubsystemReceiverChannel the elevator subsystem receiver
 	 *                                         channel
-	 *                                         
+	 * 
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
-	 *                                         
-	 * @param produceFloorFault				   An optional param for simulating elevators stuck between floors                                       
+	 * 
+	 * @param produceFloorFault                An optional param for simulating
+	 *                                         elevators stuck between floors
 	 */
-	public void notifyElevatorAtFloorArrival(int floorNumber,
-			ElevatorMotor elevatorMotor,
-			SubsystemCommunicationRPC elevatorUDP,
-			SubsystemCommunicationRPC schedulerUDP,
-			boolean isFloorFinalDestination,
-			boolean produceFloorFault) {
+	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor,
+			SubsystemCommunicationRPC elevatorUDP, SubsystemCommunicationRPC schedulerUDP,
+			boolean isFloorFinalDestination, boolean produceFloorFault) {
 
 		double topSpeed = elevatorMotor.getTopSpeed();
 		double initialSpeed = elevatorMotor.getCurrentVelocity();
@@ -177,29 +174,28 @@ public class FloorElevatorComponents {
 			@Override
 			public void run() {
 				try {
-					logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " sensor for floor "
-							+ floorNumber + " is waiting for " + totalTimeInMilliSeconds + "ms.");
+					logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " sensor for floor " + floorNumber
+							+ " is waiting for " + totalTimeInMilliSeconds + "ms.");
 					Thread.sleep(totalTimeInMilliSeconds);
 				} catch (InterruptedException e) {
 					System.out.println(e);
 				}
 
-				logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " has reached the floor "
-						+ floorNumber);
+				logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " has reached the floor " + floorNumber);
 
 				// For now, we will assume that the motor's elevatorDirection is where the
 				// elevator plans to go
 				// TODO Reevaluate the assumption.
 				try {
-					if(produceFloorFault) {
+					if (produceFloorFault) {
 						ElevatorNotArrived brokenMsg = new ElevatorNotArrived(floorNumber, elevatorId);
-						
+
 						schedulerUDP.sendMessage(brokenMsg);
 					} else {
 						elevatorArrivedAtFloor(elevatorMotor.getDirection(), floorNumber);
 						ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber,
 								newCurrentElevatorSpeed);
-						
+
 						elevatorUDP.sendMessage(notifyMsg);
 					}
 				} catch (Exception e) {

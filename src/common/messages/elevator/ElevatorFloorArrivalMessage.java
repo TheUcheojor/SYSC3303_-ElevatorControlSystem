@@ -19,6 +19,7 @@ public class ElevatorFloorArrivalMessage extends FloorElevatorTargetedMessage {
 	 * The current elevator speed at the floor.
 	 */
 	private double newCurrentElevatorSpeed;
+	
 
 	/**
 	 * A ElevatorFloorArrivalMessage constructor.

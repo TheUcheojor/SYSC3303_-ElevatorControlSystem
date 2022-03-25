@@ -4,7 +4,10 @@
 package FloorSubsystem;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
+import ElevatorSubsystem.ElevatorAutoFixing;
+import common.LoggerWrapper;
 import common.SimulationFloorInputData;
 import common.SystemValidationUtil;
 import common.messages.Message;
@@ -22,41 +25,68 @@ import common.work_management.MessageWorkQueue;
  */
 public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
+	/**
+	 * The scheduler system communication
+	 */
 	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
+
+	/**
+	 * The elevator subsystem communication
+	 */
 	private SubsystemCommunicationRPC elevatorSubsystemCommunication;
+
+	/**
+	 * The floors
+	 */
 	private Floor[] floors;
+
+	/**
+	 * The floor data collection
+	 */
 	private ArrayList<SimulationFloorInputData> floorDataCollection;
 
+	/**
+	 * The logger
+	 */
+	private static Logger logger = LoggerWrapper.getLogger();
+
+	/**
+	 * The FloorSchedulerMessageWorkQueue constructor
+	 *
+	 * @param schedulerSubsystemCommunication The scheduler subsystem communication
+	 * @param elevatorSubsystemCommunication  The elevator subsystem communication
+	 * @param floors                          the floors
+	 * @param floorDataCollection             the floor data collection
+	 */
 	public FloorSchedulerMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication,
 			SubsystemCommunicationRPC elevatorSubsystemCommunication, Floor[] floors,
-			ArrayList<SimulationFloorInputData> assignedFloorDataCollection) {
+			ArrayList<SimulationFloorInputData> floorDataCollection) {
 		this.schedulerSubsystemCommunication = schedulerSubsystemCommunication;
 		this.elevatorSubsystemCommunication = elevatorSubsystemCommunication;
 		this.floors = floors;
-		this.floorDataCollection = assignedFloorDataCollection;
+		this.floorDataCollection = floorDataCollection;
 	}
 
 	/**
-	 * Given the elevator direction, returns a floor's list of passenger
-	 * destinations (car buttons pressed)
+	 * Given the input data id, find the floor data
 	 *
-	 * @param floorId           the floor id
-	 * @param elevatorDirection
-	 * @return
+	 * @param inputDataId the input data id
+	 * @return the input data
 	 */
-	private int getFloorPassengerDestinationFloor(int inputDataId) {
+	private SimulationFloorInputData getFloorData(int inputDataId) {
 		for (SimulationFloorInputData floorData : floorDataCollection) {
 			if (floorData.getInputDataId() == inputDataId) {
-				return floorData.getDestinationFloorCarButton();
+				return floorData;
 			}
 		}
 
-		return -1;
+		return null;
 	}
 
 	/**
-	 * Handle message method, receives a message and calls the corresponding switch case. Overrides MessageWorkQueue handleMessage method.
-	 * 
+	 * Handle message method, receives a message and calls the corresponding switch
+	 * case. Overrides MessageWorkQueue handleMessage method.
+	 *
 	 * @param message the message to be handled
 	 */
 	@Override
@@ -75,11 +105,23 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		case TURN_OFF_FLOOR_LAMP:
 			floors[floorId].turnOffLampButton(request.getLampButtonDirection());
 
-			int destinationFloor = getFloorPassengerDestinationFloor(request.getInputDataId());
+			// Get the corresponding floor data
+			SimulationFloorInputData floorData = getFloorData(request.getInputDataId());
+
+			if (floorData == null) {
+				logger.severe("(FLOOR) Floor data(id=" + request.getInputDataId() + ") could not be found.");
+				return;
+			}
+
+			int destinationFloor = floorData.getDestinationFloorCarButton();
+			FloorInputFault floorFault = floorData.getFault();
+			ElevatorAutoFixing elevatorAutoFixing = floorData.getElevatorAutoFixing();
+
 			int elevatorId = request.getElevatorId();
 
 			ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloor,
-					elevatorId, request.getLampButtonDirection());
+					elevatorId, request.getLampButtonDirection(), floorFault, elevatorAutoFixing);
+
 			try {
 				elevatorSubsystemCommunication.sendMessage(elevatorTransportRequest);
 			} catch (Exception e) {
@@ -88,11 +130,11 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			}
 
 			break;
-			
+
 		case PRODUCE_STUCK_FAULT_WITH_ELEVATOR:
 			floors[floorId].setElevatorIdToFault(request.getElevatorId());
 			break;
-			
+
 		default:
 			break;
 		}

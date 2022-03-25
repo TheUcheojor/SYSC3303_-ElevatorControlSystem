@@ -6,6 +6,7 @@ package common;
 import java.security.InvalidParameterException;
 import java.util.Date;
 
+import ElevatorSubsystem.ElevatorAutoFixing;
 import FloorSubsystem.FloorInputFault;
 
 /**
@@ -46,9 +47,21 @@ public class SimulationFloorInputData {
 	 * The floor that the passenger wishes to go to.
 	 **/
 	private Integer destinationFloorCarButton;
-	
+
+	/**
+	 * The floor input fault
+	 */
 	private FloorInputFault fault = null;
+
+	/**
+	 * The floor at which the elevator gets stuck
+	 */
 	private Integer faultFloor = -1;
+
+	/**
+	 * The elevator auto fixing mode when addressing a fault
+	 */
+	private ElevatorAutoFixing elevatorAutoFixing = ElevatorAutoFixing.AUTO_FIXING_SUCCESS;
 
 	/**
 	 * Constructor.
@@ -60,7 +73,8 @@ public class SimulationFloorInputData {
 	 * @param destinationFloorCarButton the target floor
 	 */
 	public SimulationFloorInputData(Integer inputDataId, String arrivalTime, Integer currentFloor,
-			Direction floorDirectionButton, Integer destinationFloorCarButton, FloorInputFault fault, Integer faultFloor) {
+			Direction floorDirectionButton, Integer destinationFloorCarButton, FloorInputFault fault,
+			Integer faultFloor) {
 		this.inputDataId = inputDataId;
 		this.arrivalTime = arrivalTime;
 		this.currentFloor = currentFloor;
@@ -92,20 +106,29 @@ public class SimulationFloorInputData {
 			this.currentFloor = Integer.parseInt(data[1]);
 			this.floorDirectionButton = Direction.valueOf(data[2]);
 			this.destinationFloorCarButton = Integer.parseInt(data[3]);
-			
-			if(data.length > 4) {
+
+			if (data.length > 4) {
 				this.fault = FloorInputFault.valueOf(data[4]);
-				this.faultFloor = Integer.parseInt(data[5]);
-				if(!SystemValidationUtil.isFloorNumberInRange(faultFloor)
-					) {
-				throw new InvalidParameterException();
+
+				switch (this.fault) {
+
+				case STUCK_AT_FLOOR_FAULT:
+					this.faultFloor = Integer.parseInt(data[5]);
+					if (!SystemValidationUtil.isFloorNumberInRange(faultFloor)) {
+						throw new InvalidParameterException();
+					}
+					break;
+
+				case DOOR_STUCK_OPEN_FAULT:
+					this.elevatorAutoFixing = ElevatorAutoFixing.valueOf(data[5]);
+					break;
 				}
+
 			}
 
 			// Validate the current floor and destination floor inputs are valid.
 			if (!SystemValidationUtil.isFloorNumberInRange(currentFloor)
-					|| !SystemValidationUtil.isFloorNumberInRange(destinationFloorCarButton)) 
-			{
+					|| !SystemValidationUtil.isFloorNumberInRange(destinationFloorCarButton)) {
 				throw new InvalidParameterException();
 			}
 
@@ -114,6 +137,13 @@ public class SimulationFloorInputData {
 			throw new InvalidParameterException(dataString + " is an invalid floor input simulation data");
 		}
 
+	}
+
+	/**
+	 * @return the elevatorAutoFixing
+	 */
+	public ElevatorAutoFixing getElevatorAutoFixing() {
+		return elevatorAutoFixing;
 	}
 
 	/**
