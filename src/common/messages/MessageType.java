@@ -81,5 +81,9 @@ public enum MessageType {
 	 */
 	ACKNOWLEDGEMENT_RESPONSE,
 
-	STUCK_AT_FLOOR_FAULT
+	/**
+	 * A message that inidicates an elevator is stuck at a floor
+	 */
+	STUCK_AT_FLOOR_FAULT,
+	
 }
