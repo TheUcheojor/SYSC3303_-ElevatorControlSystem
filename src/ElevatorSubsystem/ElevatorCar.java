@@ -44,7 +44,7 @@ public class ElevatorCar {
 	/**
 	 * A enum indicating whether the elevator car can auto fix transient errors
 	 */
-	private ElevatorAutoFixing autoFixing = ElevatorAutoFixing.ELEVATOR_AUTO_FIXING_DISABLED;
+	private ElevatorAutoFixing autoFixing = ElevatorAutoFixing.AUTO_FIXING_SUCCESS;
 
 	/**
 	 * The elevator car

@@ -63,7 +63,6 @@ public class ElevatorDoor {
 				e.printStackTrace();
 			}
 			isOpen = false;
-
 		}
 
 		return true;
@@ -75,9 +74,25 @@ public class ElevatorDoor {
 	 * @param errorOverride the error override
 	 * @return true if successful and false otherwise
 	 */
-	public boolean closeDoor(boolean errorOverride) {
-		closeDoor();
-		return (errorOverride) ? false : true;
+	public boolean closeDoor(ElevatorAutoFixing autoFixing) {
+
+		if (this.isOpen) {
+
+			switch (autoFixing) {
+
+			case AUTO_FIXING_SUCCESS:
+				closeDoor();
+				return true;
+
+			case AUTO_FIXING_FAILURE:
+				closeDoor();
+				this.isOpen = true;
+				return false;
+
+			}
+		}
+
+		return true;
 	}
 
 	/**

@@ -23,6 +23,7 @@ import common.work_management.MessageWorkQueue;
  */
 public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
+	private static int FAULT_RETRY_ATTEMPTS = 3;
 	/**
 	 * The scheduler subsystem communication
 	 */
@@ -125,7 +126,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				break;
 			case MOVE_UP:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
-				boolean isCloseDoorProcessSuccess = closeDoorProcess(car, elevatorId);
+				boolean isCloseDoorProcessSuccess = closeDoorProcess(car);
 
 				if (!isCloseDoorProcessSuccess)
 					return;
@@ -143,7 +144,10 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				break;
 			case MOVE_DOWN:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
-				closeDoorProcess(car, elevatorId);
+				boolean isDoorClosed = closeDoorProcess(car);
+
+				if (!isDoorClosed)
+					return;
 
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " moving down");
 				car.getMotor().goDown();
@@ -179,7 +183,10 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @param elevatorId the elevator id
 	 * @return true if the close door process and false otherwise
 	 */
-	private boolean closeDoorProcess(ElevatorCar car, int elevatorId) {
+	private boolean closeDoorProcess(ElevatorCar car) {
+
+		int elevatorId = car.getId();
+		int currentFloorNumber = car.getFloorNumber();
 
 		if (car.getErrorState() == null) {
 			car.getDoor().closeDoor();
@@ -187,30 +194,36 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		}
 
 		if (car.getErrorState().getFault() == FloorInputFault.DOOR_STUCK_OPEN_FAULT) {
-			logger.severe("(Elevator) Elevator " + elevatorId + " failed to close door.");
+			logger.severe("(Elevator) Elevator " + elevatorId + " failed to close door at floor " + currentFloorNumber);
 
-			switch (car.getAutoFixing()) {
+			ElevatorAutoFixing autoFixing = car.getAutoFixing();
 
-			case AUTO_FIXING_SUCCESS:
-				car.setErrorState(null);
-				car.getDoor().closeDoor();
-				logger.severe(
-						"(Elevator) Elevator " + elevatorId + " has addressed FloorInputFault.DOOR_STUCK_OPEN_FAULT.");
-				return true;
+			// Try to close the elevator
+			for (int i = 0; i < FAULT_RETRY_ATTEMPTS; i++) {
+				boolean isDoorClosed = car.getDoor().closeDoor(autoFixing);
 
-			case AUTO_FIXING_FAILURE:
-				ElevatorStatusMessage statusMessage = car.createStatusMessage();
-				logger.severe("(Elevator) Elevator " + elevatorId
-						+ " FAILED to addressed FloorInputFault.DOOR_STUCK_OPEN_FAULT. Shutting down....");
-				car.setInService(false);
+				if (isDoorClosed) {
+					car.setErrorState(null);
+					logger.severe("(Elevator) Elevator " + elevatorId
+							+ " has addressed FloorInputFault.DOOR_STUCK_OPEN_FAULT.");
 
-				try {
-					schedulerSubsystemCommunication.sendMessage(statusMessage);
-				} catch (Exception e) {
+					return true;
 				}
 
-				return false;
 			}
+
+			// Being here indicates that the elevator exhausted the fault retry attempts.
+			// We will notify the scheduler that the elevator is shutting down
+			ElevatorStatusMessage statusMessage = car.createStatusMessage();
+			car.setInService(false);
+			logger.severe("(Elevator) Elevator " + elevatorId
+					+ " exhausted its retry attempts to address the FloorInputFault.DOOR_STUCK_OPEN_FAULT. Shutting down....");
+			try {
+				schedulerSubsystemCommunication.sendMessage(statusMessage);
+			} catch (Exception e) {
+			}
+
+			return false;
 		}
 
 		// If we are here, it means we have an error state that is not door stuck open

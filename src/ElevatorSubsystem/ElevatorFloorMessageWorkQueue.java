@@ -61,7 +61,6 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 				car = elevators.get(elevatorId);
 
 				if (elevatorTransportRequest.getFloorFault() == FloorInputFault.DOOR_STUCK_OPEN_FAULT) {
-
 					car.setErrorState(new ElevatorStateException(FloorInputFault.DOOR_STUCK_OPEN_FAULT, elevatorId,
 							"The elevator car (id= " + elevatorId + ") door is stuck"));
 					car.setAutoFixing(elevatorTransportRequest.getAutoFixing());
@@ -69,7 +68,6 @@ public class ElevatorFloorMessageWorkQueue extends MessageWorkQueue {
 
 				// Receive the message sent and set the errorOverride flag if needed
 				schedulerSubsystemCommunication.sendMessage(message);
-
 				break;
 
 			default:
