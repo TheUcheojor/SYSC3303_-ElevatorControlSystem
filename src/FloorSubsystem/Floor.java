@@ -26,7 +26,7 @@ public class Floor {
 	 * The down lamp button
 	 */
 	private DirectionLampButton downLampButton = null;
-	
+
 	private int elevatorIdToFault = -1;
 
 	/**
@@ -50,6 +50,8 @@ public class Floor {
 	 */
 	public Floor(int floorNumber) {
 
+		this.floorNumber = floorNumber;
+
 		// Create buttons depending on the floor number
 		if (floorNumber == 0) {
 			downLampButton = new DirectionLampButton(Direction.DOWN);
@@ -72,15 +74,18 @@ public class Floor {
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
 	 */
-	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor, SubsystemCommunicationRPC elevatorUDP, SubsystemCommunicationRPC schedulerUDP, boolean isFloorFinalDestination) {
+	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor,
+			SubsystemCommunicationRPC elevatorUDP, SubsystemCommunicationRPC schedulerUDP,
+			boolean isFloorFinalDestination) {
 		boolean produceFloorFault = false;
-		if(elevatorId == elevatorIdToFault) {
+		if (elevatorId == elevatorIdToFault) {
 			produceFloorFault = true;
 			// should only fault this elevator on this floor once???
 			elevatorIdToFault = -1;
 		}
-		
-		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor, elevatorUDP, schedulerUDP, isFloorFinalDestination, produceFloorFault);
+
+		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor, elevatorUDP, schedulerUDP,
+				isFloorFinalDestination, produceFloorFault);
 	}
 
 	/**
