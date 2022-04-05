@@ -90,6 +90,10 @@ public class GUI extends JFrame{
             elevatorDoorsStatus[index].setText("Door: Closed");
             mainPanel.add(elevatorDoorsStatus[index], new GridConstraints(3, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 
+            elevatorStatus[index] = new JLabel();
+            elevatorStatus[index].setText("Status: Down");
+            mainPanel.add(elevatorStatus[index], new GridConstraints(4, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
         }
     }
 
