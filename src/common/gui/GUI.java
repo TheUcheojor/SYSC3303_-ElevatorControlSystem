@@ -60,6 +60,24 @@ public class GUI extends JFrame{
         label6.setText(" ");
         panel1.add(label6, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 
+
+        logTA = new JTextArea();
+        logTA.setLineWrap(true);
+        logSP.setViewportView(logTA);
+
+        elevatorFlrLabels = new JLabel[numElevs];
+        elevatorDoors = new JLabel[numElevs];
+        elevatorDoorsStatus = new JLabel[numElevs];
+        elevatorStatus = new JLabel[numElevs];
+
+        for (int i = 1; i <= numElevs; i++){
+            int index = i - 1;
+
+            JLabel label = new JLabel();
+            label.setText("Elevator " + i);
+            mainPanel.add(label, new GridConstraints(0, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, 1, null, new Dimension(53, 50), null, 0, false));
+
+        }
     }
 
     public static void main(String[] args) {
