@@ -4,6 +4,7 @@
 package Scheduler;
 
 import ElevatorSubsystem.ElevatorController;
+import common.gui.ElevatorControllerObserver;
 import common.messages.Message;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
@@ -60,15 +61,15 @@ public class Scheduler {
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
-	/**
-	 * The main function of the Scheduler
-	 *
-	 * @param args
-	 */
-	public void main(String[] args) {
-		Scheduler scheduler = new Scheduler();
-		scheduler.runSchedulerProgram();
-	}
+//	/**
+//	 * The main function of the Scheduler
+//	 *
+//	 * @param args
+//	 */
+//	public void main(String[] args) {
+//		Scheduler scheduler = new Scheduler();
+//		scheduler.runSchedulerProgram();
+//	}
 
 	/**
 	 * The function runs the message queue for floor and elevator

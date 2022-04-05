@@ -1,19 +1,30 @@
 package common.gui;
 
-import javax.swing.*;
-import java.awt.*;
-import ElevatorSubsystem.ElevatorController;
+import java.awt.Dimension;
+import java.awt.Insets;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
+import ElevatorSubsystem.ElevatorCar;
+import ElevatorSubsystem.ElevatorController;
+import common.messages.elevator.ElevatorStatusMessage;
+
 /**
  * @author Jacob Charpentier, Favour Olotu
  *
  */
-public class GUI extends JFrame{
-	//private final ElevatorController elevatorController;
+public class GUI extends JFrame implements ElevatorControllerObserver{
+	private ElevatorController elevatorController;
     private JPanel mainPanel;
     private JScrollPane logSP;
     private JTextArea logTA;
@@ -24,19 +35,21 @@ public class GUI extends JFrame{
 
     public GUI() {
         super("Elevator GUI");
-        //this.elevatorController = new ElevatorController();
+        
         buildDisplay();
 
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setContentPane(mainPanel);
         this.setResizable(true);
+        this.elevatorController = null;
+        this.setVisible(true);
+        
     }
 
     private void buildDisplay(){
         Integer[] options = {1, 2, 3, 4, 5, 6};
         int numElevs = (Integer)JOptionPane.showInputDialog(this, "Select Number of Elevators",
                 "Elevator Setup", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        System.out.println(numElevs);
 
         ImageIcon imgClosed = new ImageIcon("resources/elevDoorsClose.png");
         ImageIcon imgOpen = new ImageIcon("resources/elevDoorsOpen.png");
@@ -99,8 +112,23 @@ public class GUI extends JFrame{
         }
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new GUI();
-        frame.setVisible(true);
+    public void setEle(ElevatorController elevatorController) {
+    	this.elevatorController = elevatorController;
     }
+    
+    @Override
+	public void handleStatusUpdate(ElevatorStatusMessage message) {
+    	ElevatorCar car = elevatorController.getElevatorCar(message.getElevatorId());
+    	
+		logTA.append("" + car.getFloorNumber() +"\n");
+		logTA.append("" + car.getId() +"\n");
+		logTA.append("" + car.getErrorState() +"\n");
+
+	}
+//    public static void main(String[] args) {
+//        JFrame frame = new GUI();
+//        frame.setVisible(true);
+//    }
+
+	
 }

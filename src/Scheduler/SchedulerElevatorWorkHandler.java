@@ -6,6 +6,7 @@ package Scheduler;
 import java.util.logging.Logger;
 
 import common.LoggerWrapper;
+import common.gui.ElevatorControllerObserver;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
@@ -30,6 +31,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	public SchedulerElevatorWorkHandler(SubsystemCommunicationRPC schedulerFloorCommunication,
 			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements) {
 		super(schedulerFloorCommunication, schedulerElevatorCommunication, elevatorJobManagements);
+
 	}
 
 	@Override
@@ -41,6 +43,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 		case ELEVATOR_STATUS_MESSAGE:
 			synchronized (elevatorJobManagements) {
 				ElevatorStatusMessage elevatorStatusMessage = (ElevatorStatusMessage) message;
+				
 				elevatorId = elevatorStatusMessage.getElevatorId();
 
 				elevatorJobManagements[elevatorId].setCurrentFloorNumber(elevatorStatusMessage.getFloorNumber());

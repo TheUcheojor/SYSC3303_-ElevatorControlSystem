@@ -2,6 +2,7 @@ package ElevatorSubsystem;
 
 import common.exceptions.ElevatorStateException;
 import common.messages.elevator.ElevatorStatusMessage;
+import common.messages.elevator.GUIStatusMessage;
 
 /**
  * Entity representing an elevator car, composed of subcomponents for major
@@ -69,6 +70,19 @@ public class ElevatorCar {
 	public ElevatorStatusMessage createStatusMessage() {
 		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber,
 				errorState);
+
+		return status;
+	}
+	
+	/**
+	 * Creates a ElevatorguiStatusMessage message containing all relevant status info
+	 * for this elevator.
+	 *
+	 * @return status response message
+	 */
+	public GUIStatusMessage createGUIStatusMessage() {
+		GUIStatusMessage status = new GUIStatusMessage(id, this.getMotor().getDirection(), floorNumber,
+				errorState, door);
 
 		return status;
 	}

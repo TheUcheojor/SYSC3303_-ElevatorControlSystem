@@ -5,8 +5,10 @@ import java.util.Map;
 
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
+import common.gui.ElevatorControllerObserver;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
+import common.messages.elevator.GUIStatusMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 
@@ -18,7 +20,7 @@ import common.remote_procedure.SubsystemComponentType;
  * @author Ryan Fife, Favour
  *
  */
-public class ElevatorController {
+public class ElevatorController{
 	/**
 	 * The number of elevators in the system
 	 */
@@ -62,8 +64,11 @@ public class ElevatorController {
 	 * RPC communications channel for the floor
 	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
-
-	public ElevatorController() {
+	
+//	private ElevatorControllerObserver observer;
+	
+	public ElevatorController() {//ElevatorControllerObserver observer) {
+		//this.observer = observer;
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -136,18 +141,28 @@ public class ElevatorController {
 			// send initial status message to scheduler
 			ElevatorCar car = elevators.get(i);
 			ElevatorStatusMessage status = car.createStatusMessage();
+			//GUIStatusMessage statusGUI = car.createGUIStatusMessage();
 			try {
 				schedulerSubsystemCommunication.sendMessage(status);
+				//observer.handleStatusUpdate(statusGUI);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	public ElevatorCar getElevatorCar(int elevatorId) {
+		return elevators.get(elevatorId);
+	} 
+	//	public void addObserver(ElevatorControllerObserver observer) {
+//		this.observer = observer;
+//		System.out.println(observer);
+//	}
 
 	// For running on stand alone system
-	public static void main(String[] args) {
-		ElevatorController controller = new ElevatorController();
-	}
+//	public static void main(String[] args) {
+//		ElevatorController controller = new ElevatorController();
+//	}
 
 }

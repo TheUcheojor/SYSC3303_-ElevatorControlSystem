@@ -86,4 +86,8 @@ public enum MessageType {
 	 */
 	STUCK_AT_FLOOR_FAULT,
 	
+	/**
+	 * A message provides a status update for the GUI
+	 */
+	GUI_MESSAGE,
 }
