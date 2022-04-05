@@ -8,6 +8,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="lib" path="C:/Users/jacob/eclipse-workspace/SYSC3303_ElevatorControlSystem/resources/forms_rt.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/jacob/eclipse-workspace/SYSC3303_ElevatorControlSystem/resources/forms_rt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
