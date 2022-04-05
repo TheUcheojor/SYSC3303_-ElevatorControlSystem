@@ -77,6 +77,10 @@ public class GUI extends JFrame{
             label.setText("Elevator " + i);
             mainPanel.add(label, new GridConstraints(0, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, 1, null, new Dimension(53, 50), null, 0, false));
 
+            elevatorFlrLabels[index] = new JLabel();
+            elevatorFlrLabels[index].setText("Current Floor: 1");
+            mainPanel.add(elevatorFlrLabels[index], new GridConstraints(1, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
         }
     }
 
