@@ -8,6 +8,10 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
+/**
+ * @author Jacob Charpentier, Favour Olotu
+ *
+ */
 public class GUI extends JFrame{
 	//private final ElevatorController elevatorController;
     private JPanel mainPanel;
@@ -60,7 +64,6 @@ public class GUI extends JFrame{
         label6.setText(" ");
         panel1.add(label6, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 
-
         logTA = new JTextArea();
         logTA.setLineWrap(true);
         logSP.setViewportView(logTA);
@@ -80,7 +83,6 @@ public class GUI extends JFrame{
             elevatorFlrLabels[index] = new JLabel();
             elevatorFlrLabels[index].setText("Current Floor: 1");
             mainPanel.add(elevatorFlrLabels[index], new GridConstraints(1, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-
 
             elevatorDoors[index] = new JLabel();
             elevatorDoors[index].setIcon(imgClosed);
