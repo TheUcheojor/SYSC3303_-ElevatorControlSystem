@@ -22,7 +22,7 @@ public class ElevatorController {
 	/**
 	 * The number of elevators in the system
 	 */
-	public final static int NUMBER_OF_ELEVATORS = 2;
+	public final static int NUMBER_OF_ELEVATORS = 4;
 
 	/**
 	 * The elevator speed in meters per second.
