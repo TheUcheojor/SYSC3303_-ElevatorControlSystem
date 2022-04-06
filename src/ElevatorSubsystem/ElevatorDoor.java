@@ -47,7 +47,6 @@ public class ElevatorDoor {
 				e.printStackTrace();
 			}
 			isOpen = true;
-			return;
 		}
 	}
 
