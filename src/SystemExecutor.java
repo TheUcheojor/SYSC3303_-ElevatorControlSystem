@@ -16,8 +16,8 @@ import common.LoggerWrapper;
 public class SystemExecutor {
 	private static Logger logger = LoggerWrapper.getLogger();
 	
-	private static int OPEN_DOOR_TIME_SECONDS = 3;
-	private static double ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_SECONDS = 2;
+	private static double DOOR_OPEN_CLOSE_TIME_MILLISECONDS = 3000;
+	private static double ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_MILLISECONDS = 1000;
 
 	/**
 	 * Set up and start the application
@@ -32,12 +32,12 @@ public class SystemExecutor {
 
 		// Set up and start the elevator controller
 		logger.info("(SYSTEM) all elevators starting at floor 0");
-		ElevatorController elevatorController = new ElevatorController(OPEN_DOOR_TIME_SECONDS);
+		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS);
 
 		// Set up and start the floor subsystem
 		String inputFileName = "resources/FloorInputFile.txt";
 		FloorSubsystem subsystem = new FloorSubsystem(inputFileName,
-				ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_SECONDS);
+				ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_MILLISECONDS);
 		subsystem.runMain();
 	}
 

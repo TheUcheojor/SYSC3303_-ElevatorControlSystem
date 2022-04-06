@@ -59,7 +59,7 @@ public class ElevatorController {
 	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
 
-	public ElevatorController(int doorOpenTime) {
+	public ElevatorController(double doorOpenCloseTime) {
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -73,7 +73,7 @@ public class ElevatorController {
 		// initialize elevator cars
 		elevators = new HashMap<Integer, ElevatorCar>();
 		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
-			ElevatorDoor door = new ElevatorDoor(doorOpenTime);
+			ElevatorDoor door = new ElevatorDoor(doorOpenCloseTime);
 			ElevatorMotor motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
 			int carId = i;
 

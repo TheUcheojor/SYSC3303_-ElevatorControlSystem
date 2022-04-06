@@ -82,13 +82,13 @@ public class FloorSubsystem {
 	 * @param floorMessageChannel - The message channel for communicating with the
 	 *                            scheduler
 	 */
-	public FloorSubsystem(String inputFileName, double elevatorFloorToFloorTimeSeconds) {
+	public FloorSubsystem(String inputFileName, double elevatorFloorToFloorTimeMilliseconds) {
 
 		this.inputFileName = inputFileName;
 
 		// Add floors to the floor subsystem
 		for (int i = 0; i < floors.length; i++) {
-			floors[i] = new Floor(i, elevatorFloorToFloorTimeSeconds);
+			floors[i] = new Floor(i, elevatorFloorToFloorTimeMilliseconds);
 		}
 
 		elevatorMessageQueue = new FloorElevatorMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors);

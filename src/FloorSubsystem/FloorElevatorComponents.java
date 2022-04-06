@@ -123,7 +123,7 @@ public class FloorElevatorComponents {
 
 			@Override
 			public void run() {
-				long sleepTimeMilli = (long) elevatorFloorToFloorTimeSeconds * 1000;
+				long sleepTimeMilli = (long) elevatorFloorToFloorTimeSeconds;
 				try {
 					logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " sensor for floor " + floorNumber
 							+ " is waiting for " + sleepTimeMilli + "ms.");
