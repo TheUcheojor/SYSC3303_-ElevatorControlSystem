@@ -31,7 +31,7 @@ public class FloorSubsystem {
 	/**
 	 * The number of floors
 	 */
-	public static final int NUMBER_OF_FLOORS = 3;
+	public static final int NUMBER_OF_FLOORS = 22;
 
 	/**
 	 * The floor to floor distance in meters
@@ -82,13 +82,13 @@ public class FloorSubsystem {
 	 * @param floorMessageChannel - The message channel for communicating with the
 	 *                            scheduler
 	 */
-	public FloorSubsystem(String inputFileName, int elevatorFloorToFloorTimeSeconds) {
+	public FloorSubsystem(String inputFileName, double elevatorFloorToFloorTimeSeconds) {
 
 		this.inputFileName = inputFileName;
 
 		// Add floors to the floor subsystem
 		for (int i = 0; i < floors.length; i++) {
-			floors[i] = new Floor(i);
+			floors[i] = new Floor(i, elevatorFloorToFloorTimeSeconds);
 		}
 
 		elevatorMessageQueue = new FloorElevatorMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors);
@@ -128,7 +128,9 @@ public class FloorSubsystem {
 	public static void main(String[] args) {
 		// Only attempt to read file when a file name as been passed
 		String inputFileName = "resources/FloorInputFile.txt";
-		FloorSubsystem subsystem = new FloorSubsystem(inputFileName);
+		double elevatorFloorToFloorTimeSeconds = 3.5;
+		
+		FloorSubsystem subsystem = new FloorSubsystem(inputFileName, elevatorFloorToFloorTimeSeconds);
 		subsystem.runMain();
 	}
 

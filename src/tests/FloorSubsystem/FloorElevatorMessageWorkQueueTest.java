@@ -32,9 +32,9 @@ public class FloorElevatorMessageWorkQueueTest {
 	private FloorElevatorMessageWorkQueue workQueue;
 	
 	private int ELEVATOR_ID = 1;
-	private int ELEVATOR_SPEED = 1000; 
 	private int FLOOR_ID = 1;
 	private int NUMBER_OF_FLOORS = 1;
+	static int ELEVATOR_FLOOR_TO_FLOOR_TIME_SECONDS = 2;
 	
 	private ArrayDeque<Message> receivedElevatorMessages = new ArrayDeque<>();
 	private Floor[] floors = new Floor[NUMBER_OF_FLOORS];
@@ -55,7 +55,7 @@ public class FloorElevatorMessageWorkQueueTest {
 		
 		//floors = new HashMap<Integer, Floor>();
 		for (int i = 0; i < floors.length; i++) {
-			floors[i] = new Floor(i);
+			floors[i] = new Floor(i, ELEVATOR_FLOOR_TO_FLOOR_TIME_SECONDS);
 		}
 		
 		workQueue = new FloorElevatorMessageWorkQueue(floorSchedulerSubsystemCommunication, floorElevatorSubsystemCommunication, floors);
@@ -78,7 +78,7 @@ public class FloorElevatorMessageWorkQueueTest {
 		simulateElevatorMessageWaiting();
 		//ElevatorFloorSignalRequestMessage floorSignalRequestMessage = new ElevatorFloorSignalRequestMessage(el);
 		
-		ElevatorFloorArrivalMessage floorMessage = new ElevatorFloorArrivalMessage(ELEVATOR_ID, FLOOR_ID, ELEVATOR_SPEED);
+		ElevatorFloorArrivalMessage floorMessage = new ElevatorFloorArrivalMessage(ELEVATOR_ID, FLOOR_ID);
 		
 		ElevatorFloorArrivalMessage arrivalMessage = null;
 		try {

@@ -114,7 +114,7 @@ public class FloorElevatorComponents {
 	 * @param produceFloorFault                An optional param for simulating
 	 *                                         elevators stuck between floors
 	 */
-	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor, int elevatorFloorToFloorTimeSeconds,
+	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor, double elevatorFloorToFloorTimeSeconds,
 			SubsystemCommunicationRPC elevatorUDP, SubsystemCommunicationRPC schedulerUDP,
 			boolean produceFloorFault) {
 
@@ -123,7 +123,7 @@ public class FloorElevatorComponents {
 
 			@Override
 			public void run() {
-				int sleepTimeMilli = elevatorFloorToFloorTimeSeconds * 1000;
+				long sleepTimeMilli = (long) elevatorFloorToFloorTimeSeconds * 1000;
 				try {
 					logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " sensor for floor " + floorNumber
 							+ " is waiting for " + sleepTimeMilli + "ms.");

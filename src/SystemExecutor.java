@@ -17,7 +17,7 @@ public class SystemExecutor {
 	private static Logger logger = LoggerWrapper.getLogger();
 	
 	private static int OPEN_DOOR_TIME_SECONDS = 3;
-	private static int ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_SECONDS = 1;
+	private static double ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_SECONDS = 2;
 
 	/**
 	 * Set up and start the application

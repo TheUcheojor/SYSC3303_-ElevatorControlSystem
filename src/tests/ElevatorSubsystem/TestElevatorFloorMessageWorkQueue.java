@@ -69,7 +69,7 @@ public class TestElevatorFloorMessageWorkQueue {
 	void testWorkQueueArrivalMessageHandler() {
 		simulateSchedulerMessageWaiting();
 		
-		ElevatorFloorArrivalMessage floorMessage = new ElevatorFloorArrivalMessage(ELEVATOR_ID, FLOOR_ID, ELEVATOR_SPEED);
+		ElevatorFloorArrivalMessage floorMessage = new ElevatorFloorArrivalMessage(ELEVATOR_ID, FLOOR_ID);
 		
 		ElevatorStatusMessage statusMessage = null;
 		try {

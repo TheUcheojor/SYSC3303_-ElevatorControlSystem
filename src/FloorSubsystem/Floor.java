@@ -35,7 +35,7 @@ public class Floor {
 	/**
 	 * floor to floor time
 	 */
-	private int elevatorFloorToFloorTimeSeconds;
+	private double elevatorFloorToFloorTimeSeconds;
 
 	/**
 	 * The elevator components (arrival sensor and direction lamp), one per elevator
@@ -56,7 +56,7 @@ public class Floor {
 	 *
 	 * @param floorNumber the floor number
 	 */
-	public Floor(int floorNumber, int elevatorFloorToFloorTimeSeconds) {
+	public Floor(int floorNumber, double elevatorFloorToFloorTimeSeconds) {
 
 		this.floorNumber = floorNumber;
 		this.elevatorFloorToFloorTimeSeconds = elevatorFloorToFloorTimeSeconds;
