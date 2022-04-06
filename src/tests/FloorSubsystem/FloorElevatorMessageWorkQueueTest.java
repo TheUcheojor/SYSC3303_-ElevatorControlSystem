@@ -34,7 +34,7 @@ public class FloorElevatorMessageWorkQueueTest {
 	private int ELEVATOR_ID = 1;
 	private int FLOOR_ID = 1;
 	private int NUMBER_OF_FLOORS = 1;
-	static int ELEVATOR_FLOOR_TO_FLOOR_TIME_SECONDS = 2;
+	static int ELEVATOR_FLOOR_TO_FLOOR_TIME_MILLISECONDS = 2000;
 	
 	private ArrayDeque<Message> receivedElevatorMessages = new ArrayDeque<>();
 	private Floor[] floors = new Floor[NUMBER_OF_FLOORS];
@@ -55,7 +55,7 @@ public class FloorElevatorMessageWorkQueueTest {
 		
 		//floors = new HashMap<Integer, Floor>();
 		for (int i = 0; i < floors.length; i++) {
-			floors[i] = new Floor(i, ELEVATOR_FLOOR_TO_FLOOR_TIME_SECONDS);
+			floors[i] = new Floor(i, ELEVATOR_FLOOR_TO_FLOOR_TIME_MILLISECONDS);
 		}
 		
 		workQueue = new FloorElevatorMessageWorkQueue(floorSchedulerSubsystemCommunication, floorElevatorSubsystemCommunication, floors);
