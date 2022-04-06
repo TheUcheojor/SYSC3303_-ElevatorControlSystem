@@ -27,7 +27,15 @@ public class Floor {
 	 */
 	private DirectionLampButton downLampButton = null;
 
+	/**
+	 * elevator Id for the floor to fault on
+	 */
 	private int elevatorIdToFault = -1;
+	
+	/**
+	 * floor to floor time
+	 */
+	private double elevatorFloorToFloorTimeMilliseconds;
 
 	/**
 	 * The elevator components (arrival sensor and direction lamp), one per elevator
@@ -48,9 +56,10 @@ public class Floor {
 	 *
 	 * @param floorNumber the floor number
 	 */
-	public Floor(int floorNumber) {
+	public Floor(int floorNumber, double elevatorFloorToFloorTimeMilliseconds) {
 
 		this.floorNumber = floorNumber;
+		this.elevatorFloorToFloorTimeMilliseconds = elevatorFloorToFloorTimeMilliseconds;
 
 		// Create buttons depending on the floor number
 		if (floorNumber == 0) {
@@ -84,8 +93,11 @@ public class Floor {
 			elevatorIdToFault = -1;
 		}
 
-		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor, elevatorUDP, schedulerUDP,
-				isFloorFinalDestination, produceFloorFault);
+		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId,
+				elevatorMotor,
+				elevatorFloorToFloorTimeMilliseconds,
+				elevatorUDP, schedulerUDP,
+				produceFloorFault);
 	}
 
 	/**
