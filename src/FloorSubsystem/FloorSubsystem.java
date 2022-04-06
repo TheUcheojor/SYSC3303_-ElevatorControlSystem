@@ -82,15 +82,7 @@ public class FloorSubsystem {
 	 * @param floorMessageChannel - The message channel for communicating with the
 	 *                            scheduler
 	 */
-	public FloorSubsystem(String inputFileName) {
-		// Validate that the floor subsystem values are valid
-		try {
-			SystemValidationUtil.validateFloorToFloorDistance(FLOOR_TO_FLOOR_DISTANCE);
-		} catch (InvalidSystemConfigurationInputException e) {
-			System.out.println("InvalidSystemConfigurationInputException: " + e);
-			// Terminate if the elevation configuration are invalid.
-			System.exit(1);
-		}
+	public FloorSubsystem(String inputFileName, int elevatorFloorToFloorTimeSeconds) {
 
 		this.inputFileName = inputFileName;
 

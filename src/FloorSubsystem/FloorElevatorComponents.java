@@ -114,87 +114,35 @@ public class FloorElevatorComponents {
 	 * @param produceFloorFault                An optional param for simulating
 	 *                                         elevators stuck between floors
 	 */
-	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor,
+	public void notifyElevatorAtFloorArrival(int floorNumber, ElevatorMotor elevatorMotor, int elevatorFloorToFloorTimeSeconds,
 			SubsystemCommunicationRPC elevatorUDP, SubsystemCommunicationRPC schedulerUDP,
-			boolean isFloorFinalDestination, boolean produceFloorFault) {
-
-		double topSpeed = elevatorMotor.getTopSpeed();
-		double initialSpeed = elevatorMotor.getCurrentVelocity();
-		double finalSpeed = 0;
-
-		double acceleration = elevatorMotor.getAcceleration();
-
-		int totalTimeInMilliSeconds;
-		double newCurrentElevatorSpeed;
-
-		// Find the time it needs to get to the maximum speed
-		double timeToAccelerateToTopSpeed = (topSpeed - initialSpeed) / acceleration;
-
-		// Find the distance traveled as the elevator accelerates to the top speed.
-		double distanceTraveledWhenAccelerating = (Math.pow(topSpeed, 2) - Math.pow(initialSpeed, 2))
-				/ (2 * acceleration);
-
-		// Find the time spent when accelerating to top speed.
-		double timeTravelledWhenAccelerating = (topSpeed - initialSpeed) / acceleration;
-
-		// Check if the current floor is the destination floor
-		if (isFloorFinalDestination) {
-			// Find the distance at which we need to start to decelerate
-			double distanceToStartDecelerating = FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE
-					- (Math.pow(topSpeed, 2) / (2 * acceleration));
-
-			// Find the distance and time spent at top speed .
-			double distanceTravelledAtTopSpeed = distanceToStartDecelerating - distanceTraveledWhenAccelerating;
-			double timeTravelledAtTopSpeed = distanceTravelledAtTopSpeed / topSpeed;
-
-			// Find the time taken to decelerate (negative acceleration)
-			double distanceToDecelerate = FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE - distanceToStartDecelerating;
-			double timeSpentDecelerating = (finalSpeed - topSpeed) / (-acceleration);
-
-			double totalTime = timeTravelledWhenAccelerating + timeTravelledAtTopSpeed + timeSpentDecelerating;
-
-			totalTimeInMilliSeconds = (int) (totalTime * 1000);
-			newCurrentElevatorSpeed = 0;
-
-		} else {
-			// Find the distance and time spent at top speed .
-			double distanceTravelledAtTopSpeed = FloorSubsystem.FLOOR_TO_FLOOR_DISTANCE
-					- distanceTraveledWhenAccelerating;
-			double timeTravelledAtTopSpeed = distanceTravelledAtTopSpeed / topSpeed;
-
-			double totalTime = timeTravelledWhenAccelerating + timeTravelledAtTopSpeed;
-			totalTimeInMilliSeconds = (int) (totalTime * 1000);
-
-			newCurrentElevatorSpeed = finalSpeed;
-		}
+			boolean produceFloorFault) {
 
 		// Notify the elevator when it has arrived
 		Thread notifyElevatorThread = new Thread() {
 
 			@Override
 			public void run() {
+				int sleepTimeMilli = elevatorFloorToFloorTimeSeconds * 1000;
 				try {
 					logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " sensor for floor " + floorNumber
-							+ " is waiting for " + totalTimeInMilliSeconds + "ms.");
-					Thread.sleep(totalTimeInMilliSeconds);
+							+ " is waiting for " + sleepTimeMilli + "ms.");
+					Thread.sleep(sleepTimeMilli);
 				} catch (InterruptedException e) {
 					System.out.println(e);
 				}
 
-				logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " has reached the floor " + floorNumber);
 
-				// For now, we will assume that the motor's elevatorDirection is where the
-				// elevator plans to go
-				// TODO Reevaluate the assumption.
 				try {
 					if (produceFloorFault) {
+						logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " never reached floor " + floorNumber);
 						ElevatorNotArrived brokenMsg = new ElevatorNotArrived(floorNumber, elevatorId);
 
 						schedulerUDP.sendMessage(brokenMsg);
 					} else {
+						logger.fine("(FLOOR_SUBSYSTEM) Elevator " + elevatorId + " has reached the floor " + floorNumber);
 						elevatorArrivedAtFloor(elevatorMotor.getDirection(), floorNumber);
-						ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber,
-								newCurrentElevatorSpeed);
+						ElevatorFloorArrivalMessage notifyMsg = new ElevatorFloorArrivalMessage(elevatorId, floorNumber);
 
 						elevatorUDP.sendMessage(notifyMsg);
 					}
