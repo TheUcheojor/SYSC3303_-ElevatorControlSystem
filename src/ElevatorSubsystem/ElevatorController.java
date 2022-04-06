@@ -23,10 +23,6 @@ public class ElevatorController {
 	 * The number of elevators in the system
 	 */
 	public final static int NUMBER_OF_ELEVATORS = 2;
-	/**
-	 * The door opening and closing time in seconds
-	 */
-	public final static double DOOR_SPEED = 3000;
 
 	/**
 	 * The elevator speed in meters per second.
@@ -63,7 +59,7 @@ public class ElevatorController {
 	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
 
-	public ElevatorController() {
+	public ElevatorController(int doorOpenTime) {
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -77,7 +73,7 @@ public class ElevatorController {
 		// initialize elevator cars
 		elevators = new HashMap<Integer, ElevatorCar>();
 		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
-			ElevatorDoor door = new ElevatorDoor(DOOR_SPEED);
+			ElevatorDoor door = new ElevatorDoor(doorOpenTime);
 			ElevatorMotor motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
 			int carId = i;
 
@@ -147,7 +143,8 @@ public class ElevatorController {
 
 	// For running on stand alone system
 	public static void main(String[] args) {
-		ElevatorController controller = new ElevatorController();
+		int DOOR_SPEED = 3;
+		ElevatorController controller = new ElevatorController(DOOR_SPEED);
 	}
 
 }
