@@ -68,7 +68,7 @@ public class ElevatorCar {
 	 */
 	public ElevatorStatusMessage createStatusMessage() {
 		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber,
-				errorState);
+				errorState, door.isOpen());
 
 		return status;
 	}

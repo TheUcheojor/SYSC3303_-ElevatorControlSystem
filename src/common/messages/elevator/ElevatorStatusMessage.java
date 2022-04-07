@@ -20,8 +20,10 @@ public class ElevatorStatusMessage extends Message {
 	private Direction direction;
 	private String timestamp;
 	private Exception errorState;
+	private boolean doorIsOpen;
 	
-	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber, Exception errorState) {
+	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber, Exception errorState,
+			boolean doorIsOpen) {
 		super(MessageType.ELEVATOR_STATUS_MESSAGE);
 		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
 
@@ -29,6 +31,7 @@ public class ElevatorStatusMessage extends Message {
 		this.direction = direction;
 		this.floorNumber = floorNumber;
 		this.errorState = errorState;
+		this.doorIsOpen = doorIsOpen;
 	}
 
 	/**
@@ -64,5 +67,12 @@ public class ElevatorStatusMessage extends Message {
 	 */
 	public Exception getErrorState() {
 		return errorState;
+	}
+	
+	/**
+	 * @return the whether or not the door is open
+	 */
+	public boolean doorIsOpen() {
+		return doorIsOpen;
 	}
 }
