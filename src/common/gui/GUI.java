@@ -36,6 +36,8 @@ public class GUI extends JFrame{
     private ImageIcon imgClosed = new ImageIcon("resources/elevDoorsClose.png");
     private ImageIcon imgOpen = new ImageIcon("resources/elevDoorsOpen.png");
     
+    private int numberElevators;
+    
 	/**
 	 * RPC communications channel for the scheduler
 	 */
@@ -56,15 +58,15 @@ public class GUI extends JFrame{
 
     private void buildDisplay(){
         Integer[] options = {1, 2, 3, 4, 5, 6};
-        int numElevs = (Integer)JOptionPane.showInputDialog(this, "Select Number of Elevators",
+        numberElevators = (Integer)JOptionPane.showInputDialog(this, "Select Number of Elevators",
                 "Elevator Setup", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         
 
-        this.setSize(500 + numElevs * 100, 350);
+        this.setSize(500 + numberElevators * 100, 350);
 
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayoutManager(6, 2 + numElevs, new Insets(0, 0, 0, 0), -1, -1));
+        mainPanel.setLayout(new GridLayoutManager(6, 2 + numberElevators, new Insets(0, 0, 0, 0), -1, -1));
         
         final JLabel label1 = new JLabel();
         label1.setText("Log / Processes");
@@ -74,7 +76,7 @@ public class GUI extends JFrame{
         mainPanel.add(logSP, new GridConstraints(1, 0, 5, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
 
         final Spacer spacer1 = new Spacer();
-        mainPanel.add(spacer1, new GridConstraints(1, numElevs + 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        mainPanel.add(spacer1, new GridConstraints(1, numberElevators + 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
 
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
@@ -89,12 +91,12 @@ public class GUI extends JFrame{
         logTA.setLineWrap(true);
         logSP.setViewportView(logTA);
 
-        elevatorFlrLabels = new JLabel[numElevs];
-        elevatorDoors = new JLabel[numElevs];
-        elevatorDoorsStatus = new JLabel[numElevs];
-        elevatorStatus = new JLabel[numElevs];
+        elevatorFlrLabels = new JLabel[numberElevators];
+        elevatorDoors = new JLabel[numberElevators];
+        elevatorDoorsStatus = new JLabel[numberElevators];
+        elevatorStatus = new JLabel[numberElevators];
 
-        for (int i = 1; i <= numElevs; i++){
+        for (int i = 1; i <= numberElevators; i++){
             int index = i - 1;
 
             JLabel label = new JLabel();
@@ -121,6 +123,9 @@ public class GUI extends JFrame{
     }
 
 
+    public int getNumberOfElevators() {
+    	return numberElevators;
+    }
     /**
      * This method set-up a thread to continously recieve elevaor status 
      * messages from the scheduler

@@ -38,7 +38,7 @@ public class SystemExecutor {
 
 		// Set up and start the elevator controller
 		logger.info("(SYSTEM) all elevators starting at floor 0");
-		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS);
+		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS, frame.getNumberOfElevators());
 
 		// Set up and start the floor subsystem
 		String inputFileName = "resources/FloorInputFile.txt";
