@@ -31,6 +31,7 @@ public class ElevatorTransportRequest extends ElevatorJobMessage {
 	 * The elevator auto fixing
 	 */
 	private ElevatorAutoFixing autoFixing;
+	
 
 	/**
 	 * A ElevatorTransportRequest constructor
@@ -42,8 +43,8 @@ public class ElevatorTransportRequest extends ElevatorJobMessage {
 	 * @param auto             fixing the auto fixing mode
 	 */
 	public ElevatorTransportRequest(int destinationFloor, int elevatorId, Direction direction,
-			FloorInputFault floorFault, ElevatorAutoFixing autoFixing) {
-		super(MessageType.ELEVATOR_DROP_PASSENGER_REQUEST, destinationFloor, direction);
+			FloorInputFault floorFault, ElevatorAutoFixing autoFixing, int floorInputId) {
+		super(MessageType.ELEVATOR_DROP_PASSENGER_REQUEST, destinationFloor, direction, floorInputId);
 		this.elevatorId = elevatorId;
 		this.floorFault = floorFault;
 		this.autoFixing = autoFixing;

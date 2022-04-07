@@ -10,6 +10,7 @@ import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
+import common.messages.scheduler.PassengerDropoffCompletedMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 
 /**
@@ -54,17 +55,9 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				logger.fine("(SCHEDULER) Received Elevator status: [ID: " + elevatorId + ", F: "
 						+ elevatorStatusMessage.getFloorNumber() + ", D: " + elevatorStatusMessage.getDirection()
 						+ ", ErrorState: " + elevatorStatusMessage.getErrorState() + " ]");
-
-				// If the elevator shuts down, notify the floor subsystem that we have addressed
-				// the jobs in the elevators
-				if (!elevatorJobManagements[elevatorId].isReadyForJob()) {
-
-					// For each job, notify the floor subsystem
-					elevatorJobManagements[elevatorId].getElevatorJobs().forEach(elevator -> {
-						// schedulerFloorCommunication.sendMessage(JOB_COMPLETED_MESSAGE)
-					});
-				}
-
+				
+				notifyElevatorShutdownCompletedJobs(elevatorJobManagements[elevatorId]);
+				
 				// If the scheduler should not give any commands, do not proceed any further
 				if (!elevatorStatusMessage.shouldIssueNextCommand()) {
 					return;

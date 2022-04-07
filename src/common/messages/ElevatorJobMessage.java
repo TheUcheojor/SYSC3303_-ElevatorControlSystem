@@ -20,6 +20,11 @@ public abstract class ElevatorJobMessage extends Message {
 	 * The direction
 	 */
 	private Direction direction;
+	
+	/**
+	 * The floor input id
+	 */
+	private int floorInputId;
 
 	/**
 	 * A ElevatorJobMessage constructor
@@ -28,11 +33,23 @@ public abstract class ElevatorJobMessage extends Message {
 	 * @param destinationFloor
 	 * @param direction
 	 */
-	public ElevatorJobMessage(MessageType messageType, int destinationFloor, Direction direction) {
+	public ElevatorJobMessage(MessageType messageType, int destinationFloor, Direction direction, int floorInputId) {
 		super(messageType);
 		this.destinationFloor = destinationFloor;
 		this.direction = direction;
+		this.floorInputId = floorInputId;
 	}
+	
+	
+
+	/**
+	 * @return the floorInputId
+	 */
+	public int getFloorInputId() {
+		return floorInputId;
+	}
+
+
 
 	/**
 	 * Get the destination floor

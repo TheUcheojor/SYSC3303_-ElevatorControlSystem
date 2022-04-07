@@ -86,4 +86,8 @@ public enum MessageType {
 	 */
 	STUCK_AT_FLOOR_FAULT,
 	
+	/**
+	 * A message that a passenger has been dropped off at a floor
+	 */
+	PASSENGER_DROP_OFF_COMPLETE,
 }

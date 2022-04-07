@@ -1,11 +1,13 @@
 package FloorSubsystem;
 
 import java.io.BufferedReader;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import common.LoggerWrapper;
 import common.SimulationFloorInputData;
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
@@ -14,6 +16,9 @@ import common.messages.floor.ElevatorFloorRequest;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 import common.work_management.MessageWorkQueue;
+import java.util.concurrent.TimeUnit;
+
+import java.util.logging.Logger;
 
 /**
  * This class simulates the FloorSubsystem thread
@@ -22,6 +27,8 @@ import common.work_management.MessageWorkQueue;
  */
 public class FloorSubsystem {
 
+	
+	private Logger logger = LoggerWrapper.getLogger();
 	/**
 	 * Delay between sending requests from the floor input file to the scheduler.
 	 * For more real life simulation purposes.
@@ -146,10 +153,12 @@ public class FloorSubsystem {
 		setUpMessageQueueing(floorElevatorUDP, elevatorMessageQueue);
 		setUpMessageQueueing(floorSchedulerUDP, schedulerMessageQueue);
 		(new Thread() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
 				// wait for scheduler messages
-				for (SimulationFloorInputData floorInputData : floorDataCollection) {
+	
+				for (SimulationFloorInputData floorInputData : (ArrayList<SimulationFloorInputData>)floorDataCollection.clone()) {
 
 					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(
 							floorInputData.getCurrentFloor(), floorInputData.getFloorDirectionButton(),
@@ -168,6 +177,30 @@ public class FloorSubsystem {
 						e.printStackTrace();
 					}
 				}
+				
+			}
+		}).start();
+		
+		(new Thread() {
+			@Override
+			public void run() {
+				long startTime = System.nanoTime();
+				while(true) {
+					synchronized(floorDataCollection) {
+						if(floorDataCollection.isEmpty()) {
+							break;
+						}
+						
+					}
+
+				}
+				/* … The code being measured ends … */
+				long endTime = System.nanoTime();
+
+				// get the difference between the two nano time valuess
+				long timeElapsed = endTime - startTime;
+
+				logger.info("Execution time in milliseconds: " + timeElapsed / 1000000);
 			}
 		}).start();
 	}

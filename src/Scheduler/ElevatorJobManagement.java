@@ -14,7 +14,7 @@ import common.messages.ElevatorJobMessage;
 /**
  * This class represents the job management for an elevator.
  *
- * @author bamideleoluwayemi
+ * @author delightoluwayemi
  *
  */
 public class ElevatorJobManagement {
