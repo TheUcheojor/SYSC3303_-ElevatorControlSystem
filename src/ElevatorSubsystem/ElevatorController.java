@@ -5,10 +5,8 @@ import java.util.Map;
 
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
-import common.gui.ElevatorControllerObserver;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
-import common.messages.elevator.GUIStatusMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 
@@ -20,15 +18,11 @@ import common.remote_procedure.SubsystemComponentType;
  * @author Ryan Fife, Favour
  *
  */
-public class ElevatorController{
+public class ElevatorController {
 	/**
 	 * The number of elevators in the system
 	 */
-	public final static int NUMBER_OF_ELEVATORS = 2;
-	/**
-	 * The door opening and closing time in seconds
-	 */
-	public final static double DOOR_SPEED = 3000;
+	public final static int NUMBER_OF_ELEVATORS = 4;
 
 	/**
 	 * The elevator speed in meters per second.
@@ -64,11 +58,8 @@ public class ElevatorController{
 	 * RPC communications channel for the floor
 	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
-	
-//	private ElevatorControllerObserver observer;
-	
-	public ElevatorController() {//ElevatorControllerObserver observer) {
-		//this.observer = observer;
+
+	public ElevatorController(double doorOpenCloseTime) {
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -82,7 +73,7 @@ public class ElevatorController{
 		// initialize elevator cars
 		elevators = new HashMap<Integer, ElevatorCar>();
 		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
-			ElevatorDoor door = new ElevatorDoor(DOOR_SPEED);
+			ElevatorDoor door = new ElevatorDoor(doorOpenCloseTime);
 			ElevatorMotor motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
 			int carId = i;
 
@@ -141,28 +132,19 @@ public class ElevatorController{
 			// send initial status message to scheduler
 			ElevatorCar car = elevators.get(i);
 			ElevatorStatusMessage status = car.createStatusMessage();
-			//GUIStatusMessage statusGUI = car.createGUIStatusMessage();
 			try {
 				schedulerSubsystemCommunication.sendMessage(status);
-				//observer.handleStatusUpdate(statusGUI);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	public ElevatorCar getElevatorCar(int elevatorId) {
-		return elevators.get(elevatorId);
-	} 
-	//	public void addObserver(ElevatorControllerObserver observer) {
-//		this.observer = observer;
-//		System.out.println(observer);
-//	}
 
 	// For running on stand alone system
-//	public static void main(String[] args) {
-//		ElevatorController controller = new ElevatorController();
-//	}
+	public static void main(String[] args) {
+		int DOOR_SPEED_MILLISECONDS = 3000;
+		ElevatorController controller = new ElevatorController(DOOR_SPEED_MILLISECONDS);
+	}
 
 }

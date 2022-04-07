@@ -118,11 +118,11 @@ public class GUI extends JFrame implements ElevatorControllerObserver{
     
     @Override
 	public void handleStatusUpdate(ElevatorStatusMessage message) {
-    	ElevatorCar car = elevatorController.getElevatorCar(message.getElevatorId());
-    	
-		logTA.append("" + car.getFloorNumber() +"\n");
-		logTA.append("" + car.getId() +"\n");
-		logTA.append("" + car.getErrorState() +"\n");
+//    	ElevatorCar car = elevatorController.getElevatorCar(message.getElevatorId());
+//    	
+//		logTA.append("" + car.getFloorNumber() +"\n");
+//		logTA.append("" + car.getId() +"\n");
+//		logTA.append("" + car.getErrorState() +"\n");
 
 	}
 //    public static void main(String[] args) {
