@@ -14,7 +14,7 @@ import common.messages.ElevatorJobMessage;
 /**
  * This class represents the job management for an elevator.
  *
- * @author bamideleoluwayemi
+ * @author delightoluwayemi
  *
  */
 public class ElevatorJobManagement {
@@ -67,6 +67,15 @@ public class ElevatorJobManagement {
 	 */
 	public void addJob(ElevatorJobMessage elevatorJob) {
 		elevatorJobs.add(elevatorJob);
+	}
+
+	/**
+	 * Return the elevator jobs
+	 *
+	 * @return the elevatorJobs
+	 */
+	public Set<ElevatorJobMessage> getElevatorJobs() {
+		return elevatorJobs;
 	}
 
 	/**
@@ -138,13 +147,32 @@ public class ElevatorJobManagement {
 	 * @param errorState the error state to set
 	 */
 	public void setErrorState(Exception errorState) {
-		if (errorState != null) {
-			logger.fine("(SCHEDULER) Elevator " + elevatorId
-					+ " has an error. No longer assigning jobs to this elevator...");
-			this.readyForJob = false;
-		} else {
-			this.readyForJob = true;
+		setErrorState(errorState, false);
+	}
+
+	/**
+	 * Set the error state
+	 *
+	 * @param errorState       the error state to set
+	 * @param isResolvingError a flag indicating if the elevator is resolving an
+	 *                         error
+	 */
+	public void setErrorState(Exception errorState, boolean isResolvingError) {
+
+		if (isResolvingError == false) {
+			if (errorState != null) {
+				logger.fine("(SCHEDULER) Elevator " + elevatorId
+						+ " has an error. No longer assigning jobs to this elevator...");
+				this.readyForJob = false;
+			} else {
+				this.readyForJob = true;
+			}
 		}
+
+		// If the elevator is resolving an error, we will leave the elevator in-service
+		// flag (readyForJob) as is.
+
+		// Set the error state
 		this.errorState = errorState;
 	}
 

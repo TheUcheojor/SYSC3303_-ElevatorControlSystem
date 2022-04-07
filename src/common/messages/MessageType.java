@@ -90,4 +90,10 @@ public enum MessageType {
 	 * A message provides a status update for the GUI
 	 */
 	GUI_MESSAGE,
+
+	/**
+	 * A message that a passenger has been dropped off at a floor
+	 */
+	PASSENGER_DROP_OFF_COMPLETE,
+
 }

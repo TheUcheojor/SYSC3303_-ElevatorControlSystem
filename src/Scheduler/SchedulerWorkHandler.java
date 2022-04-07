@@ -11,9 +11,11 @@ import common.LoggerWrapper;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.MessageType;
+import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.floor.ElevatorFloorRequest;
 import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.FloorCommand;
+import common.messages.scheduler.PassengerDropoffCompletedMessage;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.messages.scheduler.SchedulerFloorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -130,21 +132,33 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 
 				// If we have one ELEVATOR_PICK_UP_PASSENGER_REQUEST, we turn off the
 				// corresponding floor lamps.
-				// TODO we need to decouple turning off the floor lamp and sending the elevator
-				// which car buttons were pressed
 				boolean expectingElevatorButtonPress = false;
 				for (ElevatorJobMessage elevatorJob : jobsAtTargetFloor) {
-					if (elevatorJob.getMessageType() == MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST) {
 
+					switch (elevatorJob.getMessageType()) {
+					
+					case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 						ElevatorFloorRequest elevatorFloorRequestJob = (ElevatorFloorRequest) elevatorJob;
 
 						schedulerFloorCommunication
 								.sendMessage(new SchedulerFloorCommand(FloorCommand.TURN_OFF_FLOOR_LAMP,
 										nearestTargetFloor, elevatorFloorRequestJob.getDirection(), elevatorId,
-										elevatorFloorRequestJob.getInputDataId()));
+										elevatorFloorRequestJob.getFloorInputId()));
 
 						expectingElevatorButtonPress = true;
+
+						break;
+						
+					case ELEVATOR_DROP_PASSENGER_REQUEST:
+						ElevatorTransportRequest elevatorTransportRequest = (ElevatorTransportRequest) elevatorJob;
+						int floorInputDataId = elevatorTransportRequest.getFloorInputId();
+						
+						schedulerFloorCommunication
+						.sendMessage(new PassengerDropoffCompletedMessage(floorInputDataId));
+						break;
+					
 					}
+						
 				}
 
 				String addressedJobMessage = "(SCHEDULER) Elevator " + elevatorId + " has addressed: ";
@@ -153,7 +167,6 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 							+ job.getDestinationFloor() + ")";
 				}
 				logger.fine(addressedJobMessage);
-
 				// Stop the elevator and open the doors
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP, elevatorId));
@@ -186,6 +199,28 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 		} catch (Exception e) {
 			logger.severe("Error occurred in handleElevatorBehavior: " + e);
 		}
+	}
+	
+	/**
+	 * Given the shutdown elevator, notifies the floor subsystem about the completed messages
+	 * @param elevator, the elevator job manager
+	 */
+	protected void notifyElevatorShutdownCompletedJobs(ElevatorJobManagement elevator) {
+
+		// If the elevator shuts down, notify the floor subsystem that we have addressed
+		// the jobs in the elevators
+		if (!elevator.isReadyForJob()) {
+
+			// For each job, notify the floor subsystem
+			elevator.getElevatorJobs().forEach(elevatorJob -> {
+				try {
+					schedulerFloorCommunication
+					.sendMessage(new PassengerDropoffCompletedMessage(elevatorJob.getFloorInputId()));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}					});
+		}
+
 	}
 
 }

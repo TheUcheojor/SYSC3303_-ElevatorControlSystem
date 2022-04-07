@@ -13,10 +13,6 @@ import common.messages.MessageType;
  */
 public class ElevatorFloorRequest extends ElevatorJobMessage {
 
-	/**
-	 * The input data id
-	 */
-	int inputDataId;
 	FloorInputFault fault = null;
 	int faultFloorNumber = -1;
 
@@ -25,27 +21,16 @@ public class ElevatorFloorRequest extends ElevatorJobMessage {
 	 *
 	 * @param destinationFloor the destination floor
 	 * @param direction        the direction
-	 * @param inputDataId      the input input data id
+	 * @param floorInputId      the input input data id
 	 */
-	public ElevatorFloorRequest(int destinationFloor, Direction direction, int inputDataId) {
-		super(MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST, destinationFloor, direction);
-		this.inputDataId = inputDataId;
+	public ElevatorFloorRequest(int destinationFloor, Direction direction, int floorInputId) {
+		super(MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST, destinationFloor, direction, floorInputId);
 	}
 
-	public ElevatorFloorRequest(int destinationFloor, Direction direction, int inputDataId, FloorInputFault fault, int faultFloorNumber) {
-		super(MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST, destinationFloor, direction);
-		this.inputDataId = inputDataId;
+	public ElevatorFloorRequest(int destinationFloor, Direction direction, int floorInputId, FloorInputFault fault, int faultFloorNumber) {
+		super(MessageType.ELEVATOR_PICK_UP_PASSENGER_REQUEST, destinationFloor, direction, floorInputId);
 		this.fault = fault;
 		this.faultFloorNumber = faultFloorNumber;
-	}
-	
-	/**
-	 * Get the input data id
-	 *
-	 * @return the inputDataId
-	 */
-	public int getInputDataId() {
-		return inputDataId;
 	}
 
 	/**

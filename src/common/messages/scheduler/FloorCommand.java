@@ -9,5 +9,12 @@ public enum FloorCommand {
 	/**
 	 * Elevator stuck fault command
 	 */
-	PRODUCE_STUCK_FAULT_WITH_ELEVATOR
+	
+	PRODUCE_STUCK_FAULT_WITH_ELEVATOR,
+	
+	/**
+	 * A message that a passenger has been dropped off at a floor
+	 */
+	PASSENGER_DROP_OFF_COMPLETE
+
 }

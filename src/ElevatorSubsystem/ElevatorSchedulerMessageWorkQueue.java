@@ -9,7 +9,6 @@ import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
-import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorStatusRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -42,7 +41,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	/**
 	 * The elevators
 	 */
-	private Map<Integer, ElevatorCar> elevators;
+	private ElevatorCar elevator;
 
 	/**
 	 * The ElevatorSchedulerMessageWorkQueue constructor
@@ -52,10 +51,10 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @param elevators                       the elevators
 	 */
 	public ElevatorSchedulerMessageWorkQueue(SubsystemCommunicationRPC schedulerSubsystemCommunication,
-			SubsystemCommunicationRPC floorSubsystemCommunication, Map<Integer, ElevatorCar> elevators) {
+			SubsystemCommunicationRPC floorSubsystemCommunication, ElevatorCar elevator) {
 		this.schedulerSubsystemCommunication = schedulerSubsystemCommunication;
 		this.floorSubsystemCommunication = floorSubsystemCommunication;
-		this.elevators = elevators;
+		this.elevator = elevator;
 	}
 
 	/**
@@ -70,8 +69,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			switch (message.getMessageType()) {
 
 			case ELEVATOR_STATUS_REQUEST:
-				ElevatorStatusRequest statusRequest = (ElevatorStatusRequest) message;
-				schedulerSubsystemCommunication.sendMessage(elevators.get(statusRequest.getId()).createStatusMessage());
+				schedulerSubsystemCommunication.sendMessage(elevator.createStatusMessage());
 				break;
 
 			case SCHEDULER_ELEVATOR_COMMAND:
@@ -96,46 +94,44 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		ElevatorLeavingFloorMessage leavingMessage;
 		ElevatorFloorSignalRequestMessage comingMessage;
 
-		int elevatorId = command.getElevatorID();
-		ElevatorCar car = elevators.get(elevatorId);
-
-		int carFloorNumber = car.getFloorNumber();
+		int elevatorId = elevator.getId();
+		int carFloorNumber = elevator.getFloorNumber();
 
 		try {
 			switch (command.getCommand()) {
 			case STOP:
-				if (!car.getDoor().isOpen()) {
+				if (!elevator.getDoor().isOpen()) {
 					logger.fine("(ELEVATOR) Elevator " + elevatorId + " stopping");
-					car.getMotor().turnOff();
+					elevator.getMotor().turnOff();
 				} else {
-					car.setErrorState(new ElevatorStateException(null, "Attempted to stop while doors open"));
+					elevator.setErrorState(new ElevatorStateException(null, "Attempted to stop while doors open"));
 				}
 				break;
 			case CLOSE_DOORS:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
-				car.getDoor().closeDoor();
+				elevator.getDoor().closeDoor();
 				break;
 			case OPEN_DOORS:
-				if (!car.getMotor().getIsRunning()) {
+				if (!elevator.getMotor().getIsRunning()) {
 					logger.fine("(ELEVATOR) Elevator " + elevatorId + " door opening");
-					car.getDoor().openDoor();
+					elevator.getDoor().openDoor();
 				} else {
-					car.setErrorState(new ElevatorStateException(null, "Attempted to open doors while motor running"));
+					elevator.setErrorState(new ElevatorStateException(null, "Attempted to open doors while motor running"));
 				}
 
 				break;
 			case MOVE_UP:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
-				boolean isCloseDoorProcessSuccess = closeDoorProcess(car);
+				boolean isCloseDoorProcessSuccess = closeDoorProcess();
 
 				if (!isCloseDoorProcessSuccess)
 					return;
 
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " moving up");
-				car.getMotor().goUp();
+				elevator.getMotor().goUp();
 
 				leavingMessage = new ElevatorLeavingFloorMessage(elevatorId, carFloorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(car.getId(), carFloorNumber + 1, car.getMotor(),
+				comingMessage = new ElevatorFloorSignalRequestMessage(elevator.getId(), carFloorNumber + 1, elevator.getMotor(),
 						true);
 
 				floorSubsystemCommunication.sendMessage(leavingMessage);
@@ -144,16 +140,16 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				break;
 			case MOVE_DOWN:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
-				boolean isDoorClosed = closeDoorProcess(car);
+				boolean isDoorClosed = closeDoorProcess();
 
 				if (!isDoorClosed)
 					return;
 
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " moving down");
-				car.getMotor().goDown();
+				elevator.getMotor().goDown();
 
 				leavingMessage = new ElevatorLeavingFloorMessage(elevatorId, carFloorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(elevatorId, carFloorNumber - 1, car.getMotor(),
+				comingMessage = new ElevatorFloorSignalRequestMessage(elevatorId, carFloorNumber - 1, elevator.getMotor(),
 						true);
 
 				floorSubsystemCommunication.sendMessage(leavingMessage);
@@ -162,13 +158,13 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				break;
 
 			case SHUT_DOWN:
-				car.setInService(false);
-				car.setErrorState(command.getException());
+				elevator.setInService(false);
+				elevator.setErrorState(command.getException());
 				break;
 
 			case RESTART:
-				car.setInService(true);
-				car.setErrorState(null);
+				elevator.setInService(true);
+				elevator.setErrorState(null);
 				break;
 			}
 		} catch (Exception e) {
@@ -179,33 +175,47 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	/**
 	 * The close door process
 	 *
-	 * @param car        the car
+	 * @param elevator        the elevator
 	 * @param elevatorId the elevator id
 	 * @return true if the close door process and false otherwise
 	 */
-	private boolean closeDoorProcess(ElevatorCar car) {
+	private boolean closeDoorProcess() {
 
-		int elevatorId = car.getId();
-		int currentFloorNumber = car.getFloorNumber();
+		int elevatorId = elevator.getId();
+		int currentFloorNumber = elevator.getFloorNumber();
 
-		if (car.getErrorState() == null) {
-			car.getDoor().closeDoor();
+		if (elevator.getErrorState() == null) {
+			elevator.getDoor().closeDoor();
 			return true;
 		}
 
-		if (car.getErrorState().getFault() == FloorInputFault.DOOR_STUCK_OPEN_FAULT) {
+		if (elevator.getErrorState().getFault() == FloorInputFault.DOOR_STUCK_OPEN_FAULT) {
 			logger.severe("(Elevator) Elevator " + elevatorId + " failed to close door at floor " + currentFloorNumber);
 
-			ElevatorAutoFixing autoFixing = car.getAutoFixing();
+			// Notify the scheduler that the elevator is resolving an issue
+			elevator.setResolvingError(true);
+			try {
+				schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
+			} catch (Exception e) {
+			}
+
+			ElevatorAutoFixing autoFixing = elevator.getAutoFixing();
 
 			// Try to close the elevator
 			for (int i = 0; i < FAULT_RETRY_ATTEMPTS; i++) {
-				boolean isDoorClosed = car.getDoor().closeDoor(autoFixing);
+				boolean isDoorClosed = elevator.getDoor().closeDoor(autoFixing);
 
 				if (isDoorClosed) {
-					car.setErrorState(null);
-					logger.severe("(Elevator) Elevator " + elevatorId
-							+ " has addressed FloorInputFault.DOOR_STUCK_OPEN_FAULT.");
+					elevator.setErrorState(null);
+					elevator.setResolvingError(false);
+
+					logger.severe("(Elevator) Elevator " + elevatorId + " has resolved the issue and closed the door.");
+
+					// Notify the scheduler that the elevator has resolved the issue
+					try {
+						schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
+					} catch (Exception e) {
+					}
 
 					return true;
 				}
@@ -213,15 +223,19 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			}
 
 			// Being here indicates that the elevator exhausted the fault retry attempts.
-			// We will notify the scheduler that the elevator is shutting down
-			ElevatorStatusMessage statusMessage = car.createStatusMessage();
-			car.setInService(false);
-			logger.severe("(Elevator) Elevator " + elevatorId
-					+ " exhausted its retry attempts to address the FloorInputFault.DOOR_STUCK_OPEN_FAULT. Shutting down....");
+			// The elevator will not shut down...
+			elevator.setInService(false);
+			elevator.setResolvingError(false);
+
+			// Notify the scheduler that the elevator is no longer attempting to resolve an
+			// issue and that the elevator has shut down.
 			try {
-				schedulerSubsystemCommunication.sendMessage(statusMessage);
+				schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 			} catch (Exception e) {
 			}
+
+			logger.severe("(Elevator) Elevator " + elevatorId
+					+ " exhausted its retry attempts to close the door. Shutting down....");
 
 			return false;
 		}
@@ -230,9 +244,9 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		// Because we have an error state, the door should be out of service and
 		// the door-close operation will not work.
 		try {
-			car.setInService(false);
+			elevator.setInService(false);
 			// Update the scheduler of the error
-			schedulerSubsystemCommunication.sendMessage(car.createStatusMessage());
+			schedulerSubsystemCommunication.sendMessage(elevator.createStatusMessage());
 		} catch (Exception e) {
 		}
 

@@ -47,6 +47,11 @@ public class ElevatorCar {
 	private ElevatorAutoFixing autoFixing = ElevatorAutoFixing.AUTO_FIXING_SUCCESS;
 
 	/**
+	 * A flag indicating that the elevator care is resolving an error
+	 */
+	private boolean isResolvingError = false;
+
+	/**
 	 * The elevator car
 	 *
 	 * @param id    the car id
@@ -68,7 +73,21 @@ public class ElevatorCar {
 	 */
 	public ElevatorStatusMessage createStatusMessage() {
 		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber,
-				errorState, door.isOpen());
+				errorState, isResolvingError, door.isOpen());
+
+		return status;
+	}
+
+	/**
+	 * Creates a ElevatorStatusMessage message containing all relevant status info
+	 * for this elevator.
+	 *
+	 * @return status response message
+	 */
+	public ElevatorStatusMessage createCommandNonIssuingStatusMessage() {
+		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber,
+				errorState, isResolvingError, false, door.isOpen());
+
 
 		return status;
 	}
@@ -168,4 +187,23 @@ public class ElevatorCar {
 	public void setFloorNumber(int floorNumber) {
 		this.floorNumber = floorNumber;
 	}
+
+	/**
+	 * Return a flag indicating whether the car is currently resolving an error
+	 *
+	 * @return the isResolvingError
+	 */
+	public boolean isResolvingError() {
+		return isResolvingError;
+	}
+
+	/**
+	 * Set the resolving error Flag
+	 *
+	 * @param isResolvingError the isResolvingError to set
+	 */
+	public void setResolvingError(boolean isResolvingError) {
+		this.isResolvingError = isResolvingError;
+	}
+
 }

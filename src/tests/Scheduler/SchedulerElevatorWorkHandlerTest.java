@@ -6,12 +6,17 @@ package tests.Scheduler;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.ElevatorController;
+import FloorSubsystem.Floor;
+import FloorSubsystem.FloorElevatorMessageWorkQueue;
+import FloorSubsystem.FloorSchedulerMessageWorkQueue;
+import FloorSubsystem.FloorSubsystem;
 import Scheduler.ElevatorJobManagement;
 import Scheduler.SchedulerElevatorWorkHandler;
 import common.Direction;
@@ -78,6 +83,9 @@ public class SchedulerElevatorWorkHandlerTest {
 
 		schedulerElevatorWorkHandler = new SchedulerElevatorWorkHandler(schedulerFloorCommunication,
 				schedulerElevatorCommunication, elevatorJobManagements);
+		
+		FloorSubsystem subsystem = new FloorSubsystem(" ", 1);
+        subsystem.runMain();
 	}
 
 	@AfterEach
@@ -106,7 +114,7 @@ public class SchedulerElevatorWorkHandlerTest {
 
 		// We want to drop off a passenger from floor 2 to 0
 		ElevatorTransportRequest elevatorTransportMessage = new ElevatorTransportRequest(0, elevatorId, Direction.DOWN,
-				null, null);
+				null, null, -1);
 
 		// Let the scheduler work
 		schedulerElevatorWorkHandler.enqueueMessage(elevatorTransportMessage);
@@ -114,13 +122,12 @@ public class SchedulerElevatorWorkHandlerTest {
 			Thread.sleep(100);
 		} catch (Exception e) {
 		}
-
 		// Check that an MOVE_DOWN command was sent to the in-service elevator 0
 		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
 		SchedulerElevatorCommand receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages
 				.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.MOVE_DOWN);
 
 		simulateElevatorSubsystemWaitingForCommand();
@@ -141,7 +148,7 @@ public class SchedulerElevatorWorkHandlerTest {
 		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
 		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.MOVE_DOWN);
 
 		simulateElevatorSubsystemWaitingForCommand();
@@ -159,19 +166,18 @@ public class SchedulerElevatorWorkHandlerTest {
 			Thread.sleep(100);
 		} catch (Exception e) {
 		}
-
 		// Check that a STOP command was sent to the in-service elevator 0
 		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
 		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.STOP);
 
 		// Check that an OPEN DOORS command was sent to the in-service elevator 0
 		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
 		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.OPEN_DOORS);
 	}
 

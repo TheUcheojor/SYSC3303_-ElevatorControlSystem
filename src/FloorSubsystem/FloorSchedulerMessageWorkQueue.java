@@ -12,6 +12,7 @@ import common.SimulationFloorInputData;
 import common.SystemValidationUtil;
 import common.messages.Message;
 import common.messages.elevator.ElevatorTransportRequest;
+import common.messages.scheduler.PassengerDropoffCompletedMessage;
 import common.messages.scheduler.SchedulerFloorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
@@ -74,9 +75,11 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @return the input data
 	 */
 	private SimulationFloorInputData getFloorData(int inputDataId) {
-		for (SimulationFloorInputData floorData : floorDataCollection) {
-			if (floorData.getInputDataId() == inputDataId) {
-				return floorData;
+		synchronized(floorDataCollection) {
+			for (SimulationFloorInputData floorData : floorDataCollection) {
+				if (floorData.getInputDataId() == inputDataId) {
+					return floorData;
+				}
 			}
 		}
 
@@ -116,16 +119,16 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			int destinationFloor = floorData.getDestinationFloorCarButton();
 			FloorInputFault floorFault = floorData.getFault();
 			ElevatorAutoFixing elevatorAutoFixing = floorData.getElevatorAutoFixing();
+			int floorInputId = floorData.getInputDataId();
 
 			int elevatorId = request.getElevatorId();
 
 			ElevatorTransportRequest elevatorTransportRequest = new ElevatorTransportRequest(destinationFloor,
-					elevatorId, request.getLampButtonDirection(), floorFault, elevatorAutoFixing);
+					elevatorId, request.getLampButtonDirection(), floorFault, elevatorAutoFixing, floorInputId);
 
 			try {
 				elevatorSubsystemCommunication.sendMessage(elevatorTransportRequest);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -133,6 +136,15 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
 		case PRODUCE_STUCK_FAULT_WITH_ELEVATOR:
 			floors[floorId].setElevatorIdToFault(request.getElevatorId());
+			break;
+			
+		case PASSENGER_DROP_OFF_COMPLETE:
+			PassengerDropoffCompletedMessage passengerDropoffCompletedMessage = (PassengerDropoffCompletedMessage) request;
+			
+			synchronized (floorDataCollection) {
+				floorDataCollection.removeIf(floorInputData -> passengerDropoffCompletedMessage.getFloorInputDataId()== floorInputData.getInputDataId());
+			
+			}
 			break;
 
 		default:

@@ -3,22 +3,19 @@ package common.messages.scheduler;
 import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.MessageType;
+import common.messages.SchedulerElevatorTargetedMessage;
 /**
  * Elevator job requests from elevators
  * 
  * @author Favour
  *
  */
-public class SchedulerElevatorCommand extends Message{
+public class SchedulerElevatorCommand extends SchedulerElevatorTargetedMessage {
 	/**
 	 * The scheduler command for the elevator 
 	 */
 	private ElevatorCommand elevatorCommand;
-	
-	/**
-	 * The ID of the elevator getting the command
-	 */
-	private int elevatorID;
+
 	/**
 	 * The primary constructor
 	 * 
@@ -27,15 +24,13 @@ public class SchedulerElevatorCommand extends Message{
 	private ElevatorStateException elevatorException;
 	
 	public SchedulerElevatorCommand(ElevatorCommand elevatorCommand, int elevatorID) {
-		super(MessageType.SCHEDULER_ELEVATOR_COMMAND);
+		super(MessageType.SCHEDULER_ELEVATOR_COMMAND, elevatorID);
 		this.elevatorCommand = elevatorCommand;
-		this.elevatorID = elevatorID;
 	}
 	
 	public SchedulerElevatorCommand(ElevatorCommand elevatorCommand, int elevatorID, ElevatorStateException exception) {
-		super(MessageType.SCHEDULER_ELEVATOR_COMMAND);
+		super(MessageType.SCHEDULER_ELEVATOR_COMMAND, elevatorID);
 		this.elevatorCommand = elevatorCommand;
-		this.elevatorID = elevatorID;
 		this.elevatorException = exception;
 	}
 
@@ -46,14 +41,6 @@ public class SchedulerElevatorCommand extends Message{
 	 */
 	public ElevatorCommand getCommand() {
 		return elevatorCommand;
-	}
-
-	/**
-	 * This method returns the elevator ID number
-	 * @return - The elevator ID
-	 */
-	public int getElevatorID() {
-		return elevatorID;
 	}
 
 	public ElevatorStateException getException() {
