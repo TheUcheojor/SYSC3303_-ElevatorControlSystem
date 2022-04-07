@@ -48,12 +48,29 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				// For now, if the elevator goes into an error state we will hold its job
 				// requests. Once manual actions have be taken on the elevator, the elevator
 				// should proceed like normal.
-				elevatorJobManagements[elevatorId].setErrorState(elevatorStatusMessage.getErrorState());
+				elevatorJobManagements[elevatorId].setErrorState(elevatorStatusMessage.getErrorState(),
+						elevatorStatusMessage.isResolvingError());
 
 				logger.fine("(SCHEDULER) Received Elevator status: [ID: " + elevatorId + ", F: "
 						+ elevatorStatusMessage.getFloorNumber() + ", D: " + elevatorStatusMessage.getDirection()
 						+ ", ErrorState: " + elevatorStatusMessage.getErrorState() + " ]");
 
+				// If the elevator shuts down, notify the floor subsystem that we have addressed
+				// the jobs in the elevators
+				if (!elevatorJobManagements[elevatorId].isReadyForJob()) {
+
+					// For each job, notify the floor subsystem
+					elevatorJobManagements[elevatorId].getElevatorJobs().forEach(elevator -> {
+						// schedulerFloorCommunication.sendMessage(JOB_COMPLETED_MESSAGE)
+					});
+				}
+
+				// If the scheduler should not give any commands, do not proceed any further
+				if (!elevatorStatusMessage.shouldIssueNextCommand()) {
+					return;
+				}
+
+				// If the elevator is ready for job and has jobs, issue the next command
 				if (elevatorJobManagements[elevatorId].isReadyForJob()
 						&& elevatorJobManagements[elevatorId].hasJobs()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
@@ -79,7 +96,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						+ dropPassengerRequest.getDestinationFloor() + " to Elevator "
 						+ elevatorJobManagements[elevatorId].getElevatorId());
 
-				logger.fine("(SCHEDULER) Elevator Management Status: [ID: " + elevatorId +", F: "
+				logger.fine("(SCHEDULER) Elevator Management Status: [ID: " + elevatorId + ", F: "
 						+ elevatorJobManagements[elevatorId].getCurrentFloorNumber() + ", D: "
 						+ elevatorJobManagements[elevatorId].getElevatorDirection() + "]");
 
