@@ -1,5 +1,6 @@
 package common.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 
@@ -15,6 +16,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
+import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -70,7 +72,7 @@ public class GUI extends JFrame{
         mainPanel.setLayout(new GridLayoutManager(6, 2 + numberElevators, new Insets(0, 0, 0, 0), -1, -1));
         
         final JLabel label1 = new JLabel();
-        label1.setText("Log / Processes");
+        label1.setText("Log(s)");
         mainPanel.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, 1, null, new Dimension(82, 50), null, 0, false));
 
         logSP = new JScrollPane();
@@ -120,6 +122,10 @@ public class GUI extends JFrame{
             elevatorStatus[index] = new JLabel();
             elevatorStatus[index].setText("Status: Down");
             mainPanel.add(elevatorStatus[index], new GridConstraints(4, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+            
+            elevatorErrorStatus[index] = new JLabel();
+            elevatorErrorStatus[index].setText("");
+            mainPanel.add(elevatorErrorStatus[index], new GridConstraints(5, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 
         }
     }
@@ -162,14 +168,14 @@ public class GUI extends JFrame{
 		
 		// Updating the log component
 		logTA.append("Elevator " + message.getElevatorId() + " is at floor: " + message.getFloorNumber() +"\n");
-		if (message.getErrorState() != null) logTA.append("Error State => " + message.getErrorState() +"\n");
-		logTA.append("-------------\n");
+		logTA.append("--------------------------\n");
 
 		// Updating the needed elevator
 		int index = message.getElevatorId();
 
         elevatorFlrLabels[index].setText("Current Floor: " + message.getFloorNumber());
 
+		
         if(message.isDoorOpen()) {
         	elevatorDoors[index].setIcon(imgOpen);
         	elevatorDoorsStatus[index].setText("Door: Open");
@@ -179,6 +185,13 @@ public class GUI extends JFrame{
         }
         
         elevatorStatus[index].setText("Direction: " + message.getDirection());
+        
+        if (message.getErrorState() != null){
+        	elevatorErrorStatus[index].setText("" + ((ElevatorStateException)message.getErrorState()).getFault());
+        	elevatorErrorStatus[index].setForeground(Color.RED);
+        }else {
+        	elevatorErrorStatus[index].setText("");
+        }
 
 	}
 
