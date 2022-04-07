@@ -77,7 +77,7 @@ public class SchedulerElevatorWorkHandlerTest {
 		}
 
 		schedulerElevatorWorkHandler = new SchedulerElevatorWorkHandler(schedulerFloorCommunication,
-				schedulerElevatorCommunication, elevatorJobManagements, null);
+				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
 	@AfterEach

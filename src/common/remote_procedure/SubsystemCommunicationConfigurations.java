@@ -75,6 +75,17 @@ public final class SubsystemCommunicationConfigurations {
 			Map.entry(SubsystemComponentType.SCHEDULER, FlOOR_TO_SCHEDULER_SEND_RECEIVE_PORT),
 			Map.entry(SubsystemComponentType.ELEVATOR_SUBSYSTEM, FlOOR_TO_ELEVATOR_SEND_RECEIVE_PORT));
 	
+	/**
+	 * The scheduler send/receive port for the GUI component
+	 */
+	private static final int GUI_FROM_SCHEDULER_SEND_RECEIVE_PORT = 14000;
+
+	/**
+	 * The GUI port mapping that provides the appropriate port for a given
+	 * subsystem.
+	 */
+	public static final Map<SubsystemComponentType, Integer> GUI_PORT_MAPPING = Map.ofEntries(
+			Map.entry(SubsystemComponentType.SCHEDULER, GUI_FROM_SCHEDULER_SEND_RECEIVE_PORT));
 
 	/**
 	 * The ip addresses of the scheduler,floor, and elevator
@@ -128,7 +139,8 @@ public final class SubsystemCommunicationConfigurations {
 					ELEVATOR_PORT_MAPPING.get(targetSubsystemType));
 			break;
 		case GUI:
-			
+			communicationInfo = new SubsystemCommunicationInfo(GUI_IP_ADDRESS,
+					GUI_PORT_MAPPING.get(targetSubsystemType));
 			break;
 		}
 		

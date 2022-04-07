@@ -27,21 +27,26 @@ public class SystemExecutor {
 	 */
 	public static void main(String[] args) {
 
-		GUI frame = new GUI();
+		
 		
 		// Set up and start the scheduler
 		Scheduler scheduler = new Scheduler();
 		scheduler.runSchedulerProgram();
+		
+		
 
 		// Set up and start the elevator controller
 		logger.info("(SYSTEM) all elevators starting at floor 0");
 		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS);
-		frame.setEle(elevatorController);
+		//frame.setEle(elevatorController);
 
 		// Set up and start the floor subsystem
 		String inputFileName = "resources/FloorInputFile.txt";
 		FloorSubsystem subsystem = new FloorSubsystem(inputFileName,
 				ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_MILLISECONDS);
 		subsystem.runMain();
+		
+		GUI frame = new GUI();
+		frame.recieveUpdates();
 	}
 }

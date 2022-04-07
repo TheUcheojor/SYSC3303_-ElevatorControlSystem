@@ -20,6 +20,7 @@ import ElevatorSubsystem.ElevatorController;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
+import common.remote_procedure.SubsystemComponentType;
 
 /**
  * @author Jacob Charpentier, Favour Olotu
@@ -38,7 +39,8 @@ public class GUI extends JFrame{
 	/**
 	 * RPC communications channel for the scheduler
 	 */
-	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
+	private SubsystemCommunicationRPC schedulerSubsystemCommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.GUI, SubsystemComponentType.SCHEDULER);
 
     public GUI() {
         super("Elevator GUI");
@@ -50,7 +52,7 @@ public class GUI extends JFrame{
         this.setResizable(true);
         this.elevatorController = null;
         this.setVisible(true);
-        recieveUpdates();
+        //recieveUpdates();
         
     }
 
@@ -128,7 +130,7 @@ public class GUI extends JFrame{
      * This method set-up a thread to continously recieve elevaor status 
      * messages from the scheduler
      */
-    private void recieveUpdates() {
+    public void recieveUpdates() {
 		(new Thread() {
 			@Override
 			public void run() {
@@ -140,7 +142,6 @@ public class GUI extends JFrame{
 						//Handle message by updating the GUI
 						handleStatusUpdate(message);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

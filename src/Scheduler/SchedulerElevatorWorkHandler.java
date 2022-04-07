@@ -11,6 +11,7 @@ import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.remote_procedure.SubsystemCommunicationRPC;
+import common.remote_procedure.SubsystemComponentType;
 
 /**
  * @author paulokenne
@@ -29,13 +30,16 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	 */
 	
 	
-	private SubsystemCommunicationRPC schedulerGUICommunication;
+	/**
+	 * The UDP communication between the scheduler and elevator
+	 */
 	
+	private SubsystemCommunicationRPC schedulerGUICommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.GUI);
+
 	public SchedulerElevatorWorkHandler(SubsystemCommunicationRPC schedulerFloorCommunication,
-			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements,
-			SubsystemCommunicationRPC schedulerGUICommunication) {
+			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements) {
 		super(schedulerFloorCommunication, schedulerElevatorCommunication, elevatorJobManagements);
-		this.schedulerGUICommunication = schedulerGUICommunication;
 	}
 
 	@Override
