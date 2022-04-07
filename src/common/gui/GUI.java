@@ -141,6 +141,7 @@ public class GUI extends JFrame{
 						message = schedulerSubsystemCommunication.receiveMessage();
 						//Handle message by updating the GUI
 						handleStatusUpdate(message);
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

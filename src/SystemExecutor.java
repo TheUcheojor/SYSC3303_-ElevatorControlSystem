@@ -27,7 +27,8 @@ public class SystemExecutor {
 	 */
 	public static void main(String[] args) {
 
-		
+		GUI frame = new GUI();
+		frame.recieveUpdates();
 		
 		// Set up and start the scheduler
 		Scheduler scheduler = new Scheduler();
@@ -46,7 +47,6 @@ public class SystemExecutor {
 				ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_MILLISECONDS);
 		subsystem.runMain();
 		
-		GUI frame = new GUI();
-		frame.recieveUpdates();
+
 	}
 }

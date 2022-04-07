@@ -50,6 +50,15 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_STATUS_MESSAGE:
 			synchronized (elevatorJobManagements) {
+				
+				// Send the status message recieved
+				try {
+					schedulerGUICommunication.sendMessage(message);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				
 				ElevatorStatusMessage elevatorStatusMessage = (ElevatorStatusMessage) message;
 				
 				elevatorId = elevatorStatusMessage.getElevatorId();
@@ -70,12 +79,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 				}
 				
-				// Send the status message recieved
-				try {
-					schedulerGUICommunication.sendMessage(message);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				
 			}
 			break;
 
