@@ -1,11 +1,13 @@
 package ElevatorSubsystem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import common.SystemValidationUtil;
 import common.exceptions.InvalidSystemConfigurationInputException;
 import common.messages.Message;
+import common.messages.SchedulerElevatorTargetedMessage;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
@@ -70,8 +72,15 @@ public class ElevatorController {
 			System.exit(1);
 		}
 
+		// initialize the subsystem communication channels
+				schedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
+						SubsystemComponentType.SCHEDULER);
+				floorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
+						SubsystemComponentType.FLOOR_SUBSYSTEM);
+				
 		// initialize elevator cars
 		elevators = new HashMap<Integer, ElevatorCar>();
+		ArrayList<ElevatorSchedulerMessageWorkQueue> elevatorSchedulerWorkQueues = new ArrayList();
 		for (int i = 0; i < NUMBER_OF_ELEVATORS; i++) {
 			ElevatorDoor door = new ElevatorDoor(doorOpenCloseTime);
 			ElevatorMotor motor = new ElevatorMotor(MAX_ELEVATOR_SPEED, ELEVATOR_ACCELERATION);
@@ -80,19 +89,18 @@ public class ElevatorController {
 			ElevatorCar car = new ElevatorCar(carId, motor, door);
 
 			elevators.put(carId, car);
+			// initialize a work queue for each elevator
+			elevatorSchedulerWorkQueues.add(
+					new ElevatorSchedulerMessageWorkQueue(
+							schedulerSubsystemCommunication,
+							floorSubsystemCommunication,
+							car)
+					);
 		}
 
-		// initialize the subsystem communication channels
-		schedulerSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
-				SubsystemComponentType.SCHEDULER);
-		floorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
-				SubsystemComponentType.FLOOR_SUBSYSTEM);
-
-		// initialize the message queues
+		// only one floor message queue necessary (no significant consuming/blocking tasks)
 		floorMessageQueue = new ElevatorFloorMessageWorkQueue(schedulerSubsystemCommunication, elevators);
-		schedulerMessageQueue = new ElevatorSchedulerMessageWorkQueue(schedulerSubsystemCommunication,
-				floorSubsystemCommunication, elevators);
-
+		
 		// initialize the message receiving threads
 		(new Thread() {
 			@Override
@@ -116,10 +124,10 @@ public class ElevatorController {
 			public void run() {
 				// wait for scheduler messages
 				while (true) {
-					Message message;
+					SchedulerElevatorTargetedMessage message;
 					try {
-						message = schedulerSubsystemCommunication.receiveMessage();
-						schedulerMessageQueue.enqueueMessage(message);
+						message = (SchedulerElevatorTargetedMessage) schedulerSubsystemCommunication.receiveMessage();
+						(elevatorSchedulerWorkQueues.get(message.getElevatorId())).enqueueMessage(message);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

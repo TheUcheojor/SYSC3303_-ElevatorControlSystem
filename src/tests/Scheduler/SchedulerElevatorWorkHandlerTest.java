@@ -120,7 +120,7 @@ public class SchedulerElevatorWorkHandlerTest {
 		SchedulerElevatorCommand receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages
 				.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.MOVE_DOWN);
 
 		simulateElevatorSubsystemWaitingForCommand();
@@ -141,7 +141,7 @@ public class SchedulerElevatorWorkHandlerTest {
 		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
 		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.MOVE_DOWN);
 
 		simulateElevatorSubsystemWaitingForCommand();
@@ -164,14 +164,14 @@ public class SchedulerElevatorWorkHandlerTest {
 		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
 		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.STOP);
 
 		// Check that an OPEN DOORS command was sent to the in-service elevator 0
 		assertTrue(elevatorReceivedMessages.peek() instanceof SchedulerElevatorCommand);
 		receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) elevatorReceivedMessages.pop();
 
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.OPEN_DOORS);
 	}
 
