@@ -9,7 +9,6 @@ import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
-import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorStatusRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -196,6 +195,13 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		if (car.getErrorState().getFault() == FloorInputFault.DOOR_STUCK_OPEN_FAULT) {
 			logger.severe("(Elevator) Elevator " + elevatorId + " failed to close door at floor " + currentFloorNumber);
 
+			// Notify the scheduler that the elevator is resolving an issue
+			car.setResolvingError(true);
+			try {
+				schedulerSubsystemCommunication.sendMessage(car.createCommandNonIssuingStatusMessage());
+			} catch (Exception e) {
+			}
+
 			ElevatorAutoFixing autoFixing = car.getAutoFixing();
 
 			// Try to close the elevator
@@ -204,8 +210,15 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
 				if (isDoorClosed) {
 					car.setErrorState(null);
-					logger.severe("(Elevator) Elevator " + elevatorId
-							+ " has addressed FloorInputFault.DOOR_STUCK_OPEN_FAULT.");
+					car.setResolvingError(false);
+
+					logger.severe("(Elevator) Elevator " + elevatorId + " has resolved the issue and closed the door.");
+
+					// Notify the scheduler that the elevator has resolved the issue
+					try {
+						schedulerSubsystemCommunication.sendMessage(car.createCommandNonIssuingStatusMessage());
+					} catch (Exception e) {
+					}
 
 					return true;
 				}
@@ -213,15 +226,19 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			}
 
 			// Being here indicates that the elevator exhausted the fault retry attempts.
-			// We will notify the scheduler that the elevator is shutting down
-			ElevatorStatusMessage statusMessage = car.createStatusMessage();
+			// The elevator will not shut down...
 			car.setInService(false);
-			logger.severe("(Elevator) Elevator " + elevatorId
-					+ " exhausted its retry attempts to address the FloorInputFault.DOOR_STUCK_OPEN_FAULT. Shutting down....");
+			car.setResolvingError(false);
+
+			// Notify the scheduler that the elevator is no longer attempting to resolve an
+			// issue and that the elevator has shut down.
 			try {
-				schedulerSubsystemCommunication.sendMessage(statusMessage);
+				schedulerSubsystemCommunication.sendMessage(car.createCommandNonIssuingStatusMessage());
 			} catch (Exception e) {
 			}
+
+			logger.severe("(Elevator) Elevator " + elevatorId
+					+ " exhausted its retry attempts to close the door. Shutting down....");
 
 			return false;
 		}

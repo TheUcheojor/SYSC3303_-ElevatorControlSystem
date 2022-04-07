@@ -15,13 +15,54 @@ import common.messages.MessageType;
  */
 
 public class ElevatorStatusMessage extends Message {
+
+	/**
+	 * The elevator id
+	 */
 	private int elevatorId;
+
+	/**
+	 * The flood number
+	 */
 	private int floorNumber;
+
+	/**
+	 * The direction
+	 */
 	private Direction direction;
+
+	/**
+	 * A time stamp
+	 */
 	private String timestamp;
+
+	/**
+	 * The exception
+	 */
 	private Exception errorState;
-	
-	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber, Exception errorState) {
+
+	/**
+	 * A flag indicating that the elevator is resolving an error
+	 */
+	private boolean isResolvingError;
+
+	/**
+	 * A flag that indicates that the scheduler should issue the next command
+	 */
+	private boolean issueNextCommand = true;
+
+	/**
+	 * A ElevatorStatusMessage constructor
+	 *
+	 * @param elevatorId       the elevator id
+	 * @param direction        the direction
+	 * @param floorNumber      the floor number
+	 * @param errorState       the error state
+	 * @param isResolvingError a flag indicating that the elevator is resolving an
+	 *                         error
+	 */
+	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber, Exception errorState,
+			boolean isResolvingError) {
 		super(MessageType.ELEVATOR_STATUS_MESSAGE);
 		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
 
@@ -29,6 +70,30 @@ public class ElevatorStatusMessage extends Message {
 		this.direction = direction;
 		this.floorNumber = floorNumber;
 		this.errorState = errorState;
+		this.isResolvingError = isResolvingError;
+	}
+
+	/**
+	 * A ElevatorStatusMessage constructor
+	 *
+	 * @param elevatorId       the elevator id
+	 * @param direction        the direction
+	 * @param floorNumber      the floor number
+	 * @param errorState       the error state
+	 * @param isResolvingError a flag indicating that the elevator is resolving an
+	 *                         error
+	 */
+	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber, Exception errorState,
+			boolean isResolvingError, boolean issueNextCommand) {
+		super(MessageType.ELEVATOR_STATUS_MESSAGE);
+		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
+
+		this.elevatorId = elevatorId;
+		this.direction = direction;
+		this.floorNumber = floorNumber;
+		this.errorState = errorState;
+		this.isResolvingError = isResolvingError;
+		this.issueNextCommand = issueNextCommand;
 	}
 
 	/**
@@ -65,4 +130,21 @@ public class ElevatorStatusMessage extends Message {
 	public Exception getErrorState() {
 		return errorState;
 	}
+
+	/**
+	 * @return the isResolvingError
+	 */
+	public boolean isResolvingError() {
+		return isResolvingError;
+	}
+
+	/**
+	 * Return a flag indicating whether the scheduler should issue the next commant
+	 *
+	 * @return the issueNextCommand
+	 */
+	public boolean shouldIssueNextCommand() {
+		return issueNextCommand;
+	}
+
 }

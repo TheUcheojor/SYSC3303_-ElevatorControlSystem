@@ -128,7 +128,7 @@ public class SchedulerElevatorWorkHandlerTest {
 		// The elevator is at floor 1 and is sending a status message.
 		currentFloorNumber = 1;
 		ElevatorStatusMessage elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN,
-				currentFloorNumber, null);
+				currentFloorNumber, null, false);
 
 		// Add elevator message and let the scheduler work
 		schedulerElevatorWorkHandler.enqueueMessage(elevatorStatusMessage);
@@ -148,7 +148,7 @@ public class SchedulerElevatorWorkHandlerTest {
 
 		// The elevator is at floor 0 and is sending a status message.
 		currentFloorNumber = 0;
-		elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN, currentFloorNumber, null);
+		elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN, currentFloorNumber, null, false);
 
 		simulateElevatorSubsystemWaitingForCommand();
 		simulateElevatorSubsystemWaitingForCommand();
