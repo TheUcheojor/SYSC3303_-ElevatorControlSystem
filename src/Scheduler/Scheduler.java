@@ -62,15 +62,6 @@ public class Scheduler {
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
-//	/**
-//	 * The main function of the Scheduler
-//	 *
-//	 * @param args
-//	 */
-//	public void main(String[] args) {
-//		Scheduler scheduler = new Scheduler();
-//		scheduler.runSchedulerProgram();
-//	}
 
 	/**
 	 * The function runs the message queue for floor and elevator

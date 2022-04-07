@@ -64,8 +64,6 @@ public class ElevatorController {
 	public ElevatorController(double doorOpenCloseTime, int numberOfElevators) {
 		
 		NUMBER_OF_ELEVATORS = numberOfElevators;
-		System.out.println(numberOfElevators);
-		System.out.println(this.NUMBER_OF_ELEVATORS);
 		
 		// Validate that the elevator values are valid
 		try {
@@ -152,12 +150,6 @@ public class ElevatorController {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	// For running on stand alone system
-	public static void main(String[] args) {
-		int DOOR_SPEED_MILLISECONDS = 3000;
-		ElevatorController controller = new ElevatorController(DOOR_SPEED_MILLISECONDS, 4);
 	}
 
 }
