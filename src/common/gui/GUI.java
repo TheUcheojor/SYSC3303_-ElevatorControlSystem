@@ -15,7 +15,6 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
-import common.Direction;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
