@@ -130,7 +130,7 @@ public class SchedulerFloorWorkHandlerTest {
 
 		// Check that an MOVE_UP command was sent to the in-service elevator 1
 		SchedulerElevatorCommand receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) receivedMessage;
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.MOVE_UP);
 
 	}
@@ -183,7 +183,7 @@ public class SchedulerFloorWorkHandlerTest {
 
 		// Check that a shutdown command was sent to the in-service elevator 1
 		SchedulerElevatorCommand receivedSchedulerElevatorCommand = (SchedulerElevatorCommand) receivedMessage;
-		assertTrue(receivedSchedulerElevatorCommand.getElevatorID() == elevatorId);
+		assertTrue(receivedSchedulerElevatorCommand.getElevatorId() == elevatorId);
 		assertTrue(receivedSchedulerElevatorCommand.getCommand() == ElevatorCommand.SHUT_DOWN);
 
 	}

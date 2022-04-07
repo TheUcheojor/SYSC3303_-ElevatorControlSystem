@@ -55,11 +55,10 @@ class TestElevatorSchedulerMessageWorkQueue {
 		elevatorFloorSubsystemCommunication = new SubsystemCommunicationRPC(SubsystemComponentType.ELEVATOR_SUBSYSTEM,
 				SubsystemComponentType.FLOOR_SUBSYSTEM);
 		
-		elevators = new HashMap<Integer, ElevatorCar>();
 		
-		elevators.put(ELEVATOR_ID, new ElevatorCar(ELEVATOR_ID, new ElevatorMotor(ELEVATOR_SPEED), new ElevatorDoor(ELEVATOR_SPEED)));
+		ElevatorCar elevator = new ElevatorCar(ELEVATOR_ID, new ElevatorMotor(ELEVATOR_SPEED), new ElevatorDoor(ELEVATOR_SPEED));
 		
-		workQueue = new ElevatorSchedulerMessageWorkQueue(elevatorSchedulerSubsystemCommunication, elevatorFloorSubsystemCommunication, elevators);
+		workQueue = new ElevatorSchedulerMessageWorkQueue(elevatorSchedulerSubsystemCommunication, elevatorFloorSubsystemCommunication, elevator);
 		
 	}
 	
