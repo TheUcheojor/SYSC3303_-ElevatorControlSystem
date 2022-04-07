@@ -27,8 +27,8 @@ public class SystemExecutor {
 	 */
 	public static void main(String[] args) {
 
-		GUI frame = new GUI();
-		frame.recieveUpdates();
+		GUI programDisplay = new GUI();
+		programDisplay.recieveUpdates();
 		
 		// Set up and start the scheduler
 		Scheduler scheduler = new Scheduler();
@@ -38,7 +38,7 @@ public class SystemExecutor {
 
 		// Set up and start the elevator controller
 		logger.info("(SYSTEM) all elevators starting at floor 0");
-		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS, frame.getNumberOfElevators());
+		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS, programDisplay.getNumberOfElevators());
 
 		// Set up and start the floor subsystem
 		String inputFileName = "resources/FloorInputFile.txt";
