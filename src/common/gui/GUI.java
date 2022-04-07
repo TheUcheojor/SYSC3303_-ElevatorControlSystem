@@ -146,7 +146,11 @@ public class GUI extends JFrame{
 		}).start();
     }
     
-
+    /**
+     * This method updates the UI using the message recieved from the scheduler
+     * 
+     * @param msg - message to handle
+     */
 	private void handleStatusUpdate(Message msg) {
 		ElevatorStatusMessage message = (ElevatorStatusMessage) msg;
 		
@@ -156,6 +160,20 @@ public class GUI extends JFrame{
 		logTA.append("-------------\n");
 
 		// Updating the needed elevator
+		int index = message.getElevatorId();
+
+        elevatorFlrLabels[index].setText("Current Floor: " + message.getFloorNumber());
+
+        if(message.isDoorOpen()) {
+        	elevatorDoors[index].setIcon(imgOpen);
+        	elevatorDoorsStatus[index].setText("Door: Open");
+        } else {
+        	elevatorDoors[index].setIcon(imgClosed);
+        	elevatorDoorsStatus[index].setText("Door: Closed");
+        }
+        
+        elevatorStatus[index].setText("Direction: " + message.getDirection());
+
 	}
 
 
