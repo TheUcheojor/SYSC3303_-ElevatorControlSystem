@@ -26,8 +26,16 @@ public class Floor {
 	 * The down lamp button
 	 */
 	private DirectionLampButton downLampButton = null;
-	
+
+	/**
+	 * elevator Id for the floor to fault on
+	 */
 	private int elevatorIdToFault = -1;
+	
+	/**
+	 * floor to floor time
+	 */
+	private double elevatorFloorToFloorTimeMilliseconds;
 
 	/**
 	 * The elevator components (arrival sensor and direction lamp), one per elevator
@@ -48,7 +56,10 @@ public class Floor {
 	 *
 	 * @param floorNumber the floor number
 	 */
-	public Floor(int floorNumber) {
+	public Floor(int floorNumber, double elevatorFloorToFloorTimeMilliseconds) {
+
+		this.floorNumber = floorNumber;
+		this.elevatorFloorToFloorTimeMilliseconds = elevatorFloorToFloorTimeMilliseconds;
 
 		// Create buttons depending on the floor number
 		if (floorNumber == 0) {
@@ -72,15 +83,21 @@ public class Floor {
 	 * @param isFloorFinalDestination          the flag indicating whether the floor
 	 *                                         is the destination floor
 	 */
-	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor, SubsystemCommunicationRPC elevatorUDP, SubsystemCommunicationRPC schedulerUDP, boolean isFloorFinalDestination) {
+	public void notifyElevatorAtFloorArrival(int floorId, int elevatorId, ElevatorMotor elevatorMotor,
+			SubsystemCommunicationRPC elevatorUDP, SubsystemCommunicationRPC schedulerUDP,
+			boolean isFloorFinalDestination) {
 		boolean produceFloorFault = false;
-		if(elevatorId == elevatorIdToFault) {
+		if (elevatorId == elevatorIdToFault) {
 			produceFloorFault = true;
 			// should only fault this elevator on this floor once???
 			elevatorIdToFault = -1;
 		}
-		
-		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId, elevatorMotor, elevatorUDP, schedulerUDP, isFloorFinalDestination, produceFloorFault);
+
+		ELEVATOR_COMPONENTS[elevatorId].notifyElevatorAtFloorArrival(floorId,
+				elevatorMotor,
+				elevatorFloorToFloorTimeMilliseconds,
+				elevatorUDP, schedulerUDP,
+				produceFloorFault);
 	}
 
 	/**

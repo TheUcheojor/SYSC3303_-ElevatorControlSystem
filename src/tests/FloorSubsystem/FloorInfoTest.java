@@ -20,13 +20,15 @@ class FloorInfoTest {
 	 * Instance of the FloorInfo class
 	 */
 	Floor floor;
+	
+	static int ELEVATOR_FLOOR_TO_FLOOR_TIME_MILLISECONDS = 2000;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		floor = new Floor(1);
+		floor = new Floor(1, ELEVATOR_FLOOR_TO_FLOOR_TIME_MILLISECONDS);
 
 	}
 
@@ -35,7 +37,7 @@ class FloorInfoTest {
 	 */
 	@Test
 	void testFloorNumber() {
-		floor = new Floor(2);
+		floor = new Floor(2, ELEVATOR_FLOOR_TO_FLOOR_TIME_MILLISECONDS);
 		assertTrue(floor.getFloorNumber() == 2);
 	}
 

@@ -31,7 +31,7 @@ public class FloorSubsystem {
 	/**
 	 * The number of floors
 	 */
-	public static final int NUMBER_OF_FLOORS = 3;
+	public static final int NUMBER_OF_FLOORS = 22;
 
 	/**
 	 * The floor to floor distance in meters
@@ -82,21 +82,13 @@ public class FloorSubsystem {
 	 * @param floorMessageChannel - The message channel for communicating with the
 	 *                            scheduler
 	 */
-	public FloorSubsystem(String inputFileName) {
-		// Validate that the floor subsystem values are valid
-		try {
-			SystemValidationUtil.validateFloorToFloorDistance(FLOOR_TO_FLOOR_DISTANCE);
-		} catch (InvalidSystemConfigurationInputException e) {
-			System.out.println("InvalidSystemConfigurationInputException: " + e);
-			// Terminate if the elevation configuration are invalid.
-			System.exit(1);
-		}
+	public FloorSubsystem(String inputFileName, double elevatorFloorToFloorTimeMilliseconds) {
 
 		this.inputFileName = inputFileName;
 
 		// Add floors to the floor subsystem
 		for (int i = 0; i < floors.length; i++) {
-			floors[i] = new Floor(i);
+			floors[i] = new Floor(i, elevatorFloorToFloorTimeMilliseconds);
 		}
 
 		elevatorMessageQueue = new FloorElevatorMessageWorkQueue(floorSchedulerUDP, floorElevatorUDP, floors);
@@ -136,7 +128,9 @@ public class FloorSubsystem {
 	public static void main(String[] args) {
 		// Only attempt to read file when a file name as been passed
 		String inputFileName = "resources/FloorInputFile.txt";
-		FloorSubsystem subsystem = new FloorSubsystem(inputFileName);
+		double elevatorFloorToFloorTimeSeconds = 3.5;
+		
+		FloorSubsystem subsystem = new FloorSubsystem(inputFileName, elevatorFloorToFloorTimeSeconds);
 		subsystem.runMain();
 	}
 
