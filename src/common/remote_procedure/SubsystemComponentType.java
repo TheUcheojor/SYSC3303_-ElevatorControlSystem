@@ -25,4 +25,9 @@ public enum SubsystemComponentType {
 	 * The floor subsystem
 	 */
 	FLOOR_SUBSYSTEM,
+	
+	/**
+	 * The GUI component
+	 */
+	GUI
 }

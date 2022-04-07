@@ -24,6 +24,11 @@ public final class SubsystemCommunicationConfigurations {
 	 * The scheduler send/receive port for the elevator subsystem
 	 */
 	private static final int SCHEDULER_TO_ELEVATOR_SEND_RECEIVE_PORT = 11001;
+	
+	/**
+	 * The scheduler send/receive port for the elevator subsystem
+	 */
+	private static final int SCHEDULER_TO_GUI_SEND_RECEIVE_PORT = 11002;
 
 	/**
 	 * The scheduler port mapping that provides the appropriate port for a given
@@ -31,7 +36,8 @@ public final class SubsystemCommunicationConfigurations {
 	 */
 	public static final Map<SubsystemComponentType, Integer> SCHEDULER_PORT_MAPPING = Map.ofEntries(
 			Map.entry(SubsystemComponentType.ELEVATOR_SUBSYSTEM, SCHEDULER_TO_ELEVATOR_SEND_RECEIVE_PORT),
-			Map.entry(SubsystemComponentType.FLOOR_SUBSYSTEM, SCHEDULER_TO_FLOOR_SEND_RECEIVE_PORT));
+			Map.entry(SubsystemComponentType.FLOOR_SUBSYSTEM, SCHEDULER_TO_FLOOR_SEND_RECEIVE_PORT),
+			Map.entry(SubsystemComponentType.GUI, SCHEDULER_TO_GUI_SEND_RECEIVE_PORT));
 
 	/**
 	 * The elevator subsystem send/receive port for the floor subsystem
@@ -68,17 +74,19 @@ public final class SubsystemCommunicationConfigurations {
 	public static final Map<SubsystemComponentType, Integer> FLOOR_PORT_MAPPING = Map.ofEntries(
 			Map.entry(SubsystemComponentType.SCHEDULER, FlOOR_TO_SCHEDULER_SEND_RECEIVE_PORT),
 			Map.entry(SubsystemComponentType.ELEVATOR_SUBSYSTEM, FlOOR_TO_ELEVATOR_SEND_RECEIVE_PORT));
+	
 
 	/**
 	 * The ip addresses of the scheduler,floor, and elevator
 	 */
-	public static String SCHEDULER_IP_ADDRESS, FLOOR_IP_ADDRESS, ELEVATOR_IP_ADDRESS;
+	public static String SCHEDULER_IP_ADDRESS, FLOOR_IP_ADDRESS, ELEVATOR_IP_ADDRESS, GUI_IP_ADDRESS;
 
 	static {
 		try {
 			SCHEDULER_IP_ADDRESS = InetAddress.getLocalHost().getHostAddress();
 			FLOOR_IP_ADDRESS = InetAddress.getLocalHost().getHostAddress();
 			ELEVATOR_IP_ADDRESS = InetAddress.getLocalHost().getHostAddress();
+			GUI_IP_ADDRESS = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
 			System.out.println(e);
 			System.exit(1);
@@ -118,6 +126,9 @@ public final class SubsystemCommunicationConfigurations {
 		case ELEVATOR_SUBSYSTEM:
 			communicationInfo = new SubsystemCommunicationInfo(ELEVATOR_IP_ADDRESS,
 					ELEVATOR_PORT_MAPPING.get(targetSubsystemType));
+			break;
+		case GUI:
+			
 			break;
 		}
 		

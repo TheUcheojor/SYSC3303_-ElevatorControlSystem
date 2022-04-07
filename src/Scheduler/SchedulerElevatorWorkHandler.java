@@ -6,7 +6,6 @@ package Scheduler;
 import java.util.logging.Logger;
 
 import common.LoggerWrapper;
-import common.gui.ElevatorControllerObserver;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
@@ -28,10 +27,15 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	 *                                       communication
 	 * @param elevatorJobManagements         the elevator job managements
 	 */
+	
+	
+	private SubsystemCommunicationRPC schedulerGUICommunication;
+	
 	public SchedulerElevatorWorkHandler(SubsystemCommunicationRPC schedulerFloorCommunication,
-			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements) {
+			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements,
+			SubsystemCommunicationRPC schedulerGUICommunication) {
 		super(schedulerFloorCommunication, schedulerElevatorCommunication, elevatorJobManagements);
-
+		this.schedulerGUICommunication = schedulerGUICommunication;
 	}
 
 	@Override
@@ -60,6 +64,13 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				if (elevatorJobManagements[elevatorId].isReadyForJob()
 						&& elevatorJobManagements[elevatorId].hasJobs()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+				}
+				
+				// Send the status message recieved
+				try {
+					schedulerGUICommunication.sendMessage(message);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 			break;

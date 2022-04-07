@@ -17,13 +17,15 @@ import com.intellij.uiDesigner.core.Spacer;
 
 import ElevatorSubsystem.ElevatorCar;
 import ElevatorSubsystem.ElevatorController;
+import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
+import common.remote_procedure.SubsystemCommunicationRPC;
 
 /**
  * @author Jacob Charpentier, Favour Olotu
  *
  */
-public class GUI extends JFrame implements ElevatorControllerObserver{
+public class GUI extends JFrame{
 	private ElevatorController elevatorController;
     private JPanel mainPanel;
     private JScrollPane logSP;
@@ -32,6 +34,11 @@ public class GUI extends JFrame implements ElevatorControllerObserver{
     private JLabel[] elevatorDoors;
     private JLabel[] elevatorDoorsStatus;
     private JLabel[] elevatorStatus;
+    
+	/**
+	 * RPC communications channel for the scheduler
+	 */
+	private SubsystemCommunicationRPC schedulerSubsystemCommunication;
 
     public GUI() {
         super("Elevator GUI");
@@ -43,6 +50,7 @@ public class GUI extends JFrame implements ElevatorControllerObserver{
         this.setResizable(true);
         this.elevatorController = null;
         this.setVisible(true);
+        recieveUpdates();
         
     }
 
@@ -116,19 +124,41 @@ public class GUI extends JFrame implements ElevatorControllerObserver{
     	this.elevatorController = elevatorController;
     }
     
-    @Override
-	public void handleStatusUpdate(ElevatorStatusMessage message) {
-//    	ElevatorCar car = elevatorController.getElevatorCar(message.getElevatorId());
-//    	
-//		logTA.append("" + car.getFloorNumber() +"\n");
-//		logTA.append("" + car.getId() +"\n");
-//		logTA.append("" + car.getErrorState() +"\n");
+    /**
+     * This method set-up a thread to continously recieve elevaor status 
+     * messages from the scheduler
+     */
+    private void recieveUpdates() {
+		(new Thread() {
+			@Override
+			public void run() {
+				// wait for scheduler messages
+				while (true) {
+					Message message;
+					try {
+						message = schedulerSubsystemCommunication.receiveMessage();
+						//Handle message by updating the GUI
+						handleStatusUpdate(message);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
+    }
+    
+
+	private void handleStatusUpdate(Message msg) {
+		ElevatorStatusMessage message = (ElevatorStatusMessage) msg;
+    	
+		logTA.append("" + message.getFloorNumber() +"\n");
+		logTA.append("" + message.getElevatorId() +"\n");
+		logTA.append("" + message.getErrorState() +"\n");
+		logTA.append("-------------\n");
 
 	}
-//    public static void main(String[] args) {
-//        JFrame frame = new GUI();
-//        frame.setVisible(true);
-//    }
+
 
 	
 }

@@ -4,7 +4,6 @@
 package Scheduler;
 
 import ElevatorSubsystem.ElevatorController;
-import common.gui.ElevatorControllerObserver;
 import common.messages.Message;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
@@ -29,6 +28,12 @@ public class Scheduler {
 	 */
 	private SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
+	
+	/**
+	 * The UDP communication between the scheduler and elevator
+	 */
+	private SubsystemCommunicationRPC schedulerGUICommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.GUI);
 
 	/**
 	 * The job management for each elevator
@@ -55,7 +60,7 @@ public class Scheduler {
 		}
 
 		this.schedulerElevatorWorkHandler = new SchedulerElevatorWorkHandler(schedulerFloorCommunication,
-				schedulerElevatorCommunication, elevatorJobManagements);
+				schedulerElevatorCommunication, elevatorJobManagements, schedulerGUICommunication);
 
 		this.schedulerFloorWorkhandler = new SchedulerFloorWorkHandler(schedulerFloorCommunication,
 				schedulerElevatorCommunication, elevatorJobManagements);
