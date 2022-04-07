@@ -32,6 +32,7 @@ public class GUI extends JFrame{
     private JLabel[] elevatorDoors;
     private JLabel[] elevatorDoorsStatus;
     private JLabel[] elevatorStatus;
+    private JLabel[] elevatorErrorStatus;
     
     private ImageIcon imgClosed = new ImageIcon("resources/elevDoorsClose.png");
     private ImageIcon imgOpen = new ImageIcon("resources/elevDoorsOpen.png");
@@ -95,6 +96,7 @@ public class GUI extends JFrame{
         elevatorDoors = new JLabel[numberElevators];
         elevatorDoorsStatus = new JLabel[numberElevators];
         elevatorStatus = new JLabel[numberElevators];
+        elevatorErrorStatus = new JLabel[numberElevators];
 
         for (int i = 1; i <= numberElevators; i++){
             int index = i - 1;
