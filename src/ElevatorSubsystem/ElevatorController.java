@@ -24,7 +24,7 @@ public class ElevatorController {
 	/**
 	 * The number of elevators in the system
 	 */
-	public final static int NUMBER_OF_ELEVATORS = 4;
+	public static int NUMBER_OF_ELEVATORS = 4;
 
 	/**
 	 * The elevator speed in meters per second.
@@ -61,7 +61,10 @@ public class ElevatorController {
 	 */
 	private SubsystemCommunicationRPC floorSubsystemCommunication;
 
-	public ElevatorController(double doorOpenCloseTime) {
+	public ElevatorController(double doorOpenCloseTime, int numberOfElevators) {
+		
+		NUMBER_OF_ELEVATORS = numberOfElevators;
+		
 		// Validate that the elevator values are valid
 		try {
 			SystemValidationUtil.validateElevatorMaxSpeed(MAX_ELEVATOR_SPEED);
@@ -147,12 +150,6 @@ public class ElevatorController {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	// For running on stand alone system
-	public static void main(String[] args) {
-		int DOOR_SPEED_MILLISECONDS = 3000;
-		ElevatorController controller = new ElevatorController(DOOR_SPEED_MILLISECONDS);
 	}
 
 }

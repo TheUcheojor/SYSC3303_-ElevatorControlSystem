@@ -33,6 +33,13 @@ public enum ElevatorCommand {
 	 */
 	MOVE_DOWN,
 	
+	/**
+	 * The shut down elevator command.
+	 */
 	SHUT_DOWN,
+	
+	/**
+	 * The restart elevator command.
+	 */
 	RESTART
 }

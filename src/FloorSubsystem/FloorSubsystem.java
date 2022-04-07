@@ -132,14 +132,6 @@ public class FloorSubsystem {
 		}
 	}
 
-	public static void main(String[] args) {
-		// Only attempt to read file when a file name as been passed
-		String inputFileName = "resources/FloorInputFile.txt";
-		double elevatorFloorToFloorTimeSeconds = 3.5;
-		
-		FloorSubsystem subsystem = new FloorSubsystem(inputFileName, elevatorFloorToFloorTimeSeconds);
-		subsystem.runMain();
-	}
 
 	/**
 	 * This is the Main function

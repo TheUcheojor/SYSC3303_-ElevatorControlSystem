@@ -167,6 +167,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				elevator.setErrorState(null);
 				break;
 			}
+			schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -12,13 +12,21 @@ import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.scheduler.PassengerDropoffCompletedMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
+import common.remote_procedure.SubsystemComponentType;
 
 /**
- * @author paulokenne
+ * @author paulokenne, Favour Olotu
  *
  */
 public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	private Logger logger = LoggerWrapper.getLogger();
+	
+	/**
+	 * The UDP communication between the scheduler and gui component
+	 */
+	private SubsystemCommunicationRPC schedulerGUICommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.GUI);
+
 
 	/**
 	 * The SchedulerFloorMessageWorkQueue constructor
@@ -41,7 +49,17 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_STATUS_MESSAGE:
 			synchronized (elevatorJobManagements) {
+				
+				// Send the status message recieved to the GUI
+				try {
+					schedulerGUICommunication.sendMessage(message);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				
 				ElevatorStatusMessage elevatorStatusMessage = (ElevatorStatusMessage) message;
+				
 				elevatorId = elevatorStatusMessage.getElevatorId();
 
 				elevatorJobManagements[elevatorId].setCurrentFloorNumber(elevatorStatusMessage.getFloorNumber());
@@ -68,6 +86,8 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						&& elevatorJobManagements[elevatorId].hasJobs()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 				}
+				
+				
 			}
 			break;
 

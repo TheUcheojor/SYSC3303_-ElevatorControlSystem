@@ -4,13 +4,14 @@ import ElevatorSubsystem.ElevatorController;
 import FloorSubsystem.FloorSubsystem;
 import Scheduler.Scheduler;
 import common.LoggerWrapper;
+import common.gui.GUI;
 
 /**
  * This class sets up and starts the elevator, floor, and scheduler systems.
  */
 
 /**
- * @author paulokenne
+ * @author paulokenne, favour olotu
  *
  */
 public class SystemExecutor {
@@ -26,19 +27,23 @@ public class SystemExecutor {
 	 */
 	public static void main(String[] args) {
 
+		GUI programDisplay = new GUI();
+		programDisplay.recieveUpdates();
+		
 		// Set up and start the scheduler
-		Scheduler scheduler = new Scheduler();
+		Scheduler scheduler = new Scheduler(programDisplay.getNumberOfElevators());
 		scheduler.runSchedulerProgram();
-
+		
 		// Set up and start the elevator controller
 		logger.info("(SYSTEM) all elevators starting at floor 0");
-		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS);
+		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS, programDisplay.getNumberOfElevators());
 
 		// Set up and start the floor subsystem
 		String inputFileName = "resources/FloorInputFile.txt";
 		FloorSubsystem subsystem = new FloorSubsystem(inputFileName,
 				ELEVATOR_MOVE_BETWEEN_FLOOR_TIME_MILLISECONDS);
 		subsystem.runMain();
-	}
+		
 
+	}
 }

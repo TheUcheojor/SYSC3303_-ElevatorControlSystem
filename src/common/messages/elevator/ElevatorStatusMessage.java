@@ -41,6 +41,9 @@ public class ElevatorStatusMessage extends Message {
 	 */
 	private Exception errorState;
 
+	private boolean isDoorOpen;
+	
+
 	/**
 	 * A flag indicating that the elevator is resolving an error
 	 */
@@ -62,7 +65,7 @@ public class ElevatorStatusMessage extends Message {
 	 *                         error
 	 */
 	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber, Exception errorState,
-			boolean isResolvingError) {
+			boolean isResolvingError, boolean doorIsOpen) {
 		super(MessageType.ELEVATOR_STATUS_MESSAGE);
 		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
 
@@ -71,6 +74,7 @@ public class ElevatorStatusMessage extends Message {
 		this.floorNumber = floorNumber;
 		this.errorState = errorState;
 		this.isResolvingError = isResolvingError;
+		this.isDoorOpen = doorIsOpen;
 	}
 
 	/**
@@ -84,7 +88,7 @@ public class ElevatorStatusMessage extends Message {
 	 *                         error
 	 */
 	public ElevatorStatusMessage(int elevatorId, Direction direction, int floorNumber, Exception errorState,
-			boolean isResolvingError, boolean issueNextCommand) {
+			boolean isResolvingError, boolean issueNextCommand, boolean doorIsOpen) {
 		super(MessageType.ELEVATOR_STATUS_MESSAGE);
 		this.timestamp = DateFormat.DATE_FORMAT.format(new Date());
 
@@ -92,6 +96,7 @@ public class ElevatorStatusMessage extends Message {
 		this.direction = direction;
 		this.floorNumber = floorNumber;
 		this.errorState = errorState;
+		this.isDoorOpen = doorIsOpen;
 		this.isResolvingError = isResolvingError;
 		this.issueNextCommand = issueNextCommand;
 	}
@@ -131,6 +136,14 @@ public class ElevatorStatusMessage extends Message {
 		return errorState;
 	}
 
+	
+	/**
+	 * @return the whether or not the door is open
+	 */
+	public boolean isDoorOpen() {
+		return isDoorOpen;
+	}
+
 	/**
 	 * @return the isResolvingError
 	 */
@@ -146,5 +159,6 @@ public class ElevatorStatusMessage extends Message {
 	public boolean shouldIssueNextCommand() {
 		return issueNextCommand;
 	}
+
 
 }

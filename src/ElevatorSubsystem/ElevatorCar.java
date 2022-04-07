@@ -7,7 +7,7 @@ import common.messages.elevator.ElevatorStatusMessage;
  * Entity representing an elevator car, composed of subcomponents for major
  * functionality.
  *
- * @author Ryan Fife, paulokenne, Favour
+ * @author Ryan Fife, paulokenne, Favour Olotu
  *
  */
 public class ElevatorCar {
@@ -73,7 +73,7 @@ public class ElevatorCar {
 	 */
 	public ElevatorStatusMessage createStatusMessage() {
 		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber,
-				errorState, isResolvingError);
+				errorState, isResolvingError, door.isOpen());
 
 		return status;
 	}
@@ -86,10 +86,12 @@ public class ElevatorCar {
 	 */
 	public ElevatorStatusMessage createCommandNonIssuingStatusMessage() {
 		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber,
-				errorState, isResolvingError, false);
+				errorState, isResolvingError, false, door.isOpen());
+
 
 		return status;
 	}
+	
 
 	/**
 	 * Get the elevator id

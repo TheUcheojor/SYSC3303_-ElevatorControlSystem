@@ -28,11 +28,12 @@ public class Scheduler {
 	 */
 	private SubsystemCommunicationRPC schedulerElevatorCommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.ELEVATOR_SUBSYSTEM);
+	
 
 	/**
 	 * The job management for each elevator
 	 */
-	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
+	private ElevatorJobManagement[] elevatorJobManagements;
 
 	/**
 	 * The work handler for the elevator
@@ -47,8 +48,9 @@ public class Scheduler {
 	/**
 	 * The Scheduler constructor
 	 */
-	public Scheduler() {
+	public Scheduler(int numberOfElevators) {
 
+		elevatorJobManagements = new ElevatorJobManagement[numberOfElevators];
 		for (int i = 0; i < elevatorJobManagements.length; i++) {
 			elevatorJobManagements[i] = new ElevatorJobManagement(i);
 		}
@@ -60,15 +62,6 @@ public class Scheduler {
 				schedulerElevatorCommunication, elevatorJobManagements);
 	}
 
-	/**
-	 * The main function of the Scheduler
-	 *
-	 * @param args
-	 */
-	public void main(String[] args) {
-		Scheduler scheduler = new Scheduler();
-		scheduler.runSchedulerProgram();
-	}
 
 	/**
 	 * The function runs the message queue for floor and elevator

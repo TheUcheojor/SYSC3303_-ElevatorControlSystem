@@ -32,7 +32,7 @@ import common.remote_procedure.SubsystemComponentType;
  * This class tests how the scheduler communicates with the Elevator and manages
  * elevator messages
  *
- * @author paulokenne Favour Olotu
+ * @author paulokenne, Favour Olotu
  *
  */
 public class SchedulerElevatorWorkHandlerTest {
@@ -135,7 +135,7 @@ public class SchedulerElevatorWorkHandlerTest {
 		// The elevator is at floor 1 and is sending a status message.
 		currentFloorNumber = 1;
 		ElevatorStatusMessage elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN,
-				currentFloorNumber, null, false);
+				currentFloorNumber, null, false, false);
 
 		// Add elevator message and let the scheduler work
 		schedulerElevatorWorkHandler.enqueueMessage(elevatorStatusMessage);
@@ -155,7 +155,7 @@ public class SchedulerElevatorWorkHandlerTest {
 
 		// The elevator is at floor 0 and is sending a status message.
 		currentFloorNumber = 0;
-		elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN, currentFloorNumber, null, false);
+		elevatorStatusMessage = new ElevatorStatusMessage(elevatorId, Direction.DOWN, currentFloorNumber, null, false, false);
 
 		simulateElevatorSubsystemWaitingForCommand();
 		simulateElevatorSubsystemWaitingForCommand();
