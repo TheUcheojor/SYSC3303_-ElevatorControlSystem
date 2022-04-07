@@ -27,7 +27,6 @@ import common.remote_procedure.SubsystemComponentType;
  *
  */
 public class GUI extends JFrame{
-	private ElevatorController elevatorController;
     private JPanel mainPanel;
     private JScrollPane logSP;
     private JTextArea logTA;
@@ -50,7 +49,6 @@ public class GUI extends JFrame{
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setContentPane(mainPanel);
         this.setResizable(true);
-        this.elevatorController = null;
         this.setVisible(true);
         //recieveUpdates();
         
@@ -122,10 +120,7 @@ public class GUI extends JFrame{
         }
     }
 
-    public void setEle(ElevatorController elevatorController) {
-    	this.elevatorController = elevatorController;
-    }
-    
+
     /**
      * This method set-up a thread to continously recieve elevaor status 
      * messages from the scheduler
