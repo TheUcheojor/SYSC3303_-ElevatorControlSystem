@@ -172,7 +172,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP, elevatorId));
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS, elevatorId));
-
+				
 				// We can delete these jobs as we know we have addressed them
 				elevatorJobManagement.removeJobs(jobsAtTargetFloor);
 
