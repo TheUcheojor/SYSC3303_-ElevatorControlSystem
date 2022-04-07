@@ -33,7 +33,7 @@ public class Scheduler {
 	/**
 	 * The job management for each elevator
 	 */
-	private ElevatorJobManagement[] elevatorJobManagements = new ElevatorJobManagement[ElevatorController.NUMBER_OF_ELEVATORS];
+	private ElevatorJobManagement[] elevatorJobManagements;
 
 	/**
 	 * The work handler for the elevator
@@ -48,8 +48,9 @@ public class Scheduler {
 	/**
 	 * The Scheduler constructor
 	 */
-	public Scheduler() {
+	public Scheduler(int numberOfElevators) {
 
+		elevatorJobManagements = new ElevatorJobManagement[numberOfElevators];
 		for (int i = 0; i < elevatorJobManagements.length; i++) {
 			elevatorJobManagements[i] = new ElevatorJobManagement(i);
 		}

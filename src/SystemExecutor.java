@@ -31,11 +31,9 @@ public class SystemExecutor {
 		programDisplay.recieveUpdates();
 		
 		// Set up and start the scheduler
-		Scheduler scheduler = new Scheduler();
+		Scheduler scheduler = new Scheduler(programDisplay.getNumberOfElevators());
 		scheduler.runSchedulerProgram();
 		
-		
-
 		// Set up and start the elevator controller
 		logger.info("(SYSTEM) all elevators starting at floor 0");
 		ElevatorController elevatorController = new ElevatorController(DOOR_OPEN_CLOSE_TIME_MILLISECONDS, programDisplay.getNumberOfElevators());

@@ -64,6 +64,8 @@ public class ElevatorController {
 	public ElevatorController(double doorOpenCloseTime, int numberOfElevators) {
 		
 		NUMBER_OF_ELEVATORS = numberOfElevators;
+		System.out.println(numberOfElevators);
+		System.out.println(this.NUMBER_OF_ELEVATORS);
 		
 		// Validate that the elevator values are valid
 		try {
