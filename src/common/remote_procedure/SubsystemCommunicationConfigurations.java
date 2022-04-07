@@ -26,7 +26,7 @@ public final class SubsystemCommunicationConfigurations {
 	private static final int SCHEDULER_TO_ELEVATOR_SEND_RECEIVE_PORT = 11001;
 	
 	/**
-	 * The scheduler send/receive port for the elevator subsystem
+	 * The scheduler send/receive port for the GUI component
 	 */
 	private static final int SCHEDULER_TO_GUI_SEND_RECEIVE_PORT = 11002;
 
