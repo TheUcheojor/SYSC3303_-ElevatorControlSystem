@@ -27,7 +27,7 @@ import common.remote_procedure.SubsystemComponentType;
  * This class tests how the scheduler communicates with the Elevator and manages
  * elevator messages
  *
- * @author paulokenne Favour Olotu
+ * @author paulokenne, Favour Olotu
  *
  */
 public class SchedulerElevatorWorkHandlerTest {

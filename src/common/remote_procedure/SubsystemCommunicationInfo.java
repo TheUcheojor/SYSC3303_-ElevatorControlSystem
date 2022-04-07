@@ -2,7 +2,7 @@ package common.remote_procedure;
 
 import java.net.InetAddress;
 
-/*
+/**
  * The class stores the communication information for a given subsystem.
  */
 public class SubsystemCommunicationInfo {

@@ -6,7 +6,7 @@ package common.remote_procedure;
 /**
  * This class contains the different types of subsystems
  *
- * @author paulokenne
+ * @author paulokenne, favour olotu 
  *
  */
 public enum SubsystemComponentType {

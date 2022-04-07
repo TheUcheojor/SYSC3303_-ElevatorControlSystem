@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * This class provides the configuration values for each subystem
  *
- * @author paulokenne
+ * @author paulokenne, favour olotu
  *
  */
 public final class SubsystemCommunicationConfigurations {

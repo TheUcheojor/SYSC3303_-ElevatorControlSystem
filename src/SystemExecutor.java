@@ -11,7 +11,7 @@ import common.gui.GUI;
  */
 
 /**
- * @author paulokenne
+ * @author paulokenne, favour olotu
  *
  */
 public class SystemExecutor {

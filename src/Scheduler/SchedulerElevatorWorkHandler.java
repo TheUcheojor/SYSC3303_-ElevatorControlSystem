@@ -14,11 +14,18 @@ import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 
 /**
- * @author paulokenne
+ * @author paulokenne, Favour Olotu
  *
  */
 public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	private Logger logger = LoggerWrapper.getLogger();
+	
+	/**
+	 * The UDP communication between the scheduler and gui component
+	 */
+	private SubsystemCommunicationRPC schedulerGUICommunication = new SubsystemCommunicationRPC(
+			SubsystemComponentType.SCHEDULER, SubsystemComponentType.GUI);
+
 
 	/**
 	 * The SchedulerFloorMessageWorkQueue constructor
@@ -28,15 +35,6 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	 *                                       communication
 	 * @param elevatorJobManagements         the elevator job managements
 	 */
-	
-	
-	/**
-	 * The UDP communication between the scheduler and elevator
-	 */
-	
-	private SubsystemCommunicationRPC schedulerGUICommunication = new SubsystemCommunicationRPC(
-			SubsystemComponentType.SCHEDULER, SubsystemComponentType.GUI);
-
 	public SchedulerElevatorWorkHandler(SubsystemCommunicationRPC schedulerFloorCommunication,
 			SubsystemCommunicationRPC schedulerElevatorCommunication, ElevatorJobManagement[] elevatorJobManagements) {
 		super(schedulerFloorCommunication, schedulerElevatorCommunication, elevatorJobManagements);
@@ -51,7 +49,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 		case ELEVATOR_STATUS_MESSAGE:
 			synchronized (elevatorJobManagements) {
 				
-				// Send the status message recieved
+				// Send the status message recieved to the GUI
 				try {
 					schedulerGUICommunication.sendMessage(message);
 				} catch (Exception e) {

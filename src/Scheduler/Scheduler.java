@@ -77,7 +77,6 @@ public class Scheduler {
 	public void runSchedulerProgram() {
 		setUpMessageQueueing(schedulerFloorCommunication, schedulerFloorWorkhandler);
 		setUpMessageQueueing(schedulerElevatorCommunication, schedulerElevatorWorkHandler);
-//		setUpMessageQueueing(schedulerGUICommunication, schedulerElevatorWorkHandler);
 	}
 
 	/**
