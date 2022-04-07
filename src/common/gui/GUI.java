@@ -159,7 +159,7 @@ public class GUI extends JFrame{
 		ElevatorStatusMessage message = (ElevatorStatusMessage) msg;
 		
 		// Updating the log component
-		logTA.append("Elevator " + message.getElevatorId() + " has reached floor: " + message.getFloorNumber() +"\n");
+		logTA.append("Elevator " + message.getElevatorId() + " is at floor: " + message.getFloorNumber() +"\n");
 		if (message.getErrorState() != null) logTA.append("Error State => " + message.getErrorState() +"\n");
 		logTA.append("-------------\n");
 
