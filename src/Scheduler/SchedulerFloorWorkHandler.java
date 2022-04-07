@@ -61,6 +61,9 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 			try {
 				ElevatorStateException exception = new ElevatorStateException(FloorInputFault.STUCK_AT_FLOOR_FAULT, stuckMessage.getFloorNumber(), "Elevator is stuck");
 				elevatorJobManagements[stuckMessage.getElevatorId()].setErrorState(exception);
+				
+				notifyElevatorShutdownCompletedJobs(elevatorJobManagements[stuckMessage.getElevatorId()]);
+				
 				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.SHUT_DOWN, stuckMessage.getElevatorId()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
