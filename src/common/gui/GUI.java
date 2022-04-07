@@ -15,8 +15,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
-import ElevatorSubsystem.ElevatorCar;
-import ElevatorSubsystem.ElevatorController;
+import common.Direction;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -35,6 +34,9 @@ public class GUI extends JFrame{
     private JLabel[] elevatorDoorsStatus;
     private JLabel[] elevatorStatus;
     
+    private ImageIcon imgClosed = new ImageIcon("resources/elevDoorsClose.png");
+    private ImageIcon imgOpen = new ImageIcon("resources/elevDoorsOpen.png");
+    
 	/**
 	 * RPC communications channel for the scheduler
 	 */
@@ -50,7 +52,6 @@ public class GUI extends JFrame{
         this.setContentPane(mainPanel);
         this.setResizable(true);
         this.setVisible(true);
-        //recieveUpdates();
         
     }
 
@@ -59,8 +60,7 @@ public class GUI extends JFrame{
         int numElevs = (Integer)JOptionPane.showInputDialog(this, "Select Number of Elevators",
                 "Elevator Setup", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        ImageIcon imgClosed = new ImageIcon("resources/elevDoorsClose.png");
-        ImageIcon imgOpen = new ImageIcon("resources/elevDoorsOpen.png");
+        
 
         this.setSize(500 + numElevs * 100, 350);
 
@@ -86,6 +86,7 @@ public class GUI extends JFrame{
         panel1.add(label6, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 
         logTA = new JTextArea();
+        logTA.setEditable(false);
         logTA.setLineWrap(true);
         logSP.setViewportView(logTA);
 
@@ -148,12 +149,13 @@ public class GUI extends JFrame{
 
 	private void handleStatusUpdate(Message msg) {
 		ElevatorStatusMessage message = (ElevatorStatusMessage) msg;
-    	
-		logTA.append("" + message.getFloorNumber() +"\n");
-		logTA.append("" + message.getElevatorId() +"\n");
-		logTA.append("" + message.getErrorState() +"\n");
+		
+		// Updating the log component
+		logTA.append("Elevator " + message.getElevatorId() + " has reached floor: " + message.getFloorNumber() +"\n");
+		if (message.getErrorState() != null) logTA.append("Error State => " + message.getErrorState() +"\n");
 		logTA.append("-------------\n");
 
+		// Updating the needed elevator
 	}
 
 
