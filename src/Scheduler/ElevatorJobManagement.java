@@ -52,6 +52,11 @@ public class ElevatorJobManagement {
 	private boolean readyForJob;
 
 	/**
+	 * A flag indicating if the elevator is running a command
+	 */
+	private boolean isRunningCommand = false;
+
+	/**
 	 * THe constructor for ElevatorJobManagement
 	 *
 	 * @param elevatorId
@@ -67,6 +72,20 @@ public class ElevatorJobManagement {
 	 */
 	public void addJob(ElevatorJobMessage elevatorJob) {
 		elevatorJobs.add(elevatorJob);
+	}
+
+	/**
+	 * @return the isRunningCommand
+	 */
+	public boolean isRunningCommand() {
+		return isRunningCommand;
+	}
+
+	/**
+	 * @param isRunningCommand the isRunningCommand to set
+	 */
+	public void setRunningCommand(boolean isRunningCommand) {
+		this.isRunningCommand = isRunningCommand;
 	}
 
 	/**
@@ -289,16 +308,6 @@ public class ElevatorJobManagement {
 	 */
 	public void setCurrentFloorNumber(int currentFloorNumber) {
 		this.currentFloorNumber = currentFloorNumber;
-	}
-
-	/**
-	 * Return whether an elevator has jobs
-	 *
-	 *
-	 * @return true if the elevator has jobs; otherwise, return false
-	 */
-	public boolean hasJobs() {
-		return elevatorDirection != Direction.IDLE;
 	}
 
 	/**

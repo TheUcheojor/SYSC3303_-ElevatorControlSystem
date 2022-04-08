@@ -108,6 +108,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			case CLOSE_DOORS:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
 				elevator.getDoor().closeDoor();
+
 				break;
 			case OPEN_DOORS:
 				if (!elevator.getMotor().getIsRunning()) {
@@ -118,6 +119,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 							new ElevatorStateException(null, "Attempted to open doors while motor running"));
 				}
 
+				schedulerSubsystemCommunication
+						.sendMessage(elevator.createCommandNonIssuingStatusMessage().forGuiOnly());
 				break;
 			case MOVE_UP:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
@@ -159,6 +162,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			case SHUT_DOWN:
 				elevator.setInService(false);
 				elevator.setErrorState(command.getException());
+				schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 				break;
 
 			case RESTART:
@@ -166,7 +170,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				elevator.setErrorState(null);
 				break;
 			}
-			schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -186,6 +190,13 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
 		if (elevator.getErrorState() == null) {
 			elevator.getDoor().closeDoor();
+			try {
+				schedulerSubsystemCommunication
+						.sendMessage(elevator.createCommandNonIssuingStatusMessage().forGuiOnly());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return true;
 		}
 
@@ -242,7 +253,9 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		// If we are here, it means we have an error state that is not door stuck open
 		// Because we have an error state, the door should be out of service and
 		// the door-close operation will not work.
-		try {
+		try
+
+		{
 			elevator.setInService(false);
 			// Update the scheduler of the error
 			schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());

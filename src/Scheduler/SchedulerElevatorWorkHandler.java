@@ -48,7 +48,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 		case ELEVATOR_STATUS_MESSAGE:
 			synchronized (elevatorJobManagements) {
 
-				// Send the status message recieved to the GUI
+				// Send the status message received to the GUI
 				try {
 					schedulerGUICommunication.sendMessage(message);
 				} catch (Exception e) {
@@ -56,6 +56,11 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				}
 
 				ElevatorStatusMessage elevatorStatusMessage = (ElevatorStatusMessage) message;
+
+				// Do not proceed if the status message is solely for the GUI
+				if (elevatorStatusMessage.isGUIOnly()) {
+					return;
+				}
 
 				elevatorId = elevatorStatusMessage.getElevatorId();
 
@@ -78,10 +83,14 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 					return;
 				}
 
-				// If the elevator is ready for job and has jobs, issue the next command
+				elevatorJobManagements[elevatorId].setRunningCommand(false);
+
+				// If the elevator is ready for job and is currently running jobs, issue the
+				// next command
 				if (elevatorJobManagements[elevatorId].isReadyForJob()
-						&& elevatorJobManagements[elevatorId].hasJobs()) {
+						&& elevatorJobManagements[elevatorId].isRunningJob()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+
 				}
 
 			}
@@ -95,10 +104,9 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 				// If the elevators has no jobs (direction is IDLE), we will update the elevator
 				// direction
-				if (!elevatorJobManagements[elevatorId].hasJobs()) {
+				if (!elevatorJobManagements[elevatorId].isRunningJob()) {
 					elevatorJobManagements[elevatorId].setElevatorDirection(dropPassengerRequest.getDirection());
 				}
-
 				elevatorJobManagements[elevatorId].addJob((ElevatorJobMessage) message);
 
 				logger.info("(SCHEDULER) Assigning DROP_OFF_PASSENGER @ floor = "
@@ -109,11 +117,8 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						+ elevatorJobManagements[elevatorId].getCurrentFloorNumber() + ", D: "
 						+ elevatorJobManagements[elevatorId].getElevatorDirection() + "]");
 
-				// Only send the next command if there is one job. If we have multiple jobs,
-				// we know that commands will continue to given.
-				if (elevatorJobManagements[elevatorId].getNumberOfPrimaryJobs() == 1) {
-					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
-				}
+				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+
 			}
 
 			break;

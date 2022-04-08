@@ -14,6 +14,7 @@ import common.messages.floor.ElevatorFloorRequest;
 import common.messages.floor.ElevatorNotArrived;
 import common.messages.scheduler.ElevatorCommand;
 import common.messages.scheduler.FloorCommand;
+import common.messages.scheduler.PassengerDropoffCompletedMessage;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.messages.scheduler.SchedulerFloorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
@@ -61,9 +62,11 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 			try {
 				ElevatorStateException exception = new ElevatorStateException(FloorInputFault.STUCK_AT_FLOOR_FAULT,
 						stuckMessage.getFloorNumber(), "Elevator is stuck");
-				elevatorJobManagements[stuckMessage.getElevatorId()].setErrorState(exception);
 
-				notifyElevatorShutdownCompletedJobs(elevatorJobManagements[stuckMessage.getElevatorId()]);
+				synchronized (elevatorJobManagements) {
+					elevatorJobManagements[stuckMessage.getElevatorId()].setErrorState(exception);
+				}
+
 				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.SHUT_DOWN,
 						stuckMessage.getElevatorId(), exception));
 
@@ -117,6 +120,14 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 				logger.fine(
 						"No Elevator is available...Scheduler is ingoring the received Passenger-Pick-Up REQUEST @ Floor "
 								+ elevatorFloorJob.getDestinationFloor());
+
+				// Consider the job addressed
+				try {
+					schedulerFloorCommunication
+							.sendMessage(new PassengerDropoffCompletedMessage(elevatorFloorJob.getFloorInputId()));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				return;
 			}
 

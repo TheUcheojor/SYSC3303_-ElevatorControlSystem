@@ -88,10 +88,8 @@ public class ElevatorCar {
 		ElevatorStatusMessage status = new ElevatorStatusMessage(id, this.getMotor().getDirection(), floorNumber,
 				errorState, isResolvingError, false, door.isOpen());
 
-
 		return status;
 	}
-	
 
 	/**
 	 * Get the elevator id
