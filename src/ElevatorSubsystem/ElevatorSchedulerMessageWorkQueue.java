@@ -1,6 +1,5 @@
 package ElevatorSubsystem;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 import FloorSubsystem.FloorInputFault;
@@ -9,7 +8,6 @@ import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
-import common.messages.elevator.ElevatorStatusRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
@@ -116,7 +114,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 					logger.fine("(ELEVATOR) Elevator " + elevatorId + " door opening");
 					elevator.getDoor().openDoor();
 				} else {
-					elevator.setErrorState(new ElevatorStateException(null, "Attempted to open doors while motor running"));
+					elevator.setErrorState(
+							new ElevatorStateException(null, "Attempted to open doors while motor running"));
 				}
 
 				break;
@@ -131,8 +130,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				elevator.getMotor().goUp();
 
 				leavingMessage = new ElevatorLeavingFloorMessage(elevatorId, carFloorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(elevator.getId(), carFloorNumber + 1, elevator.getMotor(),
-						true);
+				comingMessage = new ElevatorFloorSignalRequestMessage(elevator.getId(), carFloorNumber + 1,
+						elevator.getMotor(), true);
 
 				floorSubsystemCommunication.sendMessage(leavingMessage);
 				floorSubsystemCommunication.sendMessage(comingMessage);
@@ -149,8 +148,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				elevator.getMotor().goDown();
 
 				leavingMessage = new ElevatorLeavingFloorMessage(elevatorId, carFloorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(elevatorId, carFloorNumber - 1, elevator.getMotor(),
-						true);
+				comingMessage = new ElevatorFloorSignalRequestMessage(elevatorId, carFloorNumber - 1,
+						elevator.getMotor(), true);
 
 				floorSubsystemCommunication.sendMessage(leavingMessage);
 				floorSubsystemCommunication.sendMessage(comingMessage);
@@ -176,7 +175,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	/**
 	 * The close door process
 	 *
-	 * @param elevator        the elevator
+	 * @param elevator   the elevator
 	 * @param elevatorId the elevator id
 	 * @return true if the close door process and false otherwise
 	 */
@@ -230,13 +229,12 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
 			// Notify the scheduler that the elevator is no longer attempting to resolve an
 			// issue and that the elevator has shut down.
+			logger.severe("(Elevator) Elevator " + elevatorId
+					+ " exhausted its retry attempts to close the door. Shutting down....");
 			try {
 				schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 			} catch (Exception e) {
 			}
-
-			logger.severe("(Elevator) Elevator " + elevatorId
-					+ " exhausted its retry attempts to close the door. Shutting down....");
 
 			return false;
 		}
@@ -247,7 +245,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		try {
 			elevator.setInService(false);
 			// Update the scheduler of the error
-			schedulerSubsystemCommunication.sendMessage(elevator.createStatusMessage());
+			schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 		} catch (Exception e) {
 		}
 

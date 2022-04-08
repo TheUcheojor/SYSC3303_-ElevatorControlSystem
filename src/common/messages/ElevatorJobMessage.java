@@ -20,7 +20,7 @@ public abstract class ElevatorJobMessage extends Message {
 	 * The direction
 	 */
 	private Direction direction;
-	
+
 	/**
 	 * The floor input id
 	 */
@@ -39,8 +39,6 @@ public abstract class ElevatorJobMessage extends Message {
 		this.direction = direction;
 		this.floorInputId = floorInputId;
 	}
-	
-	
 
 	/**
 	 * @return the floorInputId
@@ -48,8 +46,6 @@ public abstract class ElevatorJobMessage extends Message {
 	public int getFloorInputId() {
 		return floorInputId;
 	}
-
-
 
 	/**
 	 * Get the destination floor
@@ -71,7 +67,7 @@ public abstract class ElevatorJobMessage extends Message {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(destinationFloor, direction);
+		return Objects.hash(destinationFloor, direction, floorInputId);
 	}
 
 	@Override
@@ -83,7 +79,7 @@ public abstract class ElevatorJobMessage extends Message {
 		if (getClass() != obj.getClass())
 			return false;
 		ElevatorJobMessage other = (ElevatorJobMessage) obj;
-		return destinationFloor == other.destinationFloor && direction == other.direction;
+		return destinationFloor == other.destinationFloor && direction == other.direction
+				&& floorInputId == other.floorInputId;
 	}
-
 }

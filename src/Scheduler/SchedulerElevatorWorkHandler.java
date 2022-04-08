@@ -10,7 +10,6 @@ import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
-import common.messages.scheduler.PassengerDropoffCompletedMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 
@@ -20,13 +19,12 @@ import common.remote_procedure.SubsystemComponentType;
  */
 public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	private Logger logger = LoggerWrapper.getLogger();
-	
+
 	/**
 	 * The UDP communication between the scheduler and gui component
 	 */
 	private SubsystemCommunicationRPC schedulerGUICommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.GUI);
-
 
 	/**
 	 * The SchedulerFloorMessageWorkQueue constructor
@@ -49,17 +47,16 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_STATUS_MESSAGE:
 			synchronized (elevatorJobManagements) {
-				
+
 				// Send the status message recieved to the GUI
 				try {
 					schedulerGUICommunication.sendMessage(message);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-				
+
 				ElevatorStatusMessage elevatorStatusMessage = (ElevatorStatusMessage) message;
-				
+
 				elevatorId = elevatorStatusMessage.getElevatorId();
 
 				elevatorJobManagements[elevatorId].setCurrentFloorNumber(elevatorStatusMessage.getFloorNumber());
@@ -73,9 +70,9 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				logger.fine("(SCHEDULER) Received Elevator status: [ID: " + elevatorId + ", F: "
 						+ elevatorStatusMessage.getFloorNumber() + ", D: " + elevatorStatusMessage.getDirection()
 						+ ", ErrorState: " + elevatorStatusMessage.getErrorState() + " ]");
-				
+
 				notifyElevatorShutdownCompletedJobs(elevatorJobManagements[elevatorId]);
-				
+
 				// If the scheduler should not give any commands, do not proceed any further
 				if (!elevatorStatusMessage.shouldIssueNextCommand()) {
 					return;
@@ -86,8 +83,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						&& elevatorJobManagements[elevatorId].hasJobs()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
 				}
-				
-				
+
 			}
 			break;
 
@@ -113,7 +109,11 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						+ elevatorJobManagements[elevatorId].getCurrentFloorNumber() + ", D: "
 						+ elevatorJobManagements[elevatorId].getElevatorDirection() + "]");
 
-				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+				// Only send the next command if there is one job. If we have multiple jobs,
+				// we know that commands will continue to given.
+				if (elevatorJobManagements[elevatorId].getNumberOfPrimaryJobs() == 1) {
+					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+				}
 			}
 
 			break;
