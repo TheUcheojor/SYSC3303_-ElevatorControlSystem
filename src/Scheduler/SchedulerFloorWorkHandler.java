@@ -64,7 +64,7 @@ public class SchedulerFloorWorkHandler extends SchedulerWorkHandler {
 				
 				notifyElevatorShutdownCompletedJobs(elevatorJobManagements[stuckMessage.getElevatorId()]);
 				
-				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.SHUT_DOWN, stuckMessage.getElevatorId()));
+				schedulerElevatorCommunication.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.SHUT_DOWN, stuckMessage.getElevatorId(), exception));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				logger.severe(e.toString());
