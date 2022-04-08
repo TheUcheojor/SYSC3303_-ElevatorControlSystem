@@ -1,24 +1,19 @@
 package FloorSubsystem;
 
 import java.io.BufferedReader;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import common.LoggerWrapper;
 import common.SimulationFloorInputData;
-import common.SystemValidationUtil;
-import common.exceptions.InvalidSystemConfigurationInputException;
 import common.messages.Message;
 import common.messages.floor.ElevatorFloorRequest;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 import common.work_management.MessageWorkQueue;
-import java.util.concurrent.TimeUnit;
-
-import java.util.logging.Logger;
 
 /**
  * This class simulates the FloorSubsystem thread
@@ -27,7 +22,6 @@ import java.util.logging.Logger;
  */
 public class FloorSubsystem {
 
-	
 	private Logger logger = LoggerWrapper.getLogger();
 	/**
 	 * Delay between sending requests from the floor input file to the scheduler.
@@ -132,7 +126,6 @@ public class FloorSubsystem {
 		}
 	}
 
-
 	/**
 	 * This is the Main function
 	 */
@@ -149,8 +142,9 @@ public class FloorSubsystem {
 			@Override
 			public void run() {
 				// wait for scheduler messages
-	
-				for (SimulationFloorInputData floorInputData : (ArrayList<SimulationFloorInputData>)floorDataCollection.clone()) {
+
+				for (SimulationFloorInputData floorInputData : (ArrayList<SimulationFloorInputData>) floorDataCollection
+						.clone()) {
 
 					ElevatorFloorRequest elevatorFloorRequest = new ElevatorFloorRequest(
 							floorInputData.getCurrentFloor(), floorInputData.getFloorDirectionButton(),
@@ -169,22 +163,20 @@ public class FloorSubsystem {
 						e.printStackTrace();
 					}
 				}
-				
+
 			}
 		}).start();
-		
+
 		(new Thread() {
 			@Override
 			public void run() {
 				long startTime = System.nanoTime();
-				while(true) {
-					synchronized(floorDataCollection) {
-						if(floorDataCollection.isEmpty()) {
+				while (true) {
+					synchronized (floorDataCollection) {
+						if (floorDataCollection.isEmpty()) {
 							break;
 						}
-						
 					}
-
 				}
 				/* … The code being measured ends … */
 				long endTime = System.nanoTime();

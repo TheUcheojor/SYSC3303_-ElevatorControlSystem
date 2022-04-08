@@ -75,7 +75,7 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	 * @return the input data
 	 */
 	private SimulationFloorInputData getFloorData(int inputDataId) {
-		synchronized(floorDataCollection) {
+		synchronized (floorDataCollection) {
 			for (SimulationFloorInputData floorData : floorDataCollection) {
 				if (floorData.getInputDataId() == inputDataId) {
 					return floorData;
@@ -137,13 +137,14 @@ public class FloorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		case PRODUCE_STUCK_FAULT_WITH_ELEVATOR:
 			floors[floorId].setElevatorIdToFault(request.getElevatorId());
 			break;
-			
+
 		case PASSENGER_DROP_OFF_COMPLETE:
 			PassengerDropoffCompletedMessage passengerDropoffCompletedMessage = (PassengerDropoffCompletedMessage) request;
-			
+
 			synchronized (floorDataCollection) {
-				floorDataCollection.removeIf(floorInputData -> passengerDropoffCompletedMessage.getFloorInputDataId()== floorInputData.getInputDataId());
-			
+				floorDataCollection.removeIf(floorInputData -> passengerDropoffCompletedMessage
+						.getFloorInputDataId() == floorInputData.getInputDataId());
+
 			}
 			break;
 

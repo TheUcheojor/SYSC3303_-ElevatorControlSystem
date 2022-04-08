@@ -1,6 +1,5 @@
 package ElevatorSubsystem;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 import FloorSubsystem.FloorInputFault;
@@ -9,7 +8,6 @@ import common.exceptions.ElevatorStateException;
 import common.messages.Message;
 import common.messages.elevator.ElevatorFloorSignalRequestMessage;
 import common.messages.elevator.ElevatorLeavingFloorMessage;
-import common.messages.elevator.ElevatorStatusRequest;
 import common.messages.scheduler.SchedulerElevatorCommand;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.work_management.MessageWorkQueue;
@@ -110,15 +108,19 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			case CLOSE_DOORS:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
 				elevator.getDoor().closeDoor();
+
 				break;
 			case OPEN_DOORS:
 				if (!elevator.getMotor().getIsRunning()) {
 					logger.fine("(ELEVATOR) Elevator " + elevatorId + " door opening");
 					elevator.getDoor().openDoor();
 				} else {
-					elevator.setErrorState(new ElevatorStateException(null, "Attempted to open doors while motor running"));
+					elevator.setErrorState(
+							new ElevatorStateException(null, "Attempted to open doors while motor running"));
 				}
 
+				schedulerSubsystemCommunication
+						.sendMessage(elevator.createCommandNonIssuingStatusMessage().forGuiOnly());
 				break;
 			case MOVE_UP:
 				logger.fine("(ELEVATOR) Elevator " + elevatorId + " door closing");
@@ -131,8 +133,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				elevator.getMotor().goUp();
 
 				leavingMessage = new ElevatorLeavingFloorMessage(elevatorId, carFloorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(elevator.getId(), carFloorNumber + 1, elevator.getMotor(),
-						true);
+				comingMessage = new ElevatorFloorSignalRequestMessage(elevator.getId(), carFloorNumber + 1,
+						elevator.getMotor(), true);
 
 				floorSubsystemCommunication.sendMessage(leavingMessage);
 				floorSubsystemCommunication.sendMessage(comingMessage);
@@ -149,8 +151,8 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				elevator.getMotor().goDown();
 
 				leavingMessage = new ElevatorLeavingFloorMessage(elevatorId, carFloorNumber);
-				comingMessage = new ElevatorFloorSignalRequestMessage(elevatorId, carFloorNumber - 1, elevator.getMotor(),
-						true);
+				comingMessage = new ElevatorFloorSignalRequestMessage(elevatorId, carFloorNumber - 1,
+						elevator.getMotor(), true);
 
 				floorSubsystemCommunication.sendMessage(leavingMessage);
 				floorSubsystemCommunication.sendMessage(comingMessage);
@@ -160,6 +162,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 			case SHUT_DOWN:
 				elevator.setInService(false);
 				elevator.setErrorState(command.getException());
+				schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 				break;
 
 			case RESTART:
@@ -167,7 +170,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 				elevator.setErrorState(null);
 				break;
 			}
-			schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -176,7 +179,7 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 	/**
 	 * The close door process
 	 *
-	 * @param elevator        the elevator
+	 * @param elevator   the elevator
 	 * @param elevatorId the elevator id
 	 * @return true if the close door process and false otherwise
 	 */
@@ -187,6 +190,13 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
 		if (elevator.getErrorState() == null) {
 			elevator.getDoor().closeDoor();
+			try {
+				schedulerSubsystemCommunication
+						.sendMessage(elevator.createCommandNonIssuingStatusMessage().forGuiOnly());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return true;
 		}
 
@@ -230,13 +240,12 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 
 			// Notify the scheduler that the elevator is no longer attempting to resolve an
 			// issue and that the elevator has shut down.
+			logger.severe("(Elevator) Elevator " + elevatorId
+					+ " exhausted its retry attempts to close the door. Shutting down....");
 			try {
 				schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 			} catch (Exception e) {
 			}
-
-			logger.severe("(Elevator) Elevator " + elevatorId
-					+ " exhausted its retry attempts to close the door. Shutting down....");
 
 			return false;
 		}
@@ -244,10 +253,12 @@ public class ElevatorSchedulerMessageWorkQueue extends MessageWorkQueue {
 		// If we are here, it means we have an error state that is not door stuck open
 		// Because we have an error state, the door should be out of service and
 		// the door-close operation will not work.
-		try {
+		try
+
+		{
 			elevator.setInService(false);
 			// Update the scheduler of the error
-			schedulerSubsystemCommunication.sendMessage(elevator.createStatusMessage());
+			schedulerSubsystemCommunication.sendMessage(elevator.createCommandNonIssuingStatusMessage());
 		} catch (Exception e) {
 		}
 

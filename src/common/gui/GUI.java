@@ -69,7 +69,7 @@ public class GUI extends JFrame{
         this.setSize(500 + numberElevators * 100, 350);
 
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayoutManager(6, 2 + numberElevators, new Insets(0, 0, 0, 0), -1, -1));
+        mainPanel.setLayout(new GridLayoutManager(7, 2 + numberElevators, new Insets(0, 0, 0, 0), -1, -1));
         
         final JLabel label1 = new JLabel();
         label1.setText("Log(s)");
@@ -100,11 +100,11 @@ public class GUI extends JFrame{
         elevatorStatus = new JLabel[numberElevators];
         elevatorErrorStatus = new JLabel[numberElevators];
 
-        for (int i = 1; i <= numberElevators; i++){
-            int index = i - 1;
+        for (int i = 2; i <= numberElevators + 1; i++){
+            int index = i - 2;
 
             JLabel label = new JLabel();
-            label.setText("Elevator " + i);
+            label.setText("Elevator " + (i-2));
             mainPanel.add(label, new GridConstraints(0, i, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, 1, null, new Dimension(53, 50), null, 0, false));
 
             elevatorFlrLabels[index] = new JLabel();

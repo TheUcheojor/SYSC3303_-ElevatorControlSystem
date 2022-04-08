@@ -10,7 +10,6 @@ import common.messages.ElevatorJobMessage;
 import common.messages.Message;
 import common.messages.elevator.ElevatorStatusMessage;
 import common.messages.elevator.ElevatorTransportRequest;
-import common.messages.scheduler.PassengerDropoffCompletedMessage;
 import common.remote_procedure.SubsystemCommunicationRPC;
 import common.remote_procedure.SubsystemComponentType;
 
@@ -20,13 +19,12 @@ import common.remote_procedure.SubsystemComponentType;
  */
 public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 	private Logger logger = LoggerWrapper.getLogger();
-	
+
 	/**
 	 * The UDP communication between the scheduler and gui component
 	 */
 	private SubsystemCommunicationRPC schedulerGUICommunication = new SubsystemCommunicationRPC(
 			SubsystemComponentType.SCHEDULER, SubsystemComponentType.GUI);
-
 
 	/**
 	 * The SchedulerFloorMessageWorkQueue constructor
@@ -49,17 +47,21 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 		case ELEVATOR_STATUS_MESSAGE:
 			synchronized (elevatorJobManagements) {
-				
-				// Send the status message recieved to the GUI
+
+				// Send the status message received to the GUI
 				try {
 					schedulerGUICommunication.sendMessage(message);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-				
+
 				ElevatorStatusMessage elevatorStatusMessage = (ElevatorStatusMessage) message;
-				
+
+				// Do not proceed if the status message is solely for the GUI
+				if (elevatorStatusMessage.isGUIOnly()) {
+					return;
+				}
+
 				elevatorId = elevatorStatusMessage.getElevatorId();
 
 				elevatorJobManagements[elevatorId].setCurrentFloorNumber(elevatorStatusMessage.getFloorNumber());
@@ -73,21 +75,24 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 				logger.fine("(SCHEDULER) Received Elevator status: [ID: " + elevatorId + ", F: "
 						+ elevatorStatusMessage.getFloorNumber() + ", D: " + elevatorStatusMessage.getDirection()
 						+ ", ErrorState: " + elevatorStatusMessage.getErrorState() + " ]");
-				
+
 				notifyElevatorShutdownCompletedJobs(elevatorJobManagements[elevatorId]);
-				
+
 				// If the scheduler should not give any commands, do not proceed any further
 				if (!elevatorStatusMessage.shouldIssueNextCommand()) {
 					return;
 				}
 
-				// If the elevator is ready for job and has jobs, issue the next command
+				elevatorJobManagements[elevatorId].setRunningCommand(false);
+
+				// If the elevator is ready for job and is currently running jobs, issue the
+				// next command
 				if (elevatorJobManagements[elevatorId].isReadyForJob()
-						&& elevatorJobManagements[elevatorId].hasJobs()) {
+						&& elevatorJobManagements[elevatorId].isRunningJob()) {
 					executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+
 				}
-				
-				
+
 			}
 			break;
 
@@ -99,10 +104,9 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 
 				// If the elevators has no jobs (direction is IDLE), we will update the elevator
 				// direction
-				if (!elevatorJobManagements[elevatorId].hasJobs()) {
+				if (!elevatorJobManagements[elevatorId].isRunningJob()) {
 					elevatorJobManagements[elevatorId].setElevatorDirection(dropPassengerRequest.getDirection());
 				}
-
 				elevatorJobManagements[elevatorId].addJob((ElevatorJobMessage) message);
 
 				logger.info("(SCHEDULER) Assigning DROP_OFF_PASSENGER @ floor = "
@@ -114,6 +118,7 @@ public class SchedulerElevatorWorkHandler extends SchedulerWorkHandler {
 						+ elevatorJobManagements[elevatorId].getElevatorDirection() + "]");
 
 				executeNextElevatorCommand(elevatorJobManagements[elevatorId]);
+
 			}
 
 			break;
