@@ -10,7 +10,6 @@ import common.Direction;
 import common.LoggerWrapper;
 import common.messages.ElevatorJobMessage;
 import common.messages.Message;
-import common.messages.MessageType;
 import common.messages.elevator.ElevatorTransportRequest;
 import common.messages.floor.ElevatorFloorRequest;
 import common.messages.scheduler.ElevatorCommand;
@@ -75,6 +74,10 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 	 */
 	protected void executeNextElevatorCommand(ElevatorJobManagement elevatorJobManagement) {
 
+		// If we are already running a command do we do not need add another command
+		if (elevatorJobManagement.isRunningCommand())
+			return;
+
 		int nearestTargetFloor = -1;
 		switch (elevatorJobManagement.getElevatorDirection()) {
 
@@ -114,6 +117,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			if (elevatorJobManagement.getCurrentFloorNumber() > nearestTargetFloor) {
 				logger.fine("(SCHEDULER) Sending a DOWN command to Elevator " + elevatorId);
 
+				elevatorJobManagement.setRunningCommand(true);
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_DOWN, elevatorId));
 
@@ -121,6 +125,8 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			// Move up if we below the target floor
 			else if (elevatorJobManagement.getCurrentFloorNumber() < nearestTargetFloor) {
 				logger.fine("(SCHEDULER) Sending an UP command to Elevator " + elevatorId);
+
+				elevatorJobManagement.setRunningCommand(true);
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.MOVE_UP, elevatorId));
 
@@ -136,7 +142,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 				for (ElevatorJobMessage elevatorJob : jobsAtTargetFloor) {
 
 					switch (elevatorJob.getMessageType()) {
-					
+
 					case ELEVATOR_PICK_UP_PASSENGER_REQUEST:
 						ElevatorFloorRequest elevatorFloorRequestJob = (ElevatorFloorRequest) elevatorJob;
 
@@ -148,17 +154,15 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 						expectingElevatorButtonPress = true;
 
 						break;
-						
+
 					case ELEVATOR_DROP_PASSENGER_REQUEST:
 						ElevatorTransportRequest elevatorTransportRequest = (ElevatorTransportRequest) elevatorJob;
 						int floorInputDataId = elevatorTransportRequest.getFloorInputId();
-						
-						schedulerFloorCommunication
-						.sendMessage(new PassengerDropoffCompletedMessage(floorInputDataId));
+						schedulerFloorCommunication.sendMessage(new PassengerDropoffCompletedMessage(floorInputDataId));
 						break;
-					
+
 					}
-						
+
 				}
 
 				String addressedJobMessage = "(SCHEDULER) Elevator " + elevatorId + " has addressed: ";
@@ -172,7 +176,7 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.STOP, elevatorId));
 				schedulerElevatorCommunication
 						.sendMessage(new SchedulerElevatorCommand(ElevatorCommand.OPEN_DOORS, elevatorId));
-				
+
 				// We can delete these jobs as we know we have addressed them
 				elevatorJobManagement.removeJobs(jobsAtTargetFloor);
 
@@ -189,20 +193,30 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 
 						// We start focusing on address the other jobs
 						executeNextElevatorCommand(elevatorJobManagement);
-					} else {
+					} else if (!expectingElevatorButtonPress && !elevatorJobManagement.hasSecondaryJobs()) {
 						// If there are no secondary jobs, we will set the elevator's direction to idle
 						elevatorJobManagement.setElevatorDirection(Direction.IDLE);
 					}
+				} else {
+					// if we have primary jobs, provide the next instructions if the elevator is not
+					// expecting a button press. If we expect a button press, we will provide the
+					// next instructions when the button press arrives
+					if (!expectingElevatorButtonPress) {
+						executeNextElevatorCommand(elevatorJobManagement);
+					}
 				}
+
 			}
 
 		} catch (Exception e) {
 			logger.severe("Error occurred in handleElevatorBehavior: " + e);
 		}
 	}
-	
+
 	/**
-	 * Given the shutdown elevator, notifies the floor subsystem about the completed messages
+	 * Given the shutdown elevator, notifies the floor subsystem about the completed
+	 * messages
+	 *
 	 * @param elevator, the elevator job manager
 	 */
 	protected void notifyElevatorShutdownCompletedJobs(ElevatorJobManagement elevator) {
@@ -215,10 +229,11 @@ public abstract class SchedulerWorkHandler extends MessageWorkQueue {
 			elevator.getElevatorJobs().forEach(elevatorJob -> {
 				try {
 					schedulerFloorCommunication
-					.sendMessage(new PassengerDropoffCompletedMessage(elevatorJob.getFloorInputId()));
+							.sendMessage(new PassengerDropoffCompletedMessage(elevatorJob.getFloorInputId()));
 				} catch (Exception e) {
 					e.printStackTrace();
-				}					});
+				}
+			});
 		}
 
 	}

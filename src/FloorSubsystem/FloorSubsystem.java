@@ -177,17 +177,6 @@ public class FloorSubsystem {
 							break;
 						}
 					}
-
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-					}
-
-					for (SimulationFloorInputData data : floorDataCollection) {
-						System.out.println("data id: " + data.getInputDataId());
-
-					}
-
 				}
 				/* … The code being measured ends … */
 				long endTime = System.nanoTime();

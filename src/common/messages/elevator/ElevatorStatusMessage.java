@@ -42,7 +42,6 @@ public class ElevatorStatusMessage extends Message {
 	private Exception errorState;
 
 	private boolean isDoorOpen;
-	
 
 	/**
 	 * A flag indicating that the elevator is resolving an error
@@ -53,6 +52,11 @@ public class ElevatorStatusMessage extends Message {
 	 * A flag that indicates that the scheduler should issue the next command
 	 */
 	private boolean issueNextCommand = true;
+
+	/**
+	 * A flag that indicates that the message is solely for the GUI
+	 */
+	private boolean isGUIOnlyStatusMessage = false;
 
 	/**
 	 * A ElevatorStatusMessage constructor
@@ -102,6 +106,25 @@ public class ElevatorStatusMessage extends Message {
 	}
 
 	/**
+	 * Return a status message that is only for the GUI
+	 *
+	 * @return
+	 */
+	public ElevatorStatusMessage forGuiOnly() {
+		this.isGUIOnlyStatusMessage = true;
+		return this;
+	}
+
+	/**
+	 * Return a flag that indicates if the message is for the GUI only
+	 *
+	 * @return true if for the GUI only and false otherwise
+	 */
+	public boolean isGUIOnly() {
+		return isGUIOnlyStatusMessage;
+	}
+
+	/**
 	 * @return the elevatorId
 	 */
 	public int getElevatorId() {
@@ -136,7 +159,6 @@ public class ElevatorStatusMessage extends Message {
 		return errorState;
 	}
 
-	
 	/**
 	 * @return the whether or not the door is open
 	 */
@@ -152,13 +174,12 @@ public class ElevatorStatusMessage extends Message {
 	}
 
 	/**
-	 * Return a flag indicating whether the scheduler should issue the next commant
+	 * Return a flag indicating whether the scheduler should issue the next command
 	 *
 	 * @return the issueNextCommand
 	 */
 	public boolean shouldIssueNextCommand() {
 		return issueNextCommand;
 	}
-
 
 }
