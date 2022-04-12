@@ -28,7 +28,7 @@ public class SystemExecutor {
 	public static void main(String[] args) {
 
 		GUI programDisplay = new GUI();
-		programDisplay.recieveUpdates();
+		programDisplay.receiveUpdates();
 		
 		// Set up and start the scheduler
 		Scheduler scheduler = new Scheduler(programDisplay.getNumberOfElevators());
