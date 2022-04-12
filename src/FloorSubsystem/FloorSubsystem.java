@@ -32,7 +32,7 @@ public class FloorSubsystem {
 	/**
 	 * The number of floors
 	 */
-	public static final int NUMBER_OF_FLOORS = 22;
+	public static final int NUMBER_OF_FLOORS = 23;
 
 	/**
 	 * The floor to floor distance in meters
@@ -217,5 +217,14 @@ public class FloorSubsystem {
 				}
 			}
 		}).start();
+	}
+	
+	public static void main(String[] args) {
+		// Only attempt to read file when a file name as been passed
+		String inputFileName = "resources/FloorInputFile.txt";
+		double elevatorFloorToFloorTimeSeconds = 3.5;
+
+		FloorSubsystem subsystem = new FloorSubsystem(inputFileName, elevatorFloorToFloorTimeSeconds);
+		subsystem.runMain();
 	}
 }
