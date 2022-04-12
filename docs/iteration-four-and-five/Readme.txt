@@ -39,29 +39,34 @@ Running any Java application begins with executing the static main(String[] args
 This application is no different.
 
 	INSTRUCTIONS FOR ECLIPSE USERS
-	RUN AS SINGLE PROGRAM
-	1.	Import the project to your workspace. On a MacBook, you navigate as shown: 
-		i.	File -> Import -> General -> Existing Projects into Workspace
-	2.	Follow the import wizard instructions and import the project to your workspace
-	3.	Select the SystemExecutor class and run the program by clicking the play button on the top menu.
 	
-	RUN AS MULTIPLE PROGRAMS
-	1.	Import the project to your workspace. On a MacBook, you navigate as shown: 
-		i.	File -> Import -> General -> Existing Projects into Workspace
-	2.	Follow the import wizard instructions and import the project to your workspace
-	3. 	Select one system that will be run on the current computer (ie: FloorSubsystem)
-	4.	Traverse to the file SubsystemCommunicationConfigurations.java as shown:
-		i.	SYSC3303_ElevatorControlSystem/src/common/remote_procedure/SubsystemCommunicationConfigurations.java
-	5.	Look for "public static String SCHEDULER_IP_ADDRESS, FLOOR_IP_ADDRESS, ELEVATOR_IP_ADDRESS;"
-	6.	At the IP_ADDRESS declarations 4-6 lines beneath this, select the two systems that aren't your chosen system
-	7. 	For both of these systems, replace the line "InetAddress.getLocalHost().getHostAddress();" with the 
-		IP address of the computer that is running that system.
-	8. 	Repeat steps 1-7 on the other 2 computers so that all 3 subsystems are assigned to a specific computer
-	9. 	On all computers navigate to their respective subsystem Main files as shown below:
-		i. Floor Subsystem Computer = SYSC3303_ElevatorControlSystem/src/FloorSubsystem/FloorSubsystem.java
-		ii. Scheduler Subsystem Computer = SYSC3303_ElevatorControlSystem/src/Scheduler/Scheduler.java
-		iii. Elevator Subsystem Computer = SYSC3303_ElevatorControlSystem/src/ElevatorSubsystem/ElevatorController.java
-	10. 	Run the program by clicking the play button on the top menu on each computer.
+	RUN AS SINGLE PROGRAM
+		1.	Import the project to your workspace. On a MacBook, you navigate as 
+		shown: 
+				i.	File -> Import -> General -> Existing Projects into Workspace
+		2.	Follow the import wizard instructions and import the project to your 
+		workspace
+		3.	Select the SystemExecutor class and run the program by clicking the play 
+		button on the top menu. (Equivalent to compiling and executing the java file)	
+				4. 	Input the desired number of elevators into the GUI when prompted.
+			
+	DISTRIBUTED PROGRAM MODE
+		1.	Import the project to your workspace. On a MacBook, you navigate as shown: 
+				i. File -> Import -> General -> Existing Projects into Workspace
+		2.	Follow the import wizard instructions and import the project to your workspace
+		3. 	Select one system that will be run on the current computer (ie: FloorSubsystem, ElevatorController, Scheduler, GUI)
+		4.	Traverse to the file SubsystemCommunicationConfigurations.java as shown:
+				i. SYSC3303_ElevatorControlSystem/src/common/remote_procedure/SubsystemCommunicationConfigurations.java
+		5.	Look for "public static String SCHEDULER_IP_ADDRESS, FLOOR_IP_ADDRESS, ELEVATOR_IP_ADDRESS, GUI_IP_ADDRESS;"
+		6.	At the IP_ADDRESS declarations 4-6 lines beneath this, select the three systems that aren't your chosen system.
+		7. 	For both of these systems, replace the line "InetAddress.getLocalHost().getHostAddress();" with the IP address of the computer that is running that system.
+		8. 	Repeat steps 1-7 on the other 3 computers so that all 4 subsystems are assigned to a specific computer. Each individual system should now know the other system’s IPs and be properly connected.
+		9. 	On all computers navigate to their respective subsystem Main files as shown below:
+			i. Floor Subsystem Computer = SYSC3303_ElevatorControlSystem/src/FloorSubsystem/FloorSubsystem.java
+			ii. Scheduler Subsystem Computer = SYSC3303_ElevatorControlSystem/src/Scheduler/Scheduler.java
+			iii. Elevator Subsystem Computer = SYSC3303_ElevatorControlSystem/src/ElevatorSubsystem/ElevatorController.java
+			iv. GUI Subsystem Computer = SYSC3303_ElevatorControlSystem/common.gui/GUI.java
+		10. 	Run the program by clicking the play button on the top menu on each computer.
 
 
 PROJECT INPUT FORMATING
