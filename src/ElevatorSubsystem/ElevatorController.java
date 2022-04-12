@@ -151,5 +151,9 @@ public class ElevatorController {
 			}
 		}
 	}
-
+	
+	public static void main(String[] args) {
+		int DOOR_SPEED_MILLISECONDS = 3000;
+		ElevatorController controller = new ElevatorController(DOOR_SPEED_MILLISECONDS, NUMBER_OF_ELEVATORS);
+	}
 }
